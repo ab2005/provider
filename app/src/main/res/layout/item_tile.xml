@@ -21,11 +21,36 @@
     android:orientation="vertical"
     android:padding="@dimen/tile_padding">
 
-    <ImageView
+    <com.facebook.drawee.view.SimpleDraweeView
+        xmlns:fresco="http://schemas.facebook.com/apk/res/android"
+        android:id="@+id/drawee"
         android:layout_width="match_parent"
         android:layout_height="@dimen/tile_height"
-        android:scaleType="centerCrop"
-        android:src="@drawable/paris" />
+        fresco:fadeDuration="300"
+        fresco:actualImageScaleType="focusCrop"
+        fresco:progressBarImageScaleType="centerInside"
+        fresco:progressBarAutoRotateInterval="1000"
+        fresco:backgroundImage="#ff0000ff"
+        />
+
+    <!--
+            fresco:failureImage="@drawable/error"
+        fresco:failureImage="@drawable/error"
+        fresco:failureImageScaleType="centerInside"
+        fresco:retryImage="@drawable/retrying"
+        fresco:retryImageScaleType="centerCrop"
+        fresco:progressBarImage="@drawable/progress_bar"
+        fresco:placeholderImage="@color/wait_color"
+        fresco:placeholderImageScaleType="fitCenter"
+
+
+    -->
+
+    <!--<ImageView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="@dimen/tile_height"-->
+        <!--android:scaleType="centerCrop"-->
+        <!--android:src="@drawable/paris" />-->
 
     <ImageView
         android:layout_width="match_parent"

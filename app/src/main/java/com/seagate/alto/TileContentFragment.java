@@ -6,15 +6,20 @@ package com.seagate.alto;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.android.alto.R;
+import com.facebook.drawee.view.SimpleDraweeView;
+
+import java.util.Random;
 
 /**
  * Provides UI for the view with Tile.
@@ -43,8 +48,16 @@ public class TileContentFragment extends Fragment {
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
+        SimpleDraweeView drawee;
+
+
         public ViewHolder(LayoutInflater inflater, ViewGroup parent) {
+
             super(inflater.inflate(R.layout.item_tile, parent, false));
+
+
+            drawee = (SimpleDraweeView) itemView.findViewById(R.id.drawee);
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -61,7 +74,11 @@ public class TileContentFragment extends Fragment {
      */
     public static class ContentAdapter extends RecyclerView.Adapter<ViewHolder> {
         // Set numbers of Tiles in RecyclerView.
-        private static final int LENGTH = 18;
+        private static final int LENGTH = 100;
+
+        private static Random random = new Random();
+
+        private static SparseArray<Uri> uris = new SparseArray<>();
 
         public ContentAdapter() {
             // no-op
@@ -75,6 +92,23 @@ public class TileContentFragment extends Fragment {
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             // no-op
+
+            Uri uri = uris.get(position);
+
+            if (uri == null) {
+
+                int height = 300 + random.nextInt(10);
+                int width = 300 + random.nextInt(10);
+
+                String fun = "http://fillmurray.com/" + width + "/" + height;
+
+                uri = Uri.parse(fun);
+
+                uris.put(position, uri);
+
+            }
+
+            holder.drawee.setImageURI(uri);
         }
 
         @Override

@@ -30,4 +30,7 @@ dependencies {
     compile "com.nostra13.universalimageloader:universal-image-loader:${UIL_VERSION}"
     compile "com.squareup.picasso:picasso:${PICASSO_VERSION}"
     compile "com.googlecode.android-query:android-query:${AQUERY_VERSION}"
+
+    compile 'com.facebook.fresco:fresco:0.7.0+'
 }
+
