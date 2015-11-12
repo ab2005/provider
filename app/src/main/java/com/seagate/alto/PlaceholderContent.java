@@ -13,6 +13,8 @@ public class PlaceholderContent {
 
     private static SparseArray<Uri> uris = new SparseArray<>();
 
+    public static int getCount() { return 100; }
+
     public static Uri getUri(int position) {
 
         Uri uri = uris.get(position);

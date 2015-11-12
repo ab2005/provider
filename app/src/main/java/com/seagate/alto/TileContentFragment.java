@@ -53,6 +53,8 @@ public class TileContentFragment extends Fragment {
 
             drawee = (SimpleDraweeView) itemView.findViewById(R.id.drawee);
 
+
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -68,8 +70,6 @@ public class TileContentFragment extends Fragment {
      * Adapter to display recycler view.
      */
     public static class ContentAdapter extends RecyclerView.Adapter<ViewHolder> {
-        // Set numbers of Tiles in RecyclerView.
-        private static final int LENGTH = 100;
 
         public ContentAdapter() {
             // no-op
@@ -94,7 +94,7 @@ public class TileContentFragment extends Fragment {
 
         @Override
         public int getItemCount() {
-            return LENGTH;
+            return PlaceholderContent.getCount();
         }
     }
 }

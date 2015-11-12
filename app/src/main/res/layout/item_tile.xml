@@ -33,25 +33,6 @@
         fresco:backgroundImage="#ff0000ff"
         />
 
-    <!--
-            fresco:failureImage="@drawable/error"
-        fresco:failureImage="@drawable/error"
-        fresco:failureImageScaleType="centerInside"
-        fresco:retryImage="@drawable/retrying"
-        fresco:retryImageScaleType="centerCrop"
-        fresco:progressBarImage="@drawable/progress_bar"
-        fresco:placeholderImage="@color/wait_color"
-        fresco:placeholderImageScaleType="fitCenter"
-
-
-    -->
-
-    <!--<ImageView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="@dimen/tile_height"-->
-        <!--android:scaleType="centerCrop"-->
-        <!--android:src="@drawable/paris" />-->
-
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="@dimen/tile_height"

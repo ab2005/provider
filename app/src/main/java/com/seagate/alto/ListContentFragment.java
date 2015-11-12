@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.android.alto.R;
+import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 /**
@@ -44,6 +45,10 @@ public class ListContentFragment extends Fragment {
 
             drawee = (SimpleDraweeView) itemView.findViewById(R.id.list_avatar);
 
+            RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
+            roundingParams.setRoundAsCircle(true);
+            drawee.getHierarchy().setRoundingParams(roundingParams);
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -59,8 +64,6 @@ public class ListContentFragment extends Fragment {
      * Adapter to display recycler view.
      */
     public static class ContentAdapter extends RecyclerView.Adapter<ViewHolder> {
-        // Set numbers of List in RecyclerView.
-        private static final int LENGTH = 18;
 
         public ContentAdapter() {
         }
@@ -78,7 +81,7 @@ public class ListContentFragment extends Fragment {
 
         @Override
         public int getItemCount() {
-            return LENGTH;
+            return PlaceholderContent.getCount();
         }
     }
 

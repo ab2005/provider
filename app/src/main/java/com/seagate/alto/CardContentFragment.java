@@ -91,8 +91,6 @@ public class CardContentFragment extends Fragment {
      * Adapter to display recycler view.
      */
     public static class ContentAdapter extends RecyclerView.Adapter<ViewHolder> {
-        // Set numbers of Card in RecyclerView.
-        private static final int LENGTH = 18;
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -107,7 +105,7 @@ public class CardContentFragment extends Fragment {
 
         @Override
         public int getItemCount() {
-            return LENGTH;
+            return PlaceholderContent.getCount();
         }
     }
 }

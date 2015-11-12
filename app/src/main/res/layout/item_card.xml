@@ -41,14 +41,7 @@
             fresco:progressBarAutoRotateInterval="1000"
             fresco:backgroundImage="#ff0000ff"
             />
-
-        <!--<ImageView-->
-            <!--android:id="@+id/card_image"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="@dimen/card_image_height"-->
-            <!--android:scaleType="centerCrop"-->
-            <!--android:src="@drawable/paris" />-->
-
+        
         <TextView
             android:id="@+id/card_title"
             android:layout_width="match_parent"
