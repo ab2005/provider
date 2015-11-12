@@ -11,6 +11,8 @@ public class PlaceholderContent {
 
     private static Random random = new Random();
 
+    public static String INDEX = "index";
+
     private static SparseArray<Uri> uris = new SparseArray<>();
 
     public static int getCount() { return 100; }

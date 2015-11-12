@@ -41,6 +41,7 @@ public class CardContentFragment extends Fragment {
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         SimpleDraweeView drawee;
+        int position;
 
         public ViewHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.item_card, parent, false));
@@ -52,6 +53,7 @@ public class CardContentFragment extends Fragment {
                 public void onClick(View v) {
                     Context context = v.getContext();
                     Intent intent = new Intent(context, DetailActivity.class);
+                    intent.putExtra(PlaceholderContent.INDEX, position);
                     context.startActivity(intent);
                 }
             });
@@ -101,6 +103,7 @@ public class CardContentFragment extends Fragment {
         public void onBindViewHolder(ViewHolder holder, int position) {
             Uri uri = PlaceholderContent.getUri(position);
             holder.drawee.setImageURI(uri);
+            holder.position = position;
         }
 
         @Override

@@ -19,12 +19,7 @@
     <string name="item_title">Bill Murray</string>
     <string name="item_desc">William James "Bill" Murray (born September 21, 1950) is an American actor and comedian. He first gained exposure on Saturday Night Live.
     </string>
-    <string name="detail_desc">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-        eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-        nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-        irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-        pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
-        deserunt mollit anim id est laborum.
+    <string name="detail_desc">Bill, the fifth of nine children, was born in Wilmette, Illinois, to Lucille (Collins), a mailroom clerk, and Edward Joseph Murray II, who sold lumber. He is of Irish descent. Among his siblings are actors Brian Doyle-Murray, Joel Murray, and John Murray. He and most of his siblings worked as caddies, which paid his tuition to Loyola Academy, a Jesuit school. He played sports and did some acting while in that school, but in his words, mostly "screwed off." He enrolled at Regis College in Denver to study pre-med but dropped out after being arrested for marijuana possession. He then joined the National Lampoon Radio Hour with fellow members Dan Aykroyd, Gilda Radner, and John Belushi. However, while those three became the original members of Saturday Night Live (1975), he joined Saturday Night Live with Howard Cosell (1975), which premiered that same year. After that show failed, he later got the opportunity to join Saturday Night Live (1975).
     </string>
     <string name="detail_location">"8 Rue Scribe, 75009 Paris, France"</string>
 </resources>

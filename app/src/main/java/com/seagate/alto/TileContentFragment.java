@@ -46,6 +46,7 @@ public class TileContentFragment extends Fragment {
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         SimpleDraweeView drawee;
+        int position;
 
         public ViewHolder(LayoutInflater inflater, ViewGroup parent) {
 
@@ -60,6 +61,7 @@ public class TileContentFragment extends Fragment {
                 public void onClick(View v) {
                     Context context = v.getContext();
                     Intent intent = new Intent(context, DetailActivity.class);
+                    intent.putExtra(PlaceholderContent.INDEX, position);
                     context.startActivity(intent);
                 }
             });
@@ -83,13 +85,9 @@ public class TileContentFragment extends Fragment {
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
 
-//            RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
-//            roundingParams.setBorder(0x0000ff, 1.0f);
-//            roundingParams.setRoundAsCircle(true);
-//            holder.drawee.getHierarchy().setRoundingParams(roundingParams);
-
             Uri uri = PlaceholderContent.getUri(position);
             holder.drawee.setImageURI(uri);
+            holder.position = position;
         }
 
         @Override
