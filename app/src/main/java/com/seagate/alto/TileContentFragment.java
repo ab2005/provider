@@ -6,6 +6,7 @@ package com.seagate.alto;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.android.alto.R;
+import com.facebook.drawee.view.SimpleDraweeView;
 
 /**
  * Provides UI for the view with Tile.
@@ -43,8 +45,16 @@ public class TileContentFragment extends Fragment {
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
+        SimpleDraweeView drawee;
+
         public ViewHolder(LayoutInflater inflater, ViewGroup parent) {
+
             super(inflater.inflate(R.layout.item_tile, parent, false));
+
+            drawee = (SimpleDraweeView) itemView.findViewById(R.id.drawee);
+
+
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -60,8 +70,6 @@ public class TileContentFragment extends Fragment {
      * Adapter to display recycler view.
      */
     public static class ContentAdapter extends RecyclerView.Adapter<ViewHolder> {
-        // Set numbers of Tiles in RecyclerView.
-        private static final int LENGTH = 18;
 
         public ContentAdapter() {
             // no-op
@@ -74,12 +82,19 @@ public class TileContentFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            // no-op
+
+//            RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
+//            roundingParams.setBorder(0x0000ff, 1.0f);
+//            roundingParams.setRoundAsCircle(true);
+//            holder.drawee.getHierarchy().setRoundingParams(roundingParams);
+
+            Uri uri = PlaceholderContent.getUri(position);
+            holder.drawee.setImageURI(uri);
         }
 
         @Override
         public int getItemCount() {
-            return LENGTH;
+            return PlaceholderContent.getCount();
         }
     }
 }

@@ -21,12 +21,16 @@
     android:orientation="vertical"
     android:padding="@dimen/md_keylines">
 
-    <ImageView
+    <com.facebook.drawee.view.SimpleDraweeView
+        xmlns:fresco="http://schemas.facebook.com/apk/res/android"
         android:id="@+id/list_avatar"
         android:layout_width="@dimen/avator_size"
         android:layout_height="@dimen/avator_size"
-        android:scaleType="centerCrop"
-        android:src="@drawable/paris_avatar" />
+        fresco:fadeDuration="300"
+        fresco:roundAsCircle="true"
+        fresco:actualImageScaleType="focusCrop"
+        fresco:roundWithOverlayColor="#ffffffff"
+        />
 
     <TextView
         android:id="@+id/list_title"

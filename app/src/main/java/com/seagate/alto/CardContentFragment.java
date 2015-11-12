@@ -6,6 +6,7 @@ package com.seagate.alto;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.example.android.alto.R;
+import com.facebook.drawee.view.SimpleDraweeView;
 
 /**
  * Provides UI for the view with Cards.
@@ -38,8 +40,13 @@ public class CardContentFragment extends Fragment {
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
+        SimpleDraweeView drawee;
+
         public ViewHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.item_card, parent, false));
+
+            drawee = (SimpleDraweeView) itemView.findViewById(R.id.card_image);
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -84,8 +91,6 @@ public class CardContentFragment extends Fragment {
      * Adapter to display recycler view.
      */
     public static class ContentAdapter extends RecyclerView.Adapter<ViewHolder> {
-        // Set numbers of Card in RecyclerView.
-        private static final int LENGTH = 18;
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -94,12 +99,13 @@ public class CardContentFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            // no-op
+            Uri uri = PlaceholderContent.getUri(position);
+            holder.drawee.setImageURI(uri);
         }
 
         @Override
         public int getItemCount() {
-            return LENGTH;
+            return PlaceholderContent.getCount();
         }
     }
 }
