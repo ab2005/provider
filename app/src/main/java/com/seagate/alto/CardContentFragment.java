@@ -109,6 +109,7 @@ public class CardContentFragment extends Fragment {
      */
     public static class ContentAdapter extends RecyclerView.Adapter<ViewHolder> {
 
+        // FIXME - Not happy with having to store this and pass it around.  Need to look closer at need here.
         private FragmentActivity mActivity;
 
         @Override
