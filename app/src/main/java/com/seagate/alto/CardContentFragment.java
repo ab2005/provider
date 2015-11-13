@@ -62,14 +62,11 @@ public class CardContentFragment extends Fragment {
                     intent.putExtra(PlaceholderContent.INDEX, position);
 
                     // Set up the transition
-//                    View name = v.findViewById(R.id.name_holder);
                     Pair<View, String> imagePair = Pair.create((View)drawee, "tThumbnail");
-//                    Pair<View, String> namePair = Pair.create(name, "tName");
                     ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity,
                             imagePair);
 
                     ActivityCompat.startActivity(activity, intent, options.toBundle());
-//                    context.startActivity(intent);
                 }
             });
 
