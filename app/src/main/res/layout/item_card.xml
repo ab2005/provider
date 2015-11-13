@@ -34,6 +34,7 @@
             android:id="@+id/card_image"
             android:layout_width="match_parent"
             android:layout_height="@dimen/card_image_height"
+            android:transitionName="tThumbnail"
             fresco:fadeDuration="300"
             fresco:roundAsCircle="true"
             fresco:actualImageScaleType="focusCrop"
