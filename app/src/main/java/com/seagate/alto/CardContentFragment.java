@@ -4,12 +4,17 @@
 
 package com.seagate.alto;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -32,6 +37,7 @@ public class CardContentFragment extends Fragment {
         RecyclerView recyclerView = (RecyclerView) inflater.inflate(
                 R.layout.recycler_view, container, false);
         ContentAdapter adapter = new ContentAdapter();
+        adapter.setActivity(getActivity());
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -43,7 +49,7 @@ public class CardContentFragment extends Fragment {
         SimpleDraweeView drawee;
         int position;
 
-        public ViewHolder(LayoutInflater inflater, ViewGroup parent) {
+        public ViewHolder(LayoutInflater inflater, ViewGroup parent, final Activity activity) {
             super(inflater.inflate(R.layout.item_card, parent, false));
 
             drawee = (SimpleDraweeView) itemView.findViewById(R.id.card_image);
@@ -54,7 +60,13 @@ public class CardContentFragment extends Fragment {
                     Context context = v.getContext();
                     Intent intent = new Intent(context, DetailActivity.class);
                     intent.putExtra(PlaceholderContent.INDEX, position);
-                    context.startActivity(intent);
+
+                    // Set up the transition
+                    Pair<View, String> imagePair = Pair.create((View)drawee, "tThumbnail");
+                    ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity,
+                            imagePair);
+
+                    ActivityCompat.startActivity(activity, intent, options.toBundle());
                 }
             });
 
@@ -94,9 +106,12 @@ public class CardContentFragment extends Fragment {
      */
     public static class ContentAdapter extends RecyclerView.Adapter<ViewHolder> {
 
+        // FIXME - Not happy with having to store this and pass it around.  Need to look closer at need here.
+        private FragmentActivity mActivity;
+
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new ViewHolder(LayoutInflater.from(parent.getContext()), parent);
+            return new ViewHolder(LayoutInflater.from(parent.getContext()), parent, mActivity);
         }
 
         @Override
@@ -109,6 +124,10 @@ public class CardContentFragment extends Fragment {
         @Override
         public int getItemCount() {
             return PlaceholderContent.getCount();
+        }
+
+        public void setActivity(FragmentActivity activity) {
+            this.mActivity = activity;
         }
     }
 }

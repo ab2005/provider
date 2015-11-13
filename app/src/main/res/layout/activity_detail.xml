@@ -40,12 +40,13 @@
             app:expandedTitleMarginStart="@dimen/md_keylines"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-            <com.facebook.drawee.view.SimpleDraweeView
+            <com.seagate.alto.SeagateDraweeView
                 xmlns:fresco="http://schemas.facebook.com/apk/res/android"
                 android:id="@+id/image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
+                android:transitionName="tThumbnail"
                 fresco:fadeDuration="300"
                 fresco:actualImageScaleType="focusCrop"
                 fresco:roundWithOverlayColor="#ffffffff"
