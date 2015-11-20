@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="list_selector_color">#99016a96</color>
+    <color name="black">#000000</color>
+    <color name="black_50_percent">#80000000</color>
+    <color name="black_25_percent">#40000000</color>
+
+    <color name="wait_color">#000000</color>
+    <color name="blue">#335599</color>
+    <color name="red">#992222</color>
+    <color name="corner_color">#ff3333</color>
+    <color name="border_color">#33ff33</color>
+    <color name="transparent">#00000000</color>
+    <color name="seagate_green">#6fbe50</color>
+    <color name="seagate_grey">#868589</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="dark_grey">#424242</color>
+    <color name="medium_grey">#9E9E9E</color>
+    <color name="button_grey">#757575</color>
+
+</resources>
