@@ -26,6 +26,8 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private FragmentStack mFragmentStack = new FragmentStack();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // to enable cross-frag transitions
@@ -57,17 +59,14 @@ public class MainActivity extends AppCompatActivity
 
         startFresco();
 
+//        FragmentStack fs = restoreFragmentStack();
+
+//        if (fs != null) {
+//            fs.log();
+//        }
+
         setFragment(new TileContentFragment());
-
-    }
-
-    private void setFragment(Fragment frag) {
-//        Fragment nextFragment = new TileContentFragment();
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, frag)
-                .commit();
+        navigationView.setCheckedItem(R.id.tile);
     }
 
     private void startFresco() {
@@ -95,6 +94,7 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
+            mFragmentStack.pop();
         }
     }
 
@@ -140,6 +140,18 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    private void setFragment(Fragment frag) {
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.container, frag)
+                .commit();
+
+        FragmentStack.FragmentEntry fe = new FragmentStack.FragmentEntry(frag.getClass(), null);
+        mFragmentStack.set(fe);
+
+    }
+
     // the eltrans parameter is a list of hints for cool transitions
     public void pushFragment(Fragment frag, ArrayList<Pair<View, String>> eltrans) {
 
@@ -164,6 +176,9 @@ public class MainActivity extends AppCompatActivity
 //        }
 
         transaction.commit();
+
+        FragmentStack.FragmentEntry fe = new FragmentStack.FragmentEntry(frag.getClass(), null);
+        mFragmentStack.push(fe);
 
     }
 }

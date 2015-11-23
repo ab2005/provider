@@ -67,27 +67,27 @@ public class TileContentFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
 
-                    if (parent.getContext() instanceof MainActivity) {
+                if (parent.getContext() instanceof MainActivity) {
 
-                        MainActivity main = (MainActivity) parent.getContext();
+                    MainActivity main = (MainActivity) parent.getContext();
 
-                        Fragment details = new DetailFragment();
+                    Fragment details = new DetailFragment();
 
-                        Bundle args = new Bundle();
-                        args.putInt(PlaceholderContent.INDEX, position);
-                        details.setArguments(args);
+                    Bundle args = new Bundle();
+                    args.putInt(PlaceholderContent.INDEX, position);
+                    details.setArguments(args);
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                            details.setSharedElementEnterTransition(TransitionInflater.from(parent.getContext()).inflateTransition(R.transition.trans_move));
-                            details.setSharedElementReturnTransition(TransitionInflater.from(parent.getContext()).inflateTransition(R.transition.trans_move));
-                        }
-
-                        ArrayList<Pair<View, String>> pairs = new ArrayList<Pair<View, String>>();
-                        Pair<View, String> imagePair = Pair.create((View) drawee, "tThumbnail");
-                        pairs.add(imagePair);
-
-                        main.pushFragment(details, pairs);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                        details.setSharedElementEnterTransition(TransitionInflater.from(parent.getContext()).inflateTransition(R.transition.trans_move));
+                        details.setSharedElementReturnTransition(TransitionInflater.from(parent.getContext()).inflateTransition(R.transition.trans_move));
                     }
+
+                    ArrayList<Pair<View, String>> pairs = new ArrayList<Pair<View, String>>();
+                    Pair<View, String> imagePair = Pair.create((View) drawee, "tThumbnail");
+                    pairs.add(imagePair);
+
+                    main.pushFragment(details, pairs);
+                }
                 }
             });
         }
