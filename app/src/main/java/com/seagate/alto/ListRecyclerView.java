@@ -5,12 +5,12 @@
 package com.seagate.alto;
 
 import android.app.Activity;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,53 +22,87 @@ import com.facebook.drawee.view.SimpleDraweeView;
 /**
  * Provides UI for the view with List.
  */
-public class ListContentFragment extends Fragment {
+public class ListRecyclerView extends RecyclerView {
 
-    private static String TAG = LogUtils.makeTag(ListContentFragment.class);
+    private static String TAG = LogUtils.makeTag(ListRecyclerView.class);
 
-    public ListContentFragment() {
-//        BusMaster.getBus().register(this);
-        Log.d(TAG, "constructor");
-    }
+//    public ListContentView() {
+////        super.Recycler()
+////        BusMaster.getBus().register(this);
+//        Log.d(TAG, "constructor");
+//    }
 
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-//        BusMaster.getBus().unregister(this);
-        Log.d(TAG, "finalize");
-    }
+//    @Override
+//    protected void finalize() throws Throwable {
+//        super.finalize();
+////        BusMaster.getBus().unregister(this);
+//        Log.d(TAG, "finalize");
+//    }
 
     ViewHolder.ContentAdapter mAdapter;
 
     private int mSelection = 0;
 
+    public ListRecyclerView(Context context) {
+        this(context, null, 0);
+    }
+
+    public ListRecyclerView(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public ListRecyclerView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        Log.d(TAG, "constructor");
+    }
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        Log.d(TAG, "onFinishInflate");
 
-//        BusMaster.getBus().register(this);
-
-        RecyclerView recyclerView = (RecyclerView) inflater.inflate(R.layout.recycler_view, container, false);
         mAdapter = new ViewHolder.ContentAdapter();
-        mAdapter.setActivity(getActivity());
-        recyclerView.setAdapter(mAdapter);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        return recyclerView;
+        mAdapter.setActivity((Activity) getContext());
+        setAdapter(mAdapter);
+        setHasFixedSize(true);
+        setLayoutManager(new LinearLayoutManager(getContext()));
+
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        Log.d(TAG, "onResume");
-        BusMaster.getBus().register(this);
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        Log.d(TAG, "onDetachedFromWindow");
+
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        Log.d(TAG, "onPause");
-        BusMaster.getBus().unregister(this);
-    }
+    //    @Override
+//    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+//
+////        BusMaster.getBus().register(this);
+//
+//        RecyclerView recyclerView = (RecyclerView) inflater.inflate(R.layout.recycler_view, container, false);
+//        mAdapter = new ViewHolder.ContentAdapter();
+//        mAdapter.setActivity(getActivity());
+//        recyclerView.setAdapter(mAdapter);
+//        recyclerView.setHasFixedSize(true);
+//        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+//        return recyclerView;
+//    }
+
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        Log.d(TAG, "onResume");
+//        BusMaster.getBus().register(this);
+//    }
+//
+//    @Override
+//    public void onPause() {
+//        super.onPause();
+//        Log.d(TAG, "onPause");
+//        BusMaster.getBus().unregister(this);
+//    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 

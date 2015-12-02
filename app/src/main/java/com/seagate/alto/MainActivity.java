@@ -13,6 +13,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,7 +27,11 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private static String TAG = LogUtils.makeTag(MainActivity.class);
+
     private FragmentStack mFragmentStack = new FragmentStack();
+
+    private boolean mTwoPane = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +70,14 @@ public class MainActivity extends AppCompatActivity
 //            fs.log();
 //        }
 
-        setFragment(new TileContentFragment());
+        setFragment(new SplitFragment());
+
+//        if (mTwoPane) {
+//            setFragment(new SplitFragment());
+//        } else {
+//            setFragment(new ListContentFragment());
+//        }
+
         navigationView.setCheckedItem(R.id.tile);
     }
 
@@ -93,6 +105,18 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
+
+            // log the back stack
+
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            int fragCount = fragmentManager.getBackStackEntryCount();
+            Log.d(TAG, "backstack: count = " + fragCount);
+
+            for (int i = 0; i < fragCount; i++) {
+                FragmentManager.BackStackEntry fbe = fragmentManager.getBackStackEntryAt(i);
+                Log.d(TAG, "backstack: entry = " + i + "value = " + fbe.getName());
+            }
+
             super.onBackPressed();
             mFragmentStack.pop();
         }
@@ -133,7 +157,6 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.tile) {
             setFragment(new TileContentFragment());
         }
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -180,5 +203,9 @@ public class MainActivity extends AppCompatActivity
         FragmentStack.FragmentEntry fe = new FragmentStack.FragmentEntry(frag.getClass(), null);
         mFragmentStack.push(fe);
 
+    }
+
+    public boolean getTwoPane() {
+        return mTwoPane;
     }
 }
