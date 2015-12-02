@@ -18,11 +18,22 @@ import java.util.ArrayList;
 
 public class SplitFragment extends Fragment {
 
-    private static String TAG = LogUtils.makeTag(SplitFragment.class);
+    public static final String EXTRA_LAYOUT = "extra_layout";
+
+    private String TAG = makeTag();
+
+    protected String makeTag() {
+        return LogUtils.makeTag(SplitFragment.class);
+    }
 
     DetailView mDetail;
-//    DetailView mDetail2;
-//    View mImage;
+
+
+//    public static SplitFragment getDetailFragment() {
+//
+//
+//    }
+
 
     public SplitFragment() {
         Log.d(TAG, "constructor");
@@ -36,6 +47,10 @@ public class SplitFragment extends Fragment {
 //        BusMaster.getBus().unregister(this);
     }
 
+    protected int getLayout() {
+        return R.layout.split;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -46,8 +61,17 @@ public class SplitFragment extends Fragment {
 //            setSharedElementEnterTransition(TransitionInflater.from(getActivity()).inflateTransition(R.transition.trans_move));
 //            setSharedElementReturnTransition(TransitionInflater.from(getActivity()).inflateTransition(R.transition.trans_move));
 //        }
+//
+//        int layout = getLayout();
+//        Bundle args = getArguments();
+//        if (args != null) {
+//            layout = args.getInt(EXTRA_LAYOUT);
+//        }
 
-        View v = inflater.inflate(R.layout.split, container, false);
+
+
+        View v = inflater.inflate(getLayout(), container, false);
+//        View v = inflater.inflate(R.layout.split, container, false);
 
         mDetail = (DetailView) v.findViewById(R.id.detail);
 //        mDetail2 = (DetailView) v.findViewById(R.id.detail_view);
@@ -68,6 +92,18 @@ public class SplitFragment extends Fragment {
 //        }
 
         return v;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d(TAG, "onSaveInstanceState");
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        Log.d(TAG, "onViewStateRestored");
     }
 
     @Override
@@ -94,10 +130,11 @@ public class SplitFragment extends Fragment {
 
                 MainActivity main = (MainActivity) getActivity();
 
-                Fragment details = new DetailFragment();
+                Fragment details = new DetailListFragment();
 
                 Bundle args = new Bundle();
                 args.putInt(PlaceholderContent.INDEX, event.getPosition());
+//                args.putInt(EXTRA_LAYOUT, R.layout.detail_split);
                 details.setArguments(args);
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {

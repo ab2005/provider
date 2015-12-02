@@ -70,7 +70,14 @@ public class MainActivity extends AppCompatActivity
 //            fs.log();
 //        }
 
-        setFragment(new SplitFragment());
+        // if the savedInstanceState is null, we are being called for the first time
+        // otherwise the fragment stack will be restored to previous state magically
+
+        if (savedInstanceState == null) {
+            setFragment(new SplitFragment());
+        }
+
+//        setFragment(new DetailListFragment());
 
 //        if (mTwoPane) {
 //            setFragment(new SplitFragment());
@@ -118,7 +125,7 @@ public class MainActivity extends AppCompatActivity
             }
 
             super.onBackPressed();
-            mFragmentStack.pop();
+//            mFragmentStack.pop();
         }
     }
 
@@ -170,8 +177,8 @@ public class MainActivity extends AppCompatActivity
                 .replace(R.id.container, frag)
                 .commit();
 
-        FragmentStack.FragmentEntry fe = new FragmentStack.FragmentEntry(frag.getClass(), null);
-        mFragmentStack.set(fe);
+//        FragmentStack.FragmentEntry fe = new FragmentStack.FragmentEntry(frag.getClass(), null);
+//        mFragmentStack.set(fe);
 
     }
 
@@ -200,8 +207,8 @@ public class MainActivity extends AppCompatActivity
 
         transaction.commit();
 
-        FragmentStack.FragmentEntry fe = new FragmentStack.FragmentEntry(frag.getClass(), null);
-        mFragmentStack.push(fe);
+//        FragmentStack.FragmentEntry fe = new FragmentStack.FragmentEntry(frag.getClass(), null);
+//        mFragmentStack.push(fe);
 
     }
 
