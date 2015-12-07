@@ -24,14 +24,11 @@ import com.facebook.imagepipeline.core.ImagePipelineConfig;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static String TAG = LogUtils.makeTag(MainActivity.class);
 
     private FragmentStack mFragmentStack = new FragmentStack();
-
-    private boolean mTwoPane = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +62,6 @@ public class MainActivity extends AppCompatActivity
         startFresco();
 
 //        FragmentStack fs = restoreFragmentStack();
-
 //        if (fs != null) {
 //            fs.log();
 //        }
@@ -77,15 +73,15 @@ public class MainActivity extends AppCompatActivity
             setFragment(new SplitFragment());
         }
 
-//        setFragment(new DetailListFragment());
-
-//        if (mTwoPane) {
-//            setFragment(new SplitFragment());
-//        } else {
-//            setFragment(new ListContentFragment());
-//        }
-
         navigationView.setCheckedItem(R.id.tile);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+            @Override
+            public void onBackStackChanged() {
+                logTheBackStack();
+            }
+        });
     }
 
     private void startFresco() {
@@ -115,18 +111,24 @@ public class MainActivity extends AppCompatActivity
 
             // log the back stack
 
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            int fragCount = fragmentManager.getBackStackEntryCount();
-            Log.d(TAG, "backstack: count = " + fragCount);
-
-            for (int i = 0; i < fragCount; i++) {
-                FragmentManager.BackStackEntry fbe = fragmentManager.getBackStackEntryAt(i);
-                Log.d(TAG, "backstack: entry = " + i + "value = " + fbe.getName());
-            }
+            logTheBackStack();
 
             super.onBackPressed();
 //            mFragmentStack.pop();
         }
+    }
+
+    private void logTheBackStack() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        int fragCount = fragmentManager.getBackStackEntryCount();
+        Log.d(TAG, "backstack: -------- " + fragCount);
+        Log.d(TAG, "backstack: count = " + fragCount);
+
+        for (int i = 0; i < fragCount; i++) {
+            FragmentManager.BackStackEntry fbe = fragmentManager.getBackStackEntryAt(i);
+            Log.d(TAG, "backstack: entry = " + i + "value = " + fbe.getName());
+        }
+        Log.d(TAG, "backstack: -------- " + fragCount);
     }
 
     @Override
@@ -177,6 +179,8 @@ public class MainActivity extends AppCompatActivity
                 .replace(R.id.container, frag)
                 .commit();
 
+//        logTheBackStack();
+
 //        FragmentStack.FragmentEntry fe = new FragmentStack.FragmentEntry(frag.getClass(), null);
 //        mFragmentStack.set(fe);
 
@@ -207,12 +211,10 @@ public class MainActivity extends AppCompatActivity
 
         transaction.commit();
 
+//        logTheBackStack();
+
 //        FragmentStack.FragmentEntry fe = new FragmentStack.FragmentEntry(frag.getClass(), null);
 //        mFragmentStack.push(fe);
 
-    }
-
-    public boolean getTwoPane() {
-        return mTwoPane;
     }
 }
