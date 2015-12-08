@@ -22,12 +22,13 @@ import android.view.Window;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
+import com.seagate.alto.events.BusMaster;
 import com.seagate.alto.events.FragmentPushEvent;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements IFragmentStackHolder, NavigationView.OnNavigationItemSelectedListener {
 
     private static String TAG = LogUtils.makeTag(MainActivity.class);
 
@@ -77,8 +78,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // otherwise the fragment stack will be restored to previous state magically
 
         if (savedInstanceState == null) {
-            setFragment(new TileDetailFragment());
-            navigationView.setCheckedItem(R.id.tile);
+
+            setFragment(new CardDetailFragment());
+            navigationView.setCheckedItem(R.id.card);
+//            setFragment(new TileDetailFragment());
+//            navigationView.setCheckedItem(R.id.tile);
 //            setFragment(new ListDetailFragment());
 //            navigationView.setCheckedItem(R.id.list);
         }
@@ -174,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (id == R.id.list) {
             setFragment(new ListDetailFragment());
         } else if (id == R.id.card) {
-            setFragment(new CardContentFragment());
+            setFragment(new CardDetailFragment());
         } else if (id == R.id.tile) {
             setFragment(new TileDetailFragment());
         }

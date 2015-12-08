@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.seagate.alto.events.BusMaster;
 import com.seagate.alto.events.ItemSelectedEvent;
 import com.squareup.otto.Subscribe;
 
@@ -115,9 +116,9 @@ public class ListDetailFragment extends Fragment {
 
     protected void handleItemSelected(ItemSelectedEvent event) {
         if (mDetail == null) {
-            if (getActivity() instanceof MainActivity) {
+            if (getActivity() instanceof IFragmentStackHolder) {
 
-                MainActivity main = (MainActivity) getActivity();
+                IFragmentStackHolder fsh = (IFragmentStackHolder) getActivity();
 
                 Fragment details = new DetailListFragment();
 
@@ -130,7 +131,7 @@ public class ListDetailFragment extends Fragment {
                     details.setSharedElementReturnTransition(TransitionInflater.from(getActivity()).inflateTransition(R.transition.trans_move));
                 }
 
-                main.pushFragment(details, event.getPairs());
+                fsh.pushFragment(details, event.getPairs());
 
             }
         }

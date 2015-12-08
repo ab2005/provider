@@ -1,4 +1,4 @@
-package com.seagate.alto;
+package com.seagate.alto.events;
 
 // use a singleton for now to avoid injection
 

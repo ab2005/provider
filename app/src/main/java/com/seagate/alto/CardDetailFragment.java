@@ -11,16 +11,16 @@ import android.util.Log;
 import com.seagate.alto.events.ItemSelectedEvent;
 import com.squareup.otto.Subscribe;
 
-public class TileDetailFragment extends ListDetailFragment {
+public class CardDetailFragment extends ListDetailFragment {
 
     private String TAG = makeTag();
 
     protected String makeTag() {
-        return LogUtils.makeTag(TileDetailFragment.class);
+        return LogUtils.makeTag(CardDetailFragment.class);
     }
 
     protected int getLayout() {
-        return R.layout.tile_detail;
+        return R.layout.card_detail;
     }
 
     // each class must subscribe to the event
@@ -35,7 +35,7 @@ public class TileDetailFragment extends ListDetailFragment {
 
                 IFragmentStackHolder fsh = (IFragmentStackHolder) getActivity();
 
-                Fragment details = new DetailTileFragment();
+                Fragment details = new DetailCardFragment();
 
                 Bundle args = new Bundle();
                 args.putInt(PlaceholderContent.INDEX, event.getPosition());
