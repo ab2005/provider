@@ -11,13 +11,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.seagate.alto.events.FragmentPushEvent;
 import com.seagate.alto.events.ItemSelectedEvent;
 import com.squareup.otto.Subscribe;
 
 public class ListDetailFragment extends Fragment {
-
-    public static final String EXTRA_LAYOUT = "extra_layout";
 
     private String TAG = makeTag();
 
@@ -25,14 +22,7 @@ public class ListDetailFragment extends Fragment {
         return LogUtils.makeTag(ListDetailFragment.class);
     }
 
-    DetailView mDetail;
-
-
-//    public static SplitFragment getDetailFragment() {
-//
-//
-//    }
-
+    protected DetailView mDetail;
 
     public ListDetailFragment() {
         Log.d(TAG, "constructor");
@@ -85,19 +75,6 @@ public class ListDetailFragment extends Fragment {
             mDetail.showItem(index);
         }
 
-//        Fragment f =
-
-//        int index = -1;
-//        Bundle args = getArguments();
-//        if (args != null) {
-//            index = args.getInt(PlaceholderContent.INDEX);
-//        }
-//
-//        if (index >= 0) {
-//            SimpleDraweeView sdv = (SimpleDraweeView) v.findViewById(R.id.image);
-//            sdv.setImageURI(PlaceholderContent.getUri(index));
-//        }
-
         return v;
     }
 
@@ -132,12 +109,15 @@ public class ListDetailFragment extends Fragment {
         // TODO: React to the event somehow!
         Log.d(TAG, "item selected: " + event.getPosition());
 
+        handleItemSelected(event);
+
+    }
+
+    protected void handleItemSelected(ItemSelectedEvent event) {
         if (mDetail == null) {
             if (getActivity() instanceof MainActivity) {
 
                 MainActivity main = (MainActivity) getActivity();
-
-                FragmentPushEvent fpe = new FragmentPushEvent();
 
                 Fragment details = new DetailListFragment();
 
@@ -145,32 +125,15 @@ public class ListDetailFragment extends Fragment {
                 args.putInt(PlaceholderContent.INDEX, event.getPosition());
                 details.setArguments(args);
 
-                fpe.setFragment(details);
-
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                     details.setSharedElementEnterTransition(TransitionInflater.from(getActivity()).inflateTransition(R.transition.trans_move));
                     details.setSharedElementReturnTransition(TransitionInflater.from(getActivity()).inflateTransition(R.transition.trans_move));
                 }
 
-//                ArrayList<Pair<View, String>> pairs = new ArrayList<Pair<View, String>>();
-//                Pair<View, String> imagePair = Pair.create((View) drawee, "tThumbnail");
-//                pairs.add(imagePair);
-
-//                fpe.setTransitions(event.getPairs());
-
-//                BusMaster.getBus().post(fpe);
-
                 main.pushFragment(details, event.getPairs());
 
             }
         }
-
-        // if both fragments are here, then do nothing
-        // else launch the detail fragment
-
-
-//        showItem(event.getPosition());
-
     }
 
 }

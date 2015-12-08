@@ -77,10 +77,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // otherwise the fragment stack will be restored to previous state magically
 
         if (savedInstanceState == null) {
-            setFragment(new ListDetailFragment());
+            setFragment(new TileDetailFragment());
+            navigationView.setCheckedItem(R.id.tile);
+//            setFragment(new ListDetailFragment());
+//            navigationView.setCheckedItem(R.id.list);
         }
 
-        navigationView.setCheckedItem(R.id.tile);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
@@ -170,11 +172,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         if (id == R.id.list) {
-            setFragment(new ListContentFragment());
+            setFragment(new ListDetailFragment());
         } else if (id == R.id.card) {
             setFragment(new CardContentFragment());
         } else if (id == R.id.tile) {
-            setFragment(new TileContentFragment());
+            setFragment(new TileDetailFragment());
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

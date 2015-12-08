@@ -130,35 +130,8 @@ public class ListRecyclerView extends RecyclerView {
                         Pair<View, String> imagePair = Pair.create((View) drawee, "tThumbnail");
                         pairs.add(imagePair);
 
-
                         BusMaster.getBus().post(new ItemSelectedEvent(position, pairs));
 
-//                                                if (parent.getContext() instanceof MainActivity) {
-//
-//                                                    MainActivity main = (MainActivity) parent.getContext();
-//
-//                                                    if (main.getTwoPane()) {
-//                                                        BusMaster.getBus().post(new ItemSelectedEvent(position));
-//                                                    } else {
-//                                                        Fragment details = new DetailFragment();
-//
-//                                                        Bundle args = new Bundle();
-//                                                        args.putInt(PlaceholderContent.INDEX, position);
-//                                                        details.setArguments(args);
-//
-//                                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-//                                                            details.setSharedElementEnterTransition(TransitionInflater.from(parent.getContext()).inflateTransition(R.transition.trans_move));
-//                                                            details.setSharedElementReturnTransition(TransitionInflater.from(parent.getContext()).inflateTransition(R.transition.trans_move));
-//                                                        }
-//
-//                                                        ArrayList<Pair<View, String>> pairs = new ArrayList<Pair<View, String>>();
-//                                                        Pair<View, String> imagePair = Pair.create((View) drawee, "tThumbnail");
-//                                                        pairs.add(imagePair);
-//
-//                                                        main.pushFragment(details, pairs);
-//                                                    }
-//
-//                                                }
                     }
                 }
             );
