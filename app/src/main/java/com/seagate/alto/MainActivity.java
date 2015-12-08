@@ -1,6 +1,7 @@
 package com.seagate.alto;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -21,6 +22,8 @@ import android.view.Window;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
+import com.seagate.alto.events.FragmentPushEvent;
+import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 
@@ -30,12 +33,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private FragmentStack mFragmentStack = new FragmentStack();
 
+    private Handler mHandler;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // to enable cross-frag transitions
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
 
         super.onCreate(savedInstanceState);
+
+        mHandler = new Handler();
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -70,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // otherwise the fragment stack will be restored to previous state magically
 
         if (savedInstanceState == null) {
-            setFragment(new SplitFragment());
+            setFragment(new ListDetailFragment());
         }
 
         navigationView.setCheckedItem(R.id.tile);
@@ -82,6 +89,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 logTheBackStack();
             }
         });
+
+        BusMaster.getBus().register(this);
+
     }
 
     private void startFresco() {
@@ -186,6 +196,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+    // this event bus function let's you push a fragment from anywhere in the app
+    @Subscribe
+    public void answerAvailable(final FragmentPushEvent fpe) {
+        // TODO: React to the event somehow!
+        Log.d(TAG, "fragment pushed: " + fpe.getFragment().getClass().getSimpleName());
+
+        pushFragment(fpe.getFragment(), fpe.getTransitions());
+
+//
+//        mHandler.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                pushFragment(fpe.getFragment(), fpe.getTransitions());
+//            }
+//        });
+
+    }
+
+//     bug workaround
+//     http://stackoverflow.com/questions/7469082/getting-exception-illegalstateexception-can-not-perform-this-action-after-onsa
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        Log.d(TAG, "onSaveInstanceState: ");
+
+//        outState.putString("WORKAROUND_FOR_BUG_19917_KEY", "WORKAROUND_FOR_BUG_19917_VALUE");
+        super.onSaveInstanceState(outState);
+
+    }
+
+
     // the eltrans parameter is a list of hints for cool transitions
     public void pushFragment(Fragment frag, ArrayList<Pair<View, String>> eltrans) {
 
@@ -210,6 +250,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        }
 
         transaction.commit();
+
+//        transaction.commitAllowingStateLoss();
 
 //        logTheBackStack();
 

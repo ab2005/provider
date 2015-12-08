@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 
 import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.seagate.alto.events.ItemSelectedEvent;
 
 /**
  * Provides UI for the view with List.
@@ -88,7 +89,7 @@ public class ListContentFragment extends Fragment {
                                             @Override
                                             public void onClick(View v) {
 
-                                                BusMaster.getBus().post(new ItemSelectedEvent(position));
+                                                BusMaster.getBus().post(new ItemSelectedEvent(position, null));
 
 //                                                if (parent.getContext() instanceof MainActivity) {
 //

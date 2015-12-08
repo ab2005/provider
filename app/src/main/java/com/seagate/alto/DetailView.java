@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.seagate.alto.events.ItemSelectedEvent;
 import com.squareup.otto.Subscribe;
 
 public class DetailView extends android.support.v4.widget.NestedScrollView {
@@ -75,7 +76,19 @@ public class DetailView extends android.support.v4.widget.NestedScrollView {
         Log.d(TAG, "onFinishInflate");
         BusMaster.getBus().register(this);
 
-        showItem(0);
+//        this.getfr
+//
+//        Activity a = (Activity) getContext();
+//        int index = 0;
+//        Intent i = a.getIntent();
+//        if (i != null) {
+//            Bundle args = i.getExtras();
+//            if (args != null) {
+//                index = args.getInt(PlaceholderContent.INDEX);
+//            }
+//        }
+//
+//        showItem(index);
 
     }
 
@@ -86,7 +99,7 @@ public class DetailView extends android.support.v4.widget.NestedScrollView {
         BusMaster.getBus().unregister(this);
     }
 
-    private void showItem(int index) {
+    public void showItem(int index) {
 
         SimpleDraweeView sdv = (SimpleDraweeView) findViewById(R.id.image);
         if (sdv != null) {

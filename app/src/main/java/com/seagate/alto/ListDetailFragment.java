@@ -5,25 +5,24 @@ package com.seagate.alto;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.util.Pair;
 import android.transition.TransitionInflater;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.seagate.alto.events.FragmentPushEvent;
+import com.seagate.alto.events.ItemSelectedEvent;
 import com.squareup.otto.Subscribe;
 
-import java.util.ArrayList;
-
-public class SplitFragment extends Fragment {
+public class ListDetailFragment extends Fragment {
 
     public static final String EXTRA_LAYOUT = "extra_layout";
 
     private String TAG = makeTag();
 
     protected String makeTag() {
-        return LogUtils.makeTag(SplitFragment.class);
+        return LogUtils.makeTag(ListDetailFragment.class);
     }
 
     DetailView mDetail;
@@ -35,7 +34,7 @@ public class SplitFragment extends Fragment {
 //    }
 
 
-    public SplitFragment() {
+    public ListDetailFragment() {
         Log.d(TAG, "constructor");
 //        BusMaster.getBus().register(this);
     }
@@ -74,9 +73,17 @@ public class SplitFragment extends Fragment {
 //        View v = inflater.inflate(R.layout.split, container, false);
 
         mDetail = (DetailView) v.findViewById(R.id.detail);
-//        mDetail2 = (DetailView) v.findViewById(R.id.detail_view);
 
-//        mImage = v.findViewById(R.id.image);
+        if (mDetail != null) {
+
+            int index = 0;
+            Bundle args = getArguments();
+            if (args != null) {
+                index = args.getInt(PlaceholderContent.INDEX);
+            }
+
+            mDetail.showItem(index);
+        }
 
 //        Fragment f =
 
@@ -130,23 +137,30 @@ public class SplitFragment extends Fragment {
 
                 MainActivity main = (MainActivity) getActivity();
 
+                FragmentPushEvent fpe = new FragmentPushEvent();
+
                 Fragment details = new DetailListFragment();
 
                 Bundle args = new Bundle();
                 args.putInt(PlaceholderContent.INDEX, event.getPosition());
-//                args.putInt(EXTRA_LAYOUT, R.layout.detail_split);
                 details.setArguments(args);
+
+                fpe.setFragment(details);
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                     details.setSharedElementEnterTransition(TransitionInflater.from(getActivity()).inflateTransition(R.transition.trans_move));
                     details.setSharedElementReturnTransition(TransitionInflater.from(getActivity()).inflateTransition(R.transition.trans_move));
                 }
 
-                ArrayList<Pair<View, String>> pairs = new ArrayList<Pair<View, String>>();
+//                ArrayList<Pair<View, String>> pairs = new ArrayList<Pair<View, String>>();
 //                Pair<View, String> imagePair = Pair.create((View) drawee, "tThumbnail");
 //                pairs.add(imagePair);
 
-                main.pushFragment(details, pairs);
+//                fpe.setTransitions(event.getPairs());
+
+//                BusMaster.getBus().post(fpe);
+
+                main.pushFragment(details, event.getPairs());
 
             }
         }

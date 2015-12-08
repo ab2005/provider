@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -18,6 +19,9 @@ import android.view.ViewGroup;
 
 import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.seagate.alto.events.ItemSelectedEvent;
+
+import java.util.ArrayList;
 
 /**
  * Provides UI for the view with List.
@@ -119,10 +123,15 @@ public class ListRecyclerView extends RecyclerView {
             drawee.getHierarchy().setRoundingParams(roundingParams);
 
             itemView.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
+                    @Override
+                    public void onClick(View v) {
 
-                                                BusMaster.getBus().post(new ItemSelectedEvent(position));
+                        ArrayList<Pair<View, String>> pairs = new ArrayList<Pair<View, String>>();
+                        Pair<View, String> imagePair = Pair.create((View) drawee, "tThumbnail");
+                        pairs.add(imagePair);
+
+
+                        BusMaster.getBus().post(new ItemSelectedEvent(position, pairs));
 
 //                                                if (parent.getContext() instanceof MainActivity) {
 //
@@ -150,8 +159,8 @@ public class ListRecyclerView extends RecyclerView {
 //                                                    }
 //
 //                                                }
-                                            }
-                                        }
+                    }
+                }
             );
         }
 //    }

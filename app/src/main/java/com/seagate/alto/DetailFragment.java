@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.seagate.alto.events.ItemSelectedEvent;
 import com.squareup.otto.Subscribe;
 
 public class DetailFragment extends Fragment {
