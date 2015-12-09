@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 
 import com.seagate.alto.events.BusMaster;
 import com.seagate.alto.events.ItemSelectedEvent;
+import com.seagate.alto.utils.LogUtils;
 import com.squareup.otto.Subscribe;
 
 public class ListDetailFragment extends Fragment implements IBackStackName {

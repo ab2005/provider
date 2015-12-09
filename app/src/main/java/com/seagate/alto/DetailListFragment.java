@@ -4,6 +4,8 @@ package com.seagate.alto;
 
 // add a class header comment here
 
+import com.seagate.alto.utils.LogUtils;
+
 public class DetailListFragment extends ListDetailFragment {
 
     protected String makeTag() {

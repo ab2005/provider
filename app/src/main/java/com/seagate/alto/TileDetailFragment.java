@@ -9,9 +9,10 @@ import android.transition.TransitionInflater;
 import android.util.Log;
 
 import com.seagate.alto.events.ItemSelectedEvent;
+import com.seagate.alto.utils.LogUtils;
 import com.squareup.otto.Subscribe;
 
-public class TileDetailFragment extends ListDetailFragment {
+public class TileDetailFragment extends ListDetailFragment implements IBackStackName {
 
     private String TAG = makeTag();
 
@@ -21,6 +22,11 @@ public class TileDetailFragment extends ListDetailFragment {
 
     protected int getLayout() {
         return R.layout.tile_detail;
+    }
+
+    @Override
+    public String getBackStackName() {
+        return "tile-detail:w600dp";
     }
 
     // each class must subscribe to the event

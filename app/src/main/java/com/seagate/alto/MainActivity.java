@@ -1,3 +1,5 @@
+// copyright (c) 2015 Seagate
+
 package com.seagate.alto;
 
 import android.os.Bundle;
@@ -22,6 +24,8 @@ import android.view.Window;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.seagate.alto.events.BusMaster;
+import com.seagate.alto.utils.LayoutQualifierUtils;
+import com.seagate.alto.utils.LogUtils;
 
 import java.util.ArrayList;
 
@@ -29,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
 
     private static String TAG = LogUtils.makeTag(MainActivity.class);
 
-    private FragmentStack mFragmentStack = new FragmentStack();
+//    private FragmentStack mFragmentStack = new FragmentStack();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,11 +65,6 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
         navigationView.setNavigationItemSelectedListener(this);
 
         startFresco();
-
-//        FragmentStack fs = restoreFragmentStack();
-//        if (fs != null) {
-//            fs.log();
-//        }
 
         // if the savedInstanceState is null, we are being called for the first time
         // otherwise the fragment stack will be restored to previous state magically
@@ -138,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
                     // the name is in two parts -- label:qualifier
                     int colon = top.indexOf(":");
                     String qualifier = top.substring(colon + 1, top.length());
-                    popTwo = LayoutQualifierUtils.isMatch(this, qualifier);
+                    popTwo = LayoutQualifierUtils.isQualified(this, qualifier);
                 }
             }
 
@@ -216,6 +215,9 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
 
+        // clear the back stack
+        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
         transaction.replace(R.id.container, frag);
         String backStackName = null;
         if (frag instanceof IBackStackName) {
@@ -257,8 +259,6 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
 //        }
 
         transaction.commit();
-
-//        logTheBackStack();
 
 //        FragmentStack.FragmentEntry fe = new FragmentStack.FragmentEntry(frag.getClass(), null);
 //        mFragmentStack.push(fe);

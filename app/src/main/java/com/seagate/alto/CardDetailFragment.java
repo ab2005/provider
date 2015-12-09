@@ -9,9 +9,10 @@ import android.transition.TransitionInflater;
 import android.util.Log;
 
 import com.seagate.alto.events.ItemSelectedEvent;
+import com.seagate.alto.utils.LogUtils;
 import com.squareup.otto.Subscribe;
 
-public class CardDetailFragment extends ListDetailFragment {
+public class CardDetailFragment extends ListDetailFragment implements IBackStackName {
 
     private String TAG = makeTag();
 
@@ -21,6 +22,11 @@ public class CardDetailFragment extends ListDetailFragment {
 
     protected int getLayout() {
         return R.layout.card_detail;
+    }
+
+    @Override
+    public String getBackStackName() {
+        return "card-detail:w600dp";
     }
 
     // each class must subscribe to the event

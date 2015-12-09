@@ -1,4 +1,4 @@
-package com.seagate.alto;
+package com.seagate.alto.utils;
 
 // add a class header comment here
 

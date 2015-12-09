@@ -10,6 +10,8 @@ import org.json.JSONObject;
 import java.io.Serializable;
 import java.util.Stack;
 
+// unused for now -- meant for saving the stack state between starts
+
 public class FragmentStack extends Stack<FragmentStack.FragmentEntry> {
 
     public static class FragmentEntry implements Serializable {

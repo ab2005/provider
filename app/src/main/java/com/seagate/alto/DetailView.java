@@ -10,6 +10,7 @@ import android.view.View;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.seagate.alto.events.BusMaster;
 import com.seagate.alto.events.ItemSelectedEvent;
+import com.seagate.alto.utils.LogUtils;
 import com.squareup.otto.Subscribe;
 
 public class DetailView extends android.support.v4.widget.NestedScrollView {

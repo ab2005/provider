@@ -1,4 +1,4 @@
-package com.seagate.alto;
+package com.seagate.alto.utils;
 
 // add a class header comment here
 
@@ -7,14 +7,16 @@ import android.content.res.Configuration;
 
 public class LayoutQualifierUtils {
 
-    // this routine takes the qualifier string and evaluates to see if it is true
-    // I wanted to find this code in AOSP to make sure it matches
+    // this routine takes the qualifier string and evaluates to see if this
+    // device in this orientation is a match
 
-    // todo: support p values not just dp
+    // todo: support p values not just dp, also support h
 
-    public static boolean isMatch(Context context, String qualifier) {
+    public static boolean isQualified(Context context, String qualifier) {
 
         if (qualifier.startsWith("sw")) {
+            // it doesn't matter if the qualifier is always true
+            // or always not true, it only matters if it changes
             return true;
         } else if (qualifier.startsWith("w") && qualifier.endsWith("dp")) {
 
@@ -29,17 +31,11 @@ public class LayoutQualifierUtils {
 
             return screenWidthDp > width;
 
-        } else if (qualifier.startsWith("h") && qualifier.endsWith("dp")) {
-
-            // parse out the number and check it
-
-            String swidth = qualifier.substring(1); // remove h
-            swidth = swidth.substring(0, swidth.length() - 1); // remove dp
-
-
-
-
         }
+
+//        else if (qualifier.startsWith("h") && qualifier.endsWith("dp")) {
+//
+//        }
 
 
         return false;

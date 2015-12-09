@@ -2,7 +2,9 @@ package com.seagate.alto;
 
 // add a class header comment here
 
-public class DetailCardFragment extends ListDetailFragment {
+import com.seagate.alto.utils.LogUtils;
+
+public class DetailCardFragment extends ListDetailFragment implements IBackStackName {
 
     private String TAG = makeTag();
 
@@ -12,6 +14,11 @@ public class DetailCardFragment extends ListDetailFragment {
 
     protected int getLayout() {
         return R.layout.detail_card;
+    }
+
+    @Override
+    public String getBackStackName() {
+        return "card-detail:w600dp";
     }
 
     // each class must subscribe to the event
