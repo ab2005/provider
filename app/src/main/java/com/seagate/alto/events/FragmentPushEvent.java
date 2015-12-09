@@ -8,6 +8,8 @@ import android.view.View;
 
 import java.util.ArrayList;
 
+// not used currently because of issues in the fragment stack
+
 public class FragmentPushEvent {
 
     private Fragment mFragment;

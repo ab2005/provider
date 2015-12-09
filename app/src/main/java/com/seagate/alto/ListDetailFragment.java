@@ -15,7 +15,7 @@ import com.seagate.alto.events.BusMaster;
 import com.seagate.alto.events.ItemSelectedEvent;
 import com.squareup.otto.Subscribe;
 
-public class ListDetailFragment extends Fragment {
+public class ListDetailFragment extends Fragment implements IBackStackName {
 
     private String TAG = makeTag();
 
@@ -137,4 +137,8 @@ public class ListDetailFragment extends Fragment {
         }
     }
 
+    @Override
+    public String getBackStackName() {
+        return "list-detail:w600dp";
+    }
 }

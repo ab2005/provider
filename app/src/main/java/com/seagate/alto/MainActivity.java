@@ -1,7 +1,6 @@
 package com.seagate.alto;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -23,8 +22,6 @@ import android.view.Window;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.seagate.alto.events.BusMaster;
-import com.seagate.alto.events.FragmentPushEvent;
-import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 
@@ -34,16 +31,12 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
 
     private FragmentStack mFragmentStack = new FragmentStack();
 
-    private Handler mHandler;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // to enable cross-frag transitions
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
 
         super.onCreate(savedInstanceState);
-
-        mHandler = new Handler();
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -78,13 +71,8 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
         // otherwise the fragment stack will be restored to previous state magically
 
         if (savedInstanceState == null) {
-
-            setFragment(new CardDetailFragment());
-            navigationView.setCheckedItem(R.id.card);
-//            setFragment(new TileDetailFragment());
-//            navigationView.setCheckedItem(R.id.tile);
-//            setFragment(new ListDetailFragment());
-//            navigationView.setCheckedItem(R.id.list);
+            setFragment(new ListDetailFragment());
+            navigationView.setCheckedItem(R.id.list);
         }
 
 
@@ -125,26 +113,61 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
             drawer.closeDrawer(GravityCompat.START);
         } else {
 
-            // log the back stack
+            // when there are 2 master/detail items on the stack
+            // and they are both showing the master/detail view
+            // we want to pop both off at the same time to avoid looking like an error
 
-            logTheBackStack();
+            // if the names are the same and screen configuration is true, pop matching items off the stack
 
-            super.onBackPressed();
+            // get the current entry backstack name and the previous entry backstack name
+            // compare their 2 string
+            // decide to pop 1 or 2 off stack
+
+            boolean popTwo = false;
+
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            int fragCount = fragmentManager.getBackStackEntryCount();
+
+            if (fragCount >= 2) {
+
+                String top = fragmentManager.getBackStackEntryAt(fragCount-1).getName();
+                String next = fragmentManager.getBackStackEntryAt(fragCount-2).getName();
+
+                if (top != null && top.equalsIgnoreCase(next)) {
+
+                    // the name is in two parts -- label:qualifier
+                    int colon = top.indexOf(":");
+                    String qualifier = top.substring(colon + 1, top.length());
+                    popTwo = LayoutQualifierUtils.isMatch(this, qualifier);
+                }
+            }
+
+            if (popTwo) {
+                fragmentManager.popBackStackImmediate();
+            }
+
+            super.onBackPressed(); // this pops the other one
 //            mFragmentStack.pop();
+
+            // finish if the stack is empty
+            if (fragmentManager.getBackStackEntryCount() == 0) {
+                finish();
+            }
+
         }
     }
 
     private void logTheBackStack() {
         FragmentManager fragmentManager = getSupportFragmentManager();
         int fragCount = fragmentManager.getBackStackEntryCount();
-        Log.d(TAG, "backstack: -------- " + fragCount);
+        Log.d(TAG, "backstack: -------- ");
         Log.d(TAG, "backstack: count = " + fragCount);
 
         for (int i = 0; i < fragCount; i++) {
             FragmentManager.BackStackEntry fbe = fragmentManager.getBackStackEntryAt(i);
-            Log.d(TAG, "backstack: entry = " + i + "value = " + fbe.getName());
+            Log.d(TAG, "backstack: entry = " + i + " value = " + fbe.getName());
         }
-        Log.d(TAG, "backstack: -------- " + fragCount);
+        Log.d(TAG, "backstack: -------- ");
     }
 
     @Override
@@ -191,46 +214,20 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
     private void setFragment(Fragment frag) {
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, frag)
-                .commit();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-//        logTheBackStack();
+        transaction.replace(R.id.container, frag);
+        String backStackName = null;
+        if (frag instanceof IBackStackName) {
+            backStackName = ((IBackStackName) frag).getBackStackName();
+        }
+        transaction.addToBackStack(backStackName);
+        transaction.commit();
 
 //        FragmentStack.FragmentEntry fe = new FragmentStack.FragmentEntry(frag.getClass(), null);
 //        mFragmentStack.set(fe);
 
     }
-
-    // this event bus function let's you push a fragment from anywhere in the app
-    @Subscribe
-    public void answerAvailable(final FragmentPushEvent fpe) {
-        // TODO: React to the event somehow!
-        Log.d(TAG, "fragment pushed: " + fpe.getFragment().getClass().getSimpleName());
-
-        pushFragment(fpe.getFragment(), fpe.getTransitions());
-
-//
-//        mHandler.post(new Runnable() {
-//            @Override
-//            public void run() {
-//                pushFragment(fpe.getFragment(), fpe.getTransitions());
-//            }
-//        });
-
-    }
-
-//     bug workaround
-//     http://stackoverflow.com/questions/7469082/getting-exception-illegalstateexception-can-not-perform-this-action-after-onsa
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        Log.d(TAG, "onSaveInstanceState: ");
-
-//        outState.putString("WORKAROUND_FOR_BUG_19917_KEY", "WORKAROUND_FOR_BUG_19917_VALUE");
-        super.onSaveInstanceState(outState);
-
-    }
-
 
     // the eltrans parameter is a list of hints for cool transitions
     public void pushFragment(Fragment frag, ArrayList<Pair<View, String>> eltrans) {
@@ -239,7 +236,11 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
         FragmentTransaction transaction = fragmentManager.beginTransaction();
 
         transaction.replace(R.id.container, frag);
-        transaction.addToBackStack(null);
+        String backStackName = null;
+        if (frag instanceof IBackStackName) {
+            backStackName = ((IBackStackName) frag).getBackStackName();
+        }
+        transaction.addToBackStack(backStackName);
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 
         if (eltrans != null) {
@@ -256,8 +257,6 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
 //        }
 
         transaction.commit();
-
-//        transaction.commitAllowingStateLoss();
 
 //        logTheBackStack();
 
