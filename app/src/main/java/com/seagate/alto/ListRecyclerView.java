@@ -30,19 +30,6 @@ public class ListRecyclerView extends RecyclerView {
 
     private static String TAG = LogUtils.makeTag(ListRecyclerView.class);
 
-//    public ListContentView() {
-////        super.Recycler()
-////        BusMaster.getBus().register(this);
-//        Log.d(TAG, "constructor");
-//    }
-
-//    @Override
-//    protected void finalize() throws Throwable {
-//        super.finalize();
-////        BusMaster.getBus().unregister(this);
-//        Log.d(TAG, "finalize");
-//    }
-
     ViewHolder.ContentAdapter mAdapter;
 
     private int mSelection = 0;
@@ -80,34 +67,6 @@ public class ListRecyclerView extends RecyclerView {
 
     }
 
-    //    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//
-////        BusMaster.getBus().register(this);
-//
-//        RecyclerView recyclerView = (RecyclerView) inflater.inflate(R.layout.recycler_view, container, false);
-//        mAdapter = new ViewHolder.ContentAdapter();
-//        mAdapter.setActivity(getActivity());
-//        recyclerView.setAdapter(mAdapter);
-//        recyclerView.setHasFixedSize(true);
-//        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-//        return recyclerView;
-//    }
-
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        Log.d(TAG, "onResume");
-//        BusMaster.getBus().register(this);
-//    }
-//
-//    @Override
-//    public void onPause() {
-//        super.onPause();
-//        Log.d(TAG, "onPause");
-//        BusMaster.getBus().unregister(this);
-//    }
-
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         SimpleDraweeView drawee;
@@ -136,16 +95,7 @@ public class ListRecyclerView extends RecyclerView {
                 }
             );
         }
-//    }
 
-//    @Produce
-//    public ItemSelectedEvent produceAnswer() {
-//        // Assuming 'lastAnswer' exists.
-//
-//        Log.d(TAG, "ItemSelectedEvent produceAnswer = " + mSelection);
-//
-//        return new ItemSelectedEvent(mSelection);
-//    }
 
         /**
          * Adapter to display recycler view.

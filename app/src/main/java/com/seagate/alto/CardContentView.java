@@ -12,6 +12,7 @@ import android.support.v4.util.Pair;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +45,7 @@ public class CardContentView extends RecyclerView {
 
     public CardContentView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        Log.d(TAG, "contructor");
     }
 
     @Override
@@ -57,19 +59,6 @@ public class CardContentView extends RecyclerView {
         setLayoutManager(new LinearLayoutManager(getContext()));
 
     }
-
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                             Bundle savedInstanceState) {
-//        RecyclerView recyclerView = (RecyclerView) inflater.inflate(
-//                R.layout.recycler_view, container, false);
-//        ContentAdapter adapter = new ContentAdapter();
-//        adapter.setActivity(getActivity());
-//        recyclerView.setAdapter(adapter);
-//        recyclerView.setHasFixedSize(true);
-//        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-//        return recyclerView;
-//    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -86,27 +75,12 @@ public class CardContentView extends RecyclerView {
                 public void onClick(View v) {
                     if (parent.getContext() instanceof MainActivity) {
 
-//                        MainActivity main = (MainActivity) parent.getContext();
-//
-//                        Fragment details = new DetailFragment();
-//
-//                        Bundle args = new Bundle();
-//                        args.putInt(PlaceholderContent.INDEX, position);
-//                        details.setArguments(args);
-//
-//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-//                            details.setSharedElementEnterTransition(TransitionInflater.from(parent.getContext()).inflateTransition(R.transition.trans_move));
-//                            details.setSharedElementReturnTransition(TransitionInflater.from(parent.getContext()).inflateTransition(R.transition.trans_move));
-//                        }
-//
                         ArrayList<Pair<View, String>> pairs = new ArrayList<Pair<View, String>>();
                         Pair<View, String> imagePair = Pair.create((View) drawee, "tThumbnail");
                         pairs.add(imagePair);
 
                         BusMaster.getBus().post(new ItemSelectedEvent(position, pairs));
 
-//
-//                        main.pushFragment(details, pairs);
                     }
                 }
             });
