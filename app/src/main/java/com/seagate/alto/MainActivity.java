@@ -33,8 +33,6 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
 
     private static String TAG = LogUtils.makeTag(MainActivity.class);
 
-//    private FragmentStack mFragmentStack = new FragmentStack();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // to enable cross-frag transitions
@@ -226,9 +224,6 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
         transaction.addToBackStack(backStackName);
         transaction.commit();
 
-//        FragmentStack.FragmentEntry fe = new FragmentStack.FragmentEntry(frag.getClass(), null);
-//        mFragmentStack.set(fe);
-
     }
 
     // the eltrans parameter is a list of hints for cool transitions
@@ -259,9 +254,6 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
 //        }
 
         transaction.commit();
-
-//        FragmentStack.FragmentEntry fe = new FragmentStack.FragmentEntry(frag.getClass(), null);
-//        mFragmentStack.push(fe);
 
     }
 }

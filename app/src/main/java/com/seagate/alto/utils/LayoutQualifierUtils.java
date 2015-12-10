@@ -10,7 +10,7 @@ public class LayoutQualifierUtils {
     // this routine takes the qualifier string and evaluates to see if this
     // device in this orientation is a match
 
-    // todo: support p values not just dp, also support h
+    // TODO: support p values not just dp, also support h
 
     public static boolean isQualified(Context context, String qualifier) {
 

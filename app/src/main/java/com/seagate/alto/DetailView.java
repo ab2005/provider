@@ -33,43 +33,11 @@ public class DetailView extends android.support.v4.widget.NestedScrollView {
         Log.d(TAG, "constructor");
     }
 
-//    public DetailView() {
-////        BusMaster.getBus().register(this);
-//        Log.d(TAG, "constructor");
-//    }
-
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
-//        BusMaster.getBus().unregister(this);
         Log.d(TAG, "finalize");
     }
-
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                             Bundle savedInstanceState) {
-//
-//        Log.d(TAG, "onCreateView");
-//
-////        BusMaster.getBus().register(this);
-//
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-//            setSharedElementEnterTransition(TransitionInflater.from(getActivity()).inflateTransition(R.transition.trans_move));
-//            setSharedElementReturnTransition(TransitionInflater.from(getActivity()).inflateTransition(R.transition.trans_move));
-//        }
-//
-//        mView = inflater.inflate(R.layout.fragment_detail, container, false);
-//
-//        int index = 0;
-//        Bundle args = getArguments();
-//        if (args != null) {
-//            index = args.getInt(PlaceholderContent.INDEX);
-//        }
-//
-//        showItem(index);
-//
-//        return mView;
-//    }
 
 
     @Override
@@ -77,21 +45,6 @@ public class DetailView extends android.support.v4.widget.NestedScrollView {
         super.onFinishInflate();
         Log.d(TAG, "onFinishInflate");
         BusMaster.getBus().register(this);
-
-//        this.getfr
-//
-//        Activity a = (Activity) getContext();
-//        int index = 0;
-//        Intent i = a.getIntent();
-//        if (i != null) {
-//            Bundle args = i.getExtras();
-//            if (args != null) {
-//                index = args.getInt(PlaceholderContent.INDEX);
-//            }
-//        }
-//
-//        showItem(index);
-
     }
 
     @Override
@@ -109,21 +62,7 @@ public class DetailView extends android.support.v4.widget.NestedScrollView {
         }
 
     }
-
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        Log.d(TAG, "onResume");
-//        BusMaster.getBus().register(this);
-//    }
-//
-//    @Override
-//    public void onPause() {
-//        super.onPause();
-//        Log.d(TAG, "onPause");
-//        BusMaster.getBus().unregister(this);
-//    }
-
+    
     @Subscribe
     public void answerAvailable(ItemSelectedEvent event) {
         // TODO: React to the event somehow!
