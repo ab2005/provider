@@ -1,3 +1,5 @@
+//  copyright (c) 2015. seagate technology plc. all rights reserved.
+
 package com.seagate.alto;
 
 // add a class header comment here
@@ -60,9 +62,8 @@ public class DetailView extends android.support.v4.widget.NestedScrollView {
         if (sdv != null) {
             sdv.setImageURI(PlaceholderContent.getUri(index));
         }
-
     }
-    
+
     @Subscribe
     public void answerAvailable(ItemSelectedEvent event) {
         // TODO: React to the event somehow!

@@ -1,4 +1,4 @@
-//  Copyright (c) 2015. Seagate Technology PLC. All rights reserved.
+//  copyright (c) 2015. seagate technology plc. all rights reserved.
 
 package com.seagate.alto;
 

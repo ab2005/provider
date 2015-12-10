@@ -1,3 +1,5 @@
+//  copyright (c) 2015. seagate technology plc. all rights reserved.
+
 package com.seagate.alto;
 
 // add a class header comment here
@@ -28,14 +30,12 @@ public class ListDetailFragment extends Fragment implements IBackStackName {
 
     public ListDetailFragment() {
         Log.d(TAG, "constructor");
-//        BusMaster.getBus().register(this);
     }
 
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
         Log.d(TAG, "finalize");
-//        BusMaster.getBus().unregister(this);
     }
 
     protected int getLayout() {
@@ -52,17 +52,9 @@ public class ListDetailFragment extends Fragment implements IBackStackName {
 //            setSharedElementEnterTransition(TransitionInflater.from(getActivity()).inflateTransition(R.transition.trans_move));
 //            setSharedElementReturnTransition(TransitionInflater.from(getActivity()).inflateTransition(R.transition.trans_move));
 //        }
-//
-//        int layout = getLayout();
-//        Bundle args = getArguments();
-//        if (args != null) {
-//            layout = args.getInt(EXTRA_LAYOUT);
-//        }
-
 
 
         View v = inflater.inflate(getLayout(), container, false);
-//        View v = inflater.inflate(R.layout.split, container, false);
 
         mDetail = (DetailView) v.findViewById(R.id.detail);
 
