@@ -15,7 +15,7 @@ import com.seagate.alto.events.ItemSelectedEvent;
 import com.seagate.alto.utils.LogUtils;
 import com.squareup.otto.Subscribe;
 
-public class DetailView extends android.support.v4.widget.NestedScrollView {
+public class DetailView extends android.support.design.widget.CoordinatorLayout {
 
     private static String TAG = LogUtils.makeTag(DetailView.class);
 
@@ -43,14 +43,14 @@ public class DetailView extends android.support.v4.widget.NestedScrollView {
 
 
     @Override
-    protected void onFinishInflate() {
+    public void onFinishInflate() {
         super.onFinishInflate();
         Log.d(TAG, "onFinishInflate");
         BusMaster.getBus().register(this);
     }
 
     @Override
-    protected void onDetachedFromWindow() {
+    public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         Log.d(TAG, "onDetachedFromWindow");
         BusMaster.getBus().unregister(this);
