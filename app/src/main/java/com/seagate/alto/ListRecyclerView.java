@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -70,12 +71,14 @@ public class ListRecyclerView extends RecyclerView {
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         SimpleDraweeView drawee;
+        TextView title;
         int position;
 
         public ViewHolder(LayoutInflater inflater, final ViewGroup parent, final Activity activity) {
             super(inflater.inflate(R.layout.item_list, parent, false));
 
             drawee = (SimpleDraweeView) itemView.findViewById(R.id.list_avatar);
+            title = (TextView) itemView.findViewById(R.id.list_title);
 
             RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
             roundingParams.setRoundAsCircle(true);
@@ -88,6 +91,8 @@ public class ListRecyclerView extends RecyclerView {
                         ArrayList<Pair<View, String>> pairs = new ArrayList<Pair<View, String>>();
                         Pair<View, String> imagePair = Pair.create((View) drawee, "tThumbnail");
                         pairs.add(imagePair);
+                        Pair<View, String> titlePair = Pair.create((View) title, "tTitle");
+                        pairs.add(titlePair);
 
                         BusMaster.getBus().post(new ItemSelectedEvent(position, pairs));
 
@@ -125,6 +130,7 @@ public class ListRecyclerView extends RecyclerView {
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     holder.drawee.setTransitionName("ListThumb" + position);
+                    holder.title.setTransitionName("ListName" + position);
                 }
 
                 holder.position = position;

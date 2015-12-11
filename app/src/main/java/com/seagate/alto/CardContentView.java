@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.seagate.alto.events.BusMaster;
@@ -64,11 +65,13 @@ public class CardContentView extends RecyclerView {
 
         SimpleDraweeView drawee;
         int position;
+        TextView title;
 
         public ViewHolder(LayoutInflater inflater, final ViewGroup parent, final Activity activity) {
             super(inflater.inflate(R.layout.bill_card, parent, false));
 
             drawee = (SimpleDraweeView) itemView.findViewById(R.id.card_image);
+            title = (TextView) itemView.findViewById(R.id.card_title);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -78,6 +81,8 @@ public class CardContentView extends RecyclerView {
                         ArrayList<Pair<View, String>> pairs = new ArrayList<Pair<View, String>>();
                         Pair<View, String> imagePair = Pair.create((View) drawee, "tThumbnail");
                         pairs.add(imagePair);
+                        Pair<View, String> titlePair = Pair.create((View) title, "tTitle");
+                        pairs.add(titlePair);
 
                         BusMaster.getBus().post(new ItemSelectedEvent(position, pairs));
 
@@ -135,6 +140,7 @@ public class CardContentView extends RecyclerView {
             holder.drawee.setImageURI(uri);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 holder.drawee.setTransitionName("CardThumb"+position);
+                holder.title.setTransitionName("CardTitle" + position);
             }
 
             holder.position = position;

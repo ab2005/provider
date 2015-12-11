@@ -8,17 +8,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true" >
+    android:fitsSystemWindows="true">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="192dp"
+        android:layout_height="300dp"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            >
 
             <com.seagate.alto.SeagateDraweeView
                 android:id="@+id/image"
@@ -32,6 +33,22 @@
                 fresco:fadeDuration="300"
                 />
 
+            <TextView
+                android:layout_height="?attr/actionBarSize"
+                android:layout_width="match_parent"
+                android:text="@string/item_title"
+                android:layout_margin="10dp"
+                android:textSize="30sp"
+                android:textColor="#000000"
+                android:shadowColor="#ffffff"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowRadius="2"
+                android:transitionName="tTitle"
+                app:layout_collapseMode="pin"/>
+
+            <!-- putting this here stops the text and image from disappearing -->
+
             <android.support.v7.widget.Toolbar
                 android:layout_height="?attr/actionBarSize"
                 android:layout_width="match_parent"
@@ -40,79 +57,19 @@
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
         <TextView
             android:layout_margin="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="24sp"
             android:text="@string/detail_desc"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+            />
 
     </android.support.v4.widget.NestedScrollView>
 
-</LinearLayout>
-
-
-    <!--</android.support.design.widget.CoordinatorLayout>-->
-
-    <!--
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:paddingLeft="@dimen/article_keylines"
-        android:paddingRight="@dimen/md_keylines"
-        android:paddingTop="@dimen/md_keylines">
-
-        <com.seagate.alto.SeagateDraweeView
-            android:id="@+id/image"
-            xmlns:fresco="http://schemas.facebook.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:fitsSystemWindows="true"
-            android:transitionName="tThumbnail"
-            app:layout_collapseMode="parallax"
-            fresco:actualImageScaleType="focusCrop"
-            fresco:fadeDuration="300"
-            fresco:roundWithOverlayColor="#ffffffff"
-            />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/md_keylines"
-            android:text="Description"
-            android:textColor="?attr/colorAccent"
-            android:textSize="@dimen/article_titles"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/detail_desc"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/md_keylines"
-            android:layout_marginTop="@dimen/md_keylines"
-            android:text="Location"
-            android:textColor="?attr/colorAccent"
-            android:textSize="@dimen/article_titles"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/detail_location"/>
-    </LinearLayout>
-
-    -->
 
 </com.seagate.alto.DetailView>
