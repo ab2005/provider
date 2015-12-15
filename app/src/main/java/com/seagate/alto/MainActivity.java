@@ -2,6 +2,7 @@
 
 package com.seagate.alto;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -21,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 
+import com.balysv.materialmenu.MaterialMenuDrawable;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.seagate.alto.events.BusMaster;
@@ -33,6 +35,10 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
 
     private static String TAG = LogUtils.makeTag(MainActivity.class);
 
+    private ActionBarDrawerToggle mToggle;
+
+    private MaterialMenuDrawable materialMenu;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // to enable cross-frag transitions
@@ -44,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,14 +60,30 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mToggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
+        drawer.setDrawerListener(mToggle);
+        mToggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        materialMenu = new MaterialMenuDrawable(this, Color.WHITE, MaterialMenuDrawable.Stroke.THIN);
+        toolbar.setNavigationIcon(materialMenu);
+
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (isFragmentStackAtBottom()) {
+                    drawer.openDrawer(navigationView);
+                } else {
+                    onBackPressed();
+                }
+
+            }
+        });
 
         startFresco();
 
@@ -70,19 +93,64 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
         if (savedInstanceState == null) {
             setFragment(new ListDetailFragment());
             navigationView.setCheckedItem(R.id.list);
+        } else {
+            // the fragment stack is transferred over during rotation
+            // but we need to set the home icon explicitly
+            setupHomeIcon();
         }
 
+        // should we show a back arrow or a hamburger
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
             public void onBackStackChanged() {
+                setupHomeIcon();
                 logTheBackStack();
             }
         });
 
         BusMaster.getBus().register(this);
+    }
 
+    private void setupHomeIcon() {
+        if (isFragmentStackAtBottom()) {
+            materialMenu.animateIconState(MaterialMenuDrawable.IconState.BURGER);
+        } else {
+            materialMenu.animateIconState(MaterialMenuDrawable.IconState.ARROW);
+        }
+    }
+
+    private boolean isFragmentStackAtBottom() {
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        int fragCount = fragmentManager.getBackStackEntryCount();
+
+        if (fragCount <= 1) return true;
+
+        if (fragCount > 2) return false; // we should check if more than 2 screens are equivalent
+
+        if (fragCount == 2) {
+
+            return topTwoEqual(fragmentManager, fragCount);
+        }
+
+        return false;
+    }
+
+    private boolean topTwoEqual(FragmentManager fragmentManager, int fragCount) {
+        String top = fragmentManager.getBackStackEntryAt(fragCount-1).getName();
+        String next = fragmentManager.getBackStackEntryAt(fragCount-2).getName();
+
+        if (top != null && top.equalsIgnoreCase(next)) {
+
+            // the name is in two parts -- label:qualifier
+            int colon = top.indexOf(":");
+            String qualifier = top.substring(colon + 1, top.length());
+            return LayoutQualifierUtils.isQualified(this, qualifier);
+        }
+
+        return false;
     }
 
     private void startFresco() {
@@ -125,32 +193,18 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
             FragmentManager fragmentManager = getSupportFragmentManager();
             int fragCount = fragmentManager.getBackStackEntryCount();
 
-            if (fragCount >= 2) {
-
-                String top = fragmentManager.getBackStackEntryAt(fragCount-1).getName();
-                String next = fragmentManager.getBackStackEntryAt(fragCount-2).getName();
-
-                if (top != null && top.equalsIgnoreCase(next)) {
-
-                    // the name is in two parts -- label:qualifier
-                    int colon = top.indexOf(":");
-                    String qualifier = top.substring(colon + 1, top.length());
-                    popTwo = LayoutQualifierUtils.isQualified(this, qualifier);
-                }
-            }
+            popTwo = topTwoEqual(fragmentManager, fragCount);
 
             if (popTwo) {
                 fragmentManager.popBackStackImmediate();
             }
 
             super.onBackPressed(); // this pops the other one
-//            mFragmentStack.pop();
 
             // finish if the stack is empty
             if (fragmentManager.getBackStackEntryCount() == 0) {
                 finish();
             }
-
         }
     }
 
