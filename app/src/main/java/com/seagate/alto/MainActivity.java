@@ -1,145 +1,232 @@
-/*
- * Copyright (C) 2015 Seagate LLC
- */
+// Copyright (c) 2015. Seagate Technology PLC. All rights reserved.
 
 package com.seagate.alto;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.util.Pair;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 
-import com.example.android.alto.R;
+import com.balysv.materialmenu.MaterialMenuDrawable;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
-import com.facebook.imagepipeline.listener.RequestListener;
-import com.facebook.imagepipeline.listener.RequestLoggingListener;
+import com.seagate.alto.events.BusMaster;
+import com.seagate.alto.utils.LayoutQualifierUtils;
+import com.seagate.alto.utils.LogUtils;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
+public class MainActivity extends AppCompatActivity implements IFragmentStackHolder, NavigationView.OnNavigationItemSelectedListener {
 
-/**
- * Provides UI for the main screen.
- */
-public class MainActivity extends AppCompatActivity {
+    private static String TAG = LogUtils.makeTag(MainActivity.class);
 
-    private DrawerLayout mDrawerLayout;
+    private ActionBarDrawerToggle mToggle;
+
+    private MaterialMenuDrawable materialMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // to enable cross-frag transitions
+        getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
-
-        Set<RequestListener> listeners = new HashSet<RequestListener>();
-        listeners.add(new RequestLoggingListener());
-        ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
-                .setRequestListeners(listeners)
-                .build();
-        Fresco.initialize(this, config);
-
-        // Adding Toolbar to Main screen
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        // Setting ViewPager for each Tabs
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-        setupViewPager(viewPager);
-        // Set Tabs inside Toolbar
-        TabLayout tabs = (TabLayout) findViewById(R.id.tabs);
-        tabs.setupWithViewPager(viewPager);
-        // Create Navigation drawer and inlfate layout
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer);
-        // Adding menu icon to Toolbar
-        ActionBar supportActionBar = getSupportActionBar();
-        if (supportActionBar != null) {
-            supportActionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
-            supportActionBar.setDisplayHomeAsUpEnabled(true);
-        }
-        // Set behavior of Navigation drawer
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    // This method will trigger on item Click of navigation menu
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        // Set item in checked state
-                        menuItem.setChecked(true);
 
-                        // TODO: handle navigation
 
-                        // Closing drawer on item click
-                        mDrawerLayout.closeDrawers();
-                        return true;
-                    }
-                });
-        // Adding Floating Action Button to bottom right of main view
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Snackbar.make(v, "Hello Snackbar!",
-                        Snackbar.LENGTH_LONG).show();
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             }
         });
+
+        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mToggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(mToggle);
+        mToggle.syncState();
+
+        materialMenu = new MaterialMenuDrawable(this, Color.WHITE, MaterialMenuDrawable.Stroke.THIN);
+        toolbar.setNavigationIcon(materialMenu);
+
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (isFragmentStackAtBottom()) {
+                    drawer.openDrawer(navigationView);
+                } else {
+                    onBackPressed();
+                }
+
+            }
+        });
+
+        startFresco();
+
+        // if the savedInstanceState is null, we are being called for the first time
+        // otherwise the fragment stack will be restored to previous state magically
+
+        if (savedInstanceState == null) {
+            setFragment(new ListDetailFragment());
+            navigationView.setCheckedItem(R.id.list);
+        } else {
+            // the fragment stack is transferred over during rotation
+            // but we need to set the home icon explicitly
+            setupHomeIcon();
+        }
+
+        // should we show a back arrow or a hamburger
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+            @Override
+            public void onBackStackChanged() {
+                setupHomeIcon();
+                logTheBackStack();
+            }
+        });
+
+        BusMaster.getBus().register(this);
     }
 
-    // Add Fragments to Tabs
-    private void setupViewPager(ViewPager viewPager) {
-        Adapter adapter = new Adapter(getSupportFragmentManager());
-        adapter.addFragment(new ListContentFragment(), "List");
-        adapter.addFragment(new TileContentFragment(), "Tile");
-        adapter.addFragment(new CardContentFragment(), "Card");
-        viewPager.setAdapter(adapter);
+    private void setupHomeIcon() {
+        if (isFragmentStackAtBottom()) {
+            materialMenu.animateIconState(MaterialMenuDrawable.IconState.BURGER);
+        } else {
+            materialMenu.animateIconState(MaterialMenuDrawable.IconState.ARROW);
+        }
     }
 
-    static class Adapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
+    private boolean isFragmentStackAtBottom() {
 
-        public Adapter(FragmentManager manager) {
-            super(manager);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        int fragCount = fragmentManager.getBackStackEntryCount();
+
+        if (fragCount <= 1) return true;
+
+        if (fragCount > 2) return false; // we should check if more than 2 screens are equivalent
+
+        if (fragCount == 2) {
+            return topTwoEqual(fragmentManager, fragCount);
         }
 
-        @Override
-        public Fragment getItem(int position) {
-            return mFragmentList.get(position);
+        return false;
+    }
+
+    private boolean topTwoEqual(FragmentManager fragmentManager, int fragCount) {
+
+        if (fragCount < 2) return false;
+
+        String top = fragmentManager.getBackStackEntryAt(fragCount-1).getName();
+        String next = fragmentManager.getBackStackEntryAt(fragCount-2).getName();
+
+        if (top != null && top.equalsIgnoreCase(next)) {
+
+            // the name is in two parts -- label:qualifier
+            int colon = top.indexOf(":");
+            String qualifier = top.substring(colon + 1, top.length());
+            return LayoutQualifierUtils.isQualified(this, qualifier);
         }
 
-        @Override
-        public int getCount() {
-            return mFragmentList.size();
-        }
+        return false;
+    }
 
-        public void addFragment(Fragment fragment, String title) {
-            mFragmentList.add(fragment);
-            mFragmentTitleList.add(title);
-        }
+    private void startFresco() {
+//        DiskCacheConfig diskCacheConfig = DiskCacheConfig.newBuilder()
+//                .setBaseDirectoryName("SeagateCloud/ImageCache")
+//                .setBaseDirectoryPath(getExternalFilesDir(Environment.DIRECTORY_PICTURES))
+//                .setMaxCacheSize(50000000)
+//                .build();
+//        DiskCacheConfig smallImageDiskCacheConfig = DiskCacheConfig.newBuilder()
+//                .setBaseDirectoryName("SeagateCloud/SmallImageCache")
+//                .setBaseDirectoryPath(getExternalFilesDir(Environment.DIRECTORY_PICTURES))
+//                .setMaxCacheSize(10000000)
+//                .build();
+        ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
+//                .setMainDiskCacheConfig(diskCacheConfig)
+//                .setSmallImageDiskCacheConfig(smallImageDiskCacheConfig)
+                .build();
+        Fresco.initialize(this, config);
+    }
 
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return mFragmentTitleList.get(position);
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+
+            // when there are 2 master/detail items on the stack
+            // and they are both showing the master/detail view
+            // we want to pop both off at the same time to avoid looking like an error
+
+            // if the names are the same and screen configuration is true, pop matching items off the stack
+
+            // get the current entry backstack name and the previous entry backstack name
+            // compare their 2 string
+            // decide to pop 1 or 2 off stack
+
+            boolean popTwo = false;
+
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            int fragCount = fragmentManager.getBackStackEntryCount();
+
+            popTwo = topTwoEqual(fragmentManager, fragCount);
+
+            if (popTwo) {
+                fragmentManager.popBackStackImmediate();
+            }
+
+            super.onBackPressed(); // this pops the other one
+
+            // finish if the stack is empty
+            if (fragmentManager.getBackStackEntryCount() == 0) {
+                finish();
+            }
         }
+    }
+
+    private void logTheBackStack() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        int fragCount = fragmentManager.getBackStackEntryCount();
+        Log.d(TAG, "backstack: -------- ");
+        Log.d(TAG, "backstack: count = " + fragCount);
+
+        for (int i = 0; i < fragCount; i++) {
+            FragmentManager.BackStackEntry fbe = fragmentManager.getBackStackEntryAt(i);
+            Log.d(TAG, "backstack: entry = " + i + " value = " + fbe.getName());
+        }
+        Log.d(TAG, "backstack: -------- ");
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
@@ -149,12 +236,80 @@ public class MainActivity extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
-        } else if (id == android.R.id.home) {
-            mDrawerLayout.openDrawer(GravityCompat.START);
         }
+
         return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.list) {
+            setFragment(new ListDetailFragment());
+        } else if (id == R.id.card) {
+            setFragment(new CardDetailFragment());
+        } else if (id == R.id.tile) {
+            setFragment(new TileDetailFragment());
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    private void setFragment(Fragment frag) {
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+        // clear the back stack
+        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+        transaction.replace(R.id.container, frag);
+        String backStackName = null;
+        if (frag instanceof IBackStackName) {
+            backStackName = ((IBackStackName) frag).getBackStackName();
+        }
+        transaction.addToBackStack(backStackName);
+        transaction.commit();
+
+    }
+
+    // the eltrans parameter is a list of hints for cool transitions
+    public void pushFragment(Fragment frag, ArrayList<Pair<View, String>> eltrans) {
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+        transaction.replace(R.id.container, frag);
+        String backStackName = null;
+        if (frag instanceof IBackStackName) {
+            backStackName = ((IBackStackName) frag).getBackStackName();
+        }
+        transaction.addToBackStack(backStackName);
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+
+        if (eltrans != null) {
+            for (Pair<View, String> et : eltrans) {
+                transaction.addSharedElement(et.first, et.second);
+            }
+        }
+
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+////            frag.setSharedElementEnterTransition(new ChangeBounds());
+////            frag.setSharedElementReturnTransition(new ChangeBounds());
+//            frag.setAllowEnterTransitionOverlap(true);
+//            frag.setAllowReturnTransitionOverlap(true);
+//        }
+
+        transaction.commit();
+
     }
 }
