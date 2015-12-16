@@ -1,3 +1,5 @@
+# Copyright (c) 2015. Seagate Technology PLC. All rights reserved.
+
 # Add project specific ProGuard rules here.
 # By default, the flags in this file are appended to flags specified
 # in /Users/fstanbach/Dev/adt-bundle-mac-x86_64-20140624/sdk/tools/proguard/proguard-android.txt

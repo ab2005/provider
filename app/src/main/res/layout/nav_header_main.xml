@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!-- Copyright (c) 2015. Seagate Technology PLC. All rights reserved. -->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="@dimen/nav_header_height"
     android:background="@drawable/side_nav_bar"

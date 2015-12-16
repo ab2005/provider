@@ -1,3 +1,5 @@
+// Copyright (c) 2015. Seagate Technology PLC. All rights reserved.
+
 package com.seagate.alto.events;
 
 // use a singleton for now to avoid injection

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) 2015 Seagate
-  -->
+
+<!-- Copyright (c) 2015. Seagate Technology PLC. All rights reserved. -->
 
 <com.seagate.alto.DetailView
     xmlns:android="http://schemas.android.com/apk/res/android"
