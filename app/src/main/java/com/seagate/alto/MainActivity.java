@@ -131,7 +131,6 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
         if (fragCount > 2) return false; // we should check if more than 2 screens are equivalent
 
         if (fragCount == 2) {
-
             return topTwoEqual(fragmentManager, fragCount);
         }
 
@@ -139,6 +138,9 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
     }
 
     private boolean topTwoEqual(FragmentManager fragmentManager, int fragCount) {
+
+        if (fragCount < 2) return false;
+
         String top = fragmentManager.getBackStackEntryAt(fragCount-1).getName();
         String next = fragmentManager.getBackStackEntryAt(fragCount-2).getName();
 
