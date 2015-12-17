@@ -15,4 +15,11 @@
     <string name="item_desc">William James "Bill" Murray (born September 21, 1950) is an American actor and comedian. He first gained exposure on Saturday Night Live.
     </string>
 
+    <string name="digest_title">Digest</string>
+    <string name="tags_title">Tags</string>
+    <string name="just_added_title">Just Added</string>
+    <string name="favorites_title">Favorites</string>
+    <string name="photos_title">Photos</string>
+    <string name="videos_title">Videos</string>
+
 </resources>
