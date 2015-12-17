@@ -8,19 +8,27 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.seagate.alto.utils.LogUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 // Fragment that holds a Viewpager with Tabs
 
-public class PagerFragment extends Fragment {
+public class PagerFragment extends Fragment implements IBackStackName {
+
+    private final static String TAG = LogUtils.makeTag(PagerFragment.class);
+
+    private Adapter mAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView");
 
         View v = inflater.inflate(R.layout.pager_fragment, container, false);
 
@@ -35,11 +43,25 @@ public class PagerFragment extends Fragment {
 
     // Add Fragments to Tabs
     private void setupViewPager(ViewPager viewPager) {
-        Adapter adapter = new Adapter(getActivity().getSupportFragmentManager());
-        adapter.addFragment(new ListDetailFragment(), "List");
-        adapter.addFragment(new TileDetailFragment(), "Tile");
-        adapter.addFragment(new CardDetailFragment(), "Card");
-        viewPager.setAdapter(adapter);
+        // if you ARE a fragment and you HAVE fragments, use the ChildFragmentManager
+        mAdapter = new Adapter(this.getChildFragmentManager());
+        mAdapter.addFragment(new ListDetailFragment(), "List");
+        mAdapter.addFragment(new TileDetailFragment(), "Tile");
+        mAdapter.addFragment(new CardDetailFragment(), "Card");
+        viewPager.setAdapter(mAdapter);
+    }
+
+    @Override
+    public String getBackStackName() {
+        return "pager-fragment";
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume");
+
+//        mAdapter.notifyDataSetChanged();
     }
 
     static class Adapter extends FragmentPagerAdapter {
