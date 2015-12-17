@@ -91,8 +91,8 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
         // otherwise the fragment stack will be restored to previous state magically
 
         if (savedInstanceState == null) {
-            setFragment(new ListDetailFragment());
-            navigationView.setCheckedItem(R.id.list);
+            setFragment(new PagerFragment());
+            navigationView.setCheckedItem(R.id.digest);
         } else {
             // the fragment stack is transferred over during rotation
             // but we need to set the home icon explicitly
@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
         if (fragCount < 2) return false;
 
         String top = fragmentManager.getBackStackEntryAt(fragCount-1).getName();
-        String next = fragmentManager.getBackStackEntryAt(fragCount-2).getName();
+        String next = fragmentManager.getBackStackEntryAt(fragCount - 2).getName();
 
         if (top != null && top.equalsIgnoreCase(next)) {
 
@@ -251,12 +251,16 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.list) {
+        if (id == R.id.digest) {
+            setFragment(new PagerFragment());
+        } else if (id == R.id.tags) {
             setFragment(new ListDetailFragment());
-        } else if (id == R.id.card) {
-            setFragment(new CardDetailFragment());
-        } else if (id == R.id.tile) {
+        } else if (id == R.id.just_added) {
             setFragment(new TileDetailFragment());
+        } else if (id == R.id.favorites) {
+            setFragment(new CardDetailFragment());
+        } else {
+            setFragment(new ListDetailFragment());
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

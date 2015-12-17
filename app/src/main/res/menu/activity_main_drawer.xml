@@ -5,14 +5,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
-        <item android:id="@+id/tile" android:icon="@android:drawable/ic_menu_week"
-            android:title="Tile" />
-        <item android:id="@+id/list" android:icon="@android:drawable/ic_menu_day"
-            android:title="List" />
-        <item android:id="@+id/card" android:icon="@android:drawable/ic_menu_slideshow"
-            android:title="Card" />
-        <!--<item android:id="@+id/nav_manage" android:icon="@android:drawable/ic_menu_manage"-->
-            <!--android:title="Tools" />-->
+        <item android:id="@+id/digest" android:icon="@android:drawable/ic_menu_week"
+              android:title="@string/digest_title" />
+        <item android:id="@+id/tags" android:icon="@android:drawable/ic_menu_day"
+              android:title="@string/tags_title" />
+        <item android:id="@+id/just_added" android:icon="@android:drawable/ic_menu_slideshow"
+              android:title="@string/just_added_title" />
+        <item android:id="@+id/favorites" android:icon="@android:drawable/ic_menu_week"
+              android:title="@string/favorites_title" />
+        <item android:id="@+id/photos" android:icon="@android:drawable/ic_menu_day"
+              android:title="@string/photos_title" />
+        <item android:id="@+id/videos" android:icon="@android:drawable/ic_menu_slideshow"
+              android:title="@string/videos_title" />
     </group>
 
     <!--<item android:title="Communicate">-->
