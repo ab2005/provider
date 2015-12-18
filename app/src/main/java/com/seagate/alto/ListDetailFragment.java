@@ -46,7 +46,6 @@ public class ListDetailFragment extends Fragment implements IBackStackName {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
-        setRetainInstance(true);    // no reason to rebuild this fragment across rebuilds
     }
 
     @Override
