@@ -14,30 +14,10 @@ android {
         versionName "1.0"
     }
     buildTypes {
-        debug {
-            applicationVariants.all { variant ->
-                renameAPK(variant, defaultConfig, 'debug')
-            }
-        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            applicationVariants.all { variant ->
-                renameAPK(variant, defaultConfig, 'release')
-            }
         }
-    }
-}
-
-// rename the package file name
-// http://stackoverflow.com/questions/33775160/how-to-change-apk-name-by-using-gradle-like-this-format
-
-def renameAPK(variant, defaultConfig, buildType) {
-    variant.outputs.each { output ->
-        def file = output.packageApplication.outputFile
-        def fileName = applicationName + "-" + buildType + ".apk"
-        // def fileName = applicationName + "_V" + defaultConfig.versionCode + "_" + formattedDate + "_" + buildType + ".apk"
-        output.packageApplication.outputFile = new File(file.parent, fileName)
     }
 }
 
