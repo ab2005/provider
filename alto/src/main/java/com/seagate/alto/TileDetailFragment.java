@@ -39,9 +39,9 @@ public class TileDetailFragment extends ListDetailFragment implements IBackStack
         Log.d(TAG, "item selected: " + event.getPosition());
 
         if (mDetail == null) {
-            if (getActivity() instanceof IFragmentStackHolder) {
+            if (getParentFragment() instanceof IFragmentStackHolder) {
 
-                IFragmentStackHolder fsh = (IFragmentStackHolder) getActivity();
+                IFragmentStackHolder fsh = (IFragmentStackHolder) getParentFragment();
 
                 Fragment details = new DetailTileFragment();
 
