@@ -252,14 +252,16 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
         int id = item.getItemId();
 
         if (id == R.id.digest) {
-            setFragment(new PagerFragment());
+            setFragment(new DigestFragment());
         } else if (id == R.id.tags) {
             setFragment(new ListDetailFragment());
         } else if (id == R.id.just_added) {
             setFragment(new TileDetailFragment());
         } else if (id == R.id.favorites) {
             setFragment(new CardDetailFragment());
-        } else {
+        } else if (id == R.id.photos) {
+            setFragment((new PagerFragment()));
+        } else {        // id == videos
             setFragment(new ListDetailFragment());
         }
 

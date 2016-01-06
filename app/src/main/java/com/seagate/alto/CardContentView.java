@@ -2,12 +2,10 @@
 
 package com.seagate.alto;
 
-import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -54,7 +52,6 @@ public class CardContentView extends RecyclerView {
         super.onFinishInflate();
 
         mAdapter = new ContentAdapter();
-        mAdapter.setActivity((FragmentActivity) getContext());
         setAdapter(mAdapter);
         setHasFixedSize(true);
         setLayoutManager(new LinearLayoutManager(getContext()));
@@ -67,7 +64,7 @@ public class CardContentView extends RecyclerView {
         int position;
         TextView title;
 
-        public ViewHolder(LayoutInflater inflater, final ViewGroup parent, final Activity activity) {
+        public ViewHolder(LayoutInflater inflater, final ViewGroup parent) {
             super(inflater.inflate(R.layout.bill_card, parent, false));
 
             drawee = (SimpleDraweeView) itemView.findViewById(R.id.card_image);
@@ -126,12 +123,9 @@ public class CardContentView extends RecyclerView {
      */
     public static class ContentAdapter extends RecyclerView.Adapter<ViewHolder> {
 
-        // FIXME - Not happy with having to store this and pass it around.  Need to look closer at need here.
-        private FragmentActivity mActivity;
-
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new ViewHolder(LayoutInflater.from(parent.getContext()), parent, mActivity);
+            return new ViewHolder(LayoutInflater.from(parent.getContext()), parent);
         }
 
         @Override
@@ -149,10 +143,6 @@ public class CardContentView extends RecyclerView {
         @Override
         public int getItemCount() {
             return PlaceholderContent.getCount();
-        }
-
-        public void setActivity(FragmentActivity activity) {
-            this.mActivity = activity;
         }
     }
 }

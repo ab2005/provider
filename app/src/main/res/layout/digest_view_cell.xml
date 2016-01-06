@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Copyright (c) 2015. Seagate Technology PLC. All rights reserved. -->
+
+
+<com.seagate.alto.ui.DigestCellView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/group"
+    android:contentDescription="The Collage/Album view. Clicking this displays the album contents."
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:scaleType="center"
+    android:clickable="true"
+    android:background="@null"
+    />
