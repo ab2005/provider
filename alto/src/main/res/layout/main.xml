@@ -2,10 +2,9 @@
 
 <!-- Copyright (c) 2015. Seagate Technology PLC. All rights reserved. -->
 
-<fragment
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:name="com.seagate.alto.SplashFragment"
-    android:id="@+id/splash_fragment"
+    android:id="@+id/main_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     />

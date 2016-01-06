@@ -5,6 +5,7 @@ package com.seagate.alto;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Window;
@@ -14,12 +15,14 @@ import com.seagate.alto.utils.LogUtils;
 import java.util.List;
 
 
-// this activity switches between the startup fragment and the main  fragment
+// this activity switches between the startup fragment and the main fragment
 
 
 public class MainActivity extends AppCompatActivity implements IContentSwitcher {
 
     private static String TAG = LogUtils.makeTag(MainActivity.class);
+
+    private FragmentManager mFragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,16 +31,28 @@ public class MainActivity extends AppCompatActivity implements IContentSwitcher 
 
         super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.main);
+
+        mFragmentManager = getSupportFragmentManager();
+
         boolean showSplash = true; // show the splash if they are not logged in
 
         if (savedInstanceState == null) {
+            Fragment frag = null;
             if (showSplash) {
-                setContentView(R.layout.fragment_splash);
+                frag = new SplashFragment();
             } else {
                 // go straight to main
-                setContentView(R.layout.fragment_main);
+                frag = new MainFragment();
             }
+            setFragment(frag);
         }
+    }
+
+    private void setFragment(Fragment frag) {
+        FragmentTransaction transaction = mFragmentManager.beginTransaction();
+        transaction.replace(R.id.main_container, frag);
+        transaction.commit();
     }
 
     @Override
@@ -60,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements IContentSwitcher 
     @Override
     public void switchToMain() {
         Log.d(TAG, "switching to main");
-        setContentView(R.layout.fragment_main);
+        setFragment(new MainFragment());
 
     }
 }

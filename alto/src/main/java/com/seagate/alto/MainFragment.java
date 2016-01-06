@@ -50,7 +50,7 @@ public class MainFragment extends Fragment implements IBackPressHandler, IFragme
 
         // setContentView(R.layout.activity_main);
 
-        v = inflater.inflate(R.layout.activity_main, container, false);
+        v = inflater.inflate(R.layout.fragment_main, container, false);
 
         Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
 
@@ -166,7 +166,6 @@ public class MainFragment extends Fragment implements IBackPressHandler, IFragme
         return false;
     }
 
-//    @Override
     public void onBackPressed() {
 
         // v is the drawerlayout and you cannot find yourself
