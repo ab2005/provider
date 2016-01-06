@@ -29,9 +29,9 @@ import com.seagate.alto.utils.LogUtils;
 
 import java.util.ArrayList;
 
-public class MainFragment extends Fragment implements IBackPressHandler, IFragmentStackHolder, NavigationView.OnNavigationItemSelectedListener {
+public class StackFragment extends Fragment implements IBackPressHandler, IFragmentStackHolder, NavigationView.OnNavigationItemSelectedListener {
 
-    private static String TAG = LogUtils.makeTag(MainFragment.class);
+    private static String TAG = LogUtils.makeTag(StackFragment.class);
 
     private ActionBarDrawerToggle mToggle;
     private MaterialMenuDrawable materialMenu;

@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements IContentSwitcher 
                 frag = new SplashFragment();
             } else {
                 // go straight to main
-                frag = new MainFragment();
+                frag = new StackFragment();
             }
             setFragment(frag);
         }
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements IContentSwitcher 
     @Override
     public void switchToMain() {
         Log.d(TAG, "switching to main");
-        setFragment(new MainFragment());
+        setFragment(new StackFragment());
 
     }
 }

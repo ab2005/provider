@@ -5,6 +5,7 @@ package com.seagate.alto;
 // fragment to display splash and authentication
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,16 +31,31 @@ public class SplashFragment extends Fragment {
             public void onClick(View v) {
                 //validate login
                 Log.d(TAG, "start clicked");
-
-                // switch to the main fragment
-                if (getActivity() instanceof IContentSwitcher) {
-                    ((IContentSwitcher) getActivity()).switchToMain();
-                }
-
+                doneSplash();
             }
         });
 
         return view;
+    }
+
+    private void doneSplash() {
+        // switch to the main fragment
+        if (getActivity() instanceof IContentSwitcher) {
+            ((IContentSwitcher) getActivity()).switchToMain();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, "splash done");
+                doneSplash();
+            }
+        }, 3000);
     }
 
     @Override
