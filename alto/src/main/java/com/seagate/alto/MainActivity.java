@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity implements IContentSwitcher 
                 ((IBackPressHandler) currentFragment).onBackPressed();
             }
         }
-
     }
 
     @Override

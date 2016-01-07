@@ -21,5 +21,9 @@
     <string name="favorites_title">Favorites</string>
     <string name="photos_title">Photos</string>
     <string name="videos_title">Videos</string>
+    <string name="byline">by Seagate</string>
+    <string name="sign_in">Sign In</string>
+    <string name="password_hint">password</string>
+    <string name="username_hint">Account ID</string>
 
 </resources>

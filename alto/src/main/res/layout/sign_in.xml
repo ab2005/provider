@@ -9,16 +9,42 @@
     android:background="@android:color/white"
     >
 
-    <ImageView
+    <LinearLayout
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="130sp"
-        android:gravity="center"
-        android:src="@drawable/by_seagate"
-        />
+        android:orientation="horizontal"
+        android:layout_marginBottom="100sp"
+        >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:src="@drawable/cloud"
+            />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name"
+                android:textSize="30sp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/byline"
+                android:textSize="24sp"
+                />
+        </LinearLayout>
+    </LinearLayout>
+
 
     <RelativeLayout
         android:id="@+id/login_form"
@@ -64,9 +90,9 @@
             android:layout_marginBottom="30sp"
             android:layout_marginLeft="40sp"
             android:layout_marginRight="40sp"
-            android:background="@drawable/text_border"
+            style="?android:attr/editTextStyle"
             android:gravity="center_horizontal"
-            android:hint="Account ID"
+            android:hint="@string/username_hint"
             android:paddingBottom="5dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
@@ -98,9 +124,9 @@
             android:layout_marginBottom="40sp"
             android:layout_marginLeft="40sp"
             android:layout_marginRight="40sp"
-            android:background="@drawable/text_border"
+            style="?android:attr/editTextStyle"
             android:gravity="center_horizontal"
-            android:hint="password"
+            android:hint="@string/password_hint"
             android:paddingBottom="5dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
@@ -121,12 +147,11 @@
             android:layout_marginLeft="40sp"
             android:layout_marginRight="40sp"
             android:layout_marginTop="40sp"
-            android:background="@drawable/button_border"
+            style="?android:attr/borderlessButtonStyle"
             android:gravity="center"
             android:paddingBottom="5dp"
             android:paddingTop="5dp"
-            android:text="Sign in"
-            android:textColor="#ff33b5f5"
+            android:text="@string/sign_in"
             android:textSize="24sp"
             />
     </RelativeLayout>
