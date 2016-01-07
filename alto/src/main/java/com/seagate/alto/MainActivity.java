@@ -14,9 +14,7 @@ import com.seagate.alto.utils.LogUtils;
 
 import java.util.List;
 
-
-// this activity switches between the startup fragment and the main fragment
-
+// this activity switches between the splash fragment and the main fragment
 
 public class MainActivity extends AppCompatActivity implements IContentSwitcher {
 
@@ -35,17 +33,8 @@ public class MainActivity extends AppCompatActivity implements IContentSwitcher 
 
         mFragmentManager = getSupportFragmentManager();
 
-        boolean showSplash = true; // show the splash if they are not logged in
-
         if (savedInstanceState == null) {
-            Fragment frag = null;
-            if (showSplash) {
-                frag = new SplashFragment();
-            } else {
-                // go straight to main
-                frag = new StackFragment();
-            }
-            setFragment(frag);
+            setFragment(new SplashFragment());
         }
     }
 
