@@ -44,6 +44,19 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
         mFragView = inflater.inflate(R.layout.sign_in, container, false);
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+
+        // if we're logged in, move on
+        String username = mSharedPreferences.getString("username", null);
+        if (mSharedPreferences.getBoolean("logged", false)) {
+            String token = mSharedPreferences.getString("token."+username, null);
+            String uid = mSharedPreferences.getString("uid."+username, null);
+            if (token != null) {
+                // DropboxProducer.setCurrent(username, token, uid);
+                doneSplash();
+                return null;
+            }
+        }
+
         View bySeagate = mFragView.findViewById(R.id.title);
         mWebView = (WebView) mFragView.findViewById(R.id.webview);
         mWebView.getSettings().setJavaScriptEnabled(true);
