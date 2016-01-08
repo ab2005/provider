@@ -58,6 +58,8 @@ public class DigestListView extends RecyclerView {
 
         @Override
         public void onBindViewHolder(DigestCellViewHolder holder, int position) {
+            // based on position, we should be able to get the date of images in this cell
+            // Date date = getDateFromPosition(position);
             holder.digestCellView.loadContent(position);
         }
 

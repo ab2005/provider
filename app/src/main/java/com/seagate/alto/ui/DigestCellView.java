@@ -38,8 +38,7 @@ public class DigestCellView extends View {
     private DraweeHolder mFirstDraweeHolder;
     private DraweeHolder mSecondDraweeHolder;
     private DraweeHolder mThirdDraweeHolder;
-    private MultiDraweeHolder<GenericDraweeHierarchy> mMultiDraweeHolder =
-            new MultiDraweeHolder<>();
+    private MultiDraweeHolder<GenericDraweeHierarchy> mMultiDraweeHolder;
 
     private final static String TAG = DigestCellView.class.getName();
     private static final int CURSOR_WINDOW_SIZE = 20;
@@ -59,7 +58,10 @@ public class DigestCellView extends View {
 
     private final InfoPanel mInfoPanel = new InfoPanel();
 
+    private long mDigestId;
     private int mPosition = 1;
+    private Cursor mContentCursor;
+    private int mContentCursorCount = 0;
     private final Random mRandom = new Random();
 
     final Rect mViewBounds = new Rect();
@@ -92,11 +94,15 @@ public class DigestCellView extends View {
         mFirstDraweeHolder = DraweeHolder.create(createDraweeHierarchy(), context);
         mSecondDraweeHolder = DraweeHolder.create(createDraweeHierarchy(), context);
         mThirdDraweeHolder = DraweeHolder.create(createDraweeHierarchy(), context);
+        mMultiDraweeHolder = new MultiDraweeHolder<>();
     }
 
 
     public void loadContent(int position) {
+
+
         setMultiDraweeSource(position);
+        invalidate();
     }
 
 
@@ -224,6 +230,7 @@ public class DigestCellView extends View {
 
 
 
+    // Drawee stuff
 
     private GenericDraweeHierarchy createDraweeHierarchy() {
         return new GenericDraweeHierarchyBuilder(getResources())
@@ -260,9 +267,9 @@ public class DigestCellView extends View {
     }
 
     private void setMultiDraweeSource(int position) {
-        setFirstDraweeSource(PlaceholderContent.getUri(1 * position));
-        setSecondDraweeSource(PlaceholderContent.getUri(2 * position));
-        setThirdDraweeSource(PlaceholderContent.getUri(3 * position));
+        setFirstDraweeSource(PlaceholderContent.getUri(1 * (position+1)));
+        setSecondDraweeSource(PlaceholderContent.getUri(2 * (position+1)));
+        setThirdDraweeSource(PlaceholderContent.getUri(3 * (position+1)));
         mFirstDraweeHolder.onAttach();
         mSecondDraweeHolder.onAttach();
         mThirdDraweeHolder.onAttach();
@@ -272,6 +279,12 @@ public class DigestCellView extends View {
 
 
 
+
+    // private
+
+    private int getCursorCount() {
+        return mContentCursorCount;     // = mContentCursor.getCount();
+    }
 
 
 
