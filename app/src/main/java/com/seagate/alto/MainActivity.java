@@ -28,6 +28,7 @@ import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.seagate.alto.events.BusMaster;
 import com.seagate.alto.utils.LayoutQualifierUtils;
 import com.seagate.alto.utils.LogUtils;
+import com.seagate.alto.utils.ScreenUtils;
 
 import java.util.ArrayList;
 
@@ -45,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
 
         super.onCreate(savedInstanceState);
+
+        ScreenUtils.init(this);
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

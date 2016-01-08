@@ -1,15 +1,12 @@
 package com.seagate.alto.ui;
 
 import android.content.Context;
-import android.net.Uri;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import com.facebook.drawee.view.SimpleDraweeView;
-import com.seagate.alto.PlaceholderContent;
 import com.seagate.alto.R;
 
 public class DigestListView extends RecyclerView {
@@ -41,20 +38,11 @@ public class DigestListView extends RecyclerView {
     public static class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.DigestCellViewHolder> {
 
         public static class DigestCellViewHolder extends RecyclerView.ViewHolder {
-
-            SimpleDraweeView drawee;
-            int position;
+            DigestCellView digestCellView;
 
             public DigestCellViewHolder(LayoutInflater inflater, final ViewGroup parent) {
                 super(inflater.inflate(R.layout.digest_view_cell, parent, false));
-                final DigestCellView digestCellView = (DigestCellView) itemView.findViewById(R.id.group);
-                if (digestCellView != null) {
-                    digestCellView.loadContent();           // TODO: 1/5/16 load it now? or later? (onBindViewHolder)
-                }
-
-//                super(inflater.inflate(R.layout.bill_card, parent, false));
-//                drawee = (SimpleDraweeView) itemView.findViewById(R.id.card_image);
-
+                digestCellView = (DigestCellView) itemView.findViewById(R.id.group);
             }
         }
 
@@ -70,11 +58,7 @@ public class DigestListView extends RecyclerView {
 
         @Override
         public void onBindViewHolder(DigestCellViewHolder holder, int position) {
-
-//            Uri uri = PlaceholderContent.getUri(position);
-//            holder.drawee.setImageURI(uri);
-
-            holder.position = position;
+            holder.digestCellView.loadContent(position);
         }
 
         @Override

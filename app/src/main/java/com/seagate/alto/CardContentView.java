@@ -44,7 +44,7 @@ public class CardContentView extends RecyclerView {
 
     public CardContentView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        Log.d(TAG, "contructor");
+        Log.d(TAG, "constructor");
     }
 
     @Override
