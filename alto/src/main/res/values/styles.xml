@@ -9,6 +9,10 @@
         <item name="colorPrimary">@color/seagate_green</item>
         <item name="colorPrimaryDark">@color/seagate_grey</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="colorControlNormal">@color/seagate_grey</item>
+        <item name="colorControlHighlight">@color/seagate_grey</item>
+        <item name="colorControlActivated">@color/lyve_blue</item>
     </style>
     <style name="SeagateTheme.NoActionBar">
         <item name="windowActionBar">false</item>

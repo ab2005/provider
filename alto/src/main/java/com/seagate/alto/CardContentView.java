@@ -76,9 +76,8 @@ public class CardContentView extends RecyclerView {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (parent.getContext() instanceof MainActivity) {
 
-                        ArrayList<Pair<View, String>> pairs = new ArrayList<Pair<View, String>>();
+                    ArrayList<Pair<View, String>> pairs = new ArrayList<Pair<View, String>>();
                         Pair<View, String> imagePair = Pair.create((View) drawee, "tThumbnail");
                         pairs.add(imagePair);
                         Pair<View, String> titlePair = Pair.create((View) title, "tTitle");
@@ -86,7 +85,6 @@ public class CardContentView extends RecyclerView {
 
                         BusMaster.getBus().post(new ItemSelectedEvent(position, pairs));
 
-                    }
                 }
             });
 

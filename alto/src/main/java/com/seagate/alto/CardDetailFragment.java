@@ -39,9 +39,10 @@ public class CardDetailFragment extends ListDetailFragment implements IBackStack
         Log.d(TAG, "item selected: " + event.getPosition());
 
         if (mDetail == null) {
-            if (getActivity() instanceof IFragmentStackHolder) {
 
-                IFragmentStackHolder fsh = (IFragmentStackHolder) getActivity();
+            if (getParentFragment() instanceof IFragmentStackHolder) {
+
+                IFragmentStackHolder fsh = (IFragmentStackHolder) getParentFragment();
 
                 Fragment details = new DetailCardFragment();
 

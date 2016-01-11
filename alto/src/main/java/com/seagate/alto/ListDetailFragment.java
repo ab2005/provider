@@ -115,9 +115,9 @@ public class ListDetailFragment extends Fragment implements IBackStackName {
 
     protected void handleItemSelected(ItemSelectedEvent event) {
         if (mDetail == null) {
-            if (getActivity() instanceof IFragmentStackHolder) {
+            if (getParentFragment() instanceof IFragmentStackHolder) {
 
-                IFragmentStackHolder fsh = (IFragmentStackHolder) getActivity();
+                IFragmentStackHolder fsh = (IFragmentStackHolder) getParentFragment();
 
                 Fragment details = new DetailListFragment();
 

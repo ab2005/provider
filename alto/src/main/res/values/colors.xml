@@ -6,6 +6,8 @@
     <color name="seagate_green">#6fbe50</color>
     <color name="seagate_grey">#868589</color>
 
+    <color name="lyve_blue">#ff33b5f5</color>
+
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
