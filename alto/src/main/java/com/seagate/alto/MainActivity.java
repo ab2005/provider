@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Window;
 
+import com.seagate.alto.metrics.Metrics;
 import com.seagate.alto.utils.LogUtils;
 
 import java.util.List;
@@ -39,6 +40,13 @@ public class MainActivity extends AppCompatActivity implements IContentSwitcher 
         if (savedInstanceState == null) {
             setFragment(new SplashFragment());
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        Metrics.getInstance().flush();
     }
 
     @Override

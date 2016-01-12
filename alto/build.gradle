@@ -32,4 +32,5 @@ dependencies {
     compile 'com.balysv.materialmenu:material-menu-toolbar:1.5.4'
 
     compile 'uk.co.chrisjenx:calligraphy:2.1.0'
+    compile "com.mixpanel.android:mixpanel-android:4.6.4"       // for mixpanel
 }

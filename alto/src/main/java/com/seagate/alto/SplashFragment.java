@@ -22,6 +22,8 @@ import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.seagate.alto.metrics.AltoMetricsEvent;
+import com.seagate.alto.metrics.Metrics;
 import com.seagate.alto.utils.LogUtils;
 
 // Splash is used at the beginning of the app to get things started -- includes sign in for now
@@ -44,6 +46,8 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
         mFragView = inflater.inflate(R.layout.sign_in, container, false);
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+
+        Metrics.getInstance().start(AltoMetricsEvent.ShowSplash);
 
         // if we're logged in, move on
         String username = mSharedPreferences.getString("username", null);
@@ -81,6 +85,8 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
                         String passw = passView.getText().toString();
                         e.putString("pass." + username, passw);
                         e.apply();
+
+                        Metrics.getInstance().report(AltoMetricsEvent.LogintoExistingAccount);
 
                         // DropboxProducer.setCurrent(username, token, uid);
                         doneSplash();
@@ -126,6 +132,9 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
     }
 
     private void doneSplash() {
+
+        Metrics.getInstance().report(AltoMetricsEvent.ShowSplash);
+
         // switch to the main fragment
         if (getActivity() instanceof IContentSwitcher) {
             ((IContentSwitcher) getActivity()).switchToMain();
