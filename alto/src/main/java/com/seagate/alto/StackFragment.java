@@ -37,7 +37,8 @@ public class StackFragment extends Fragment implements IToolbarHolder, IBackPres
     private MaterialMenuDrawable materialMenu;
     private FragmentManager mFragmentManager;
     private Toolbar mToolbar;
-    private View v;
+    private View mFragView;
+    private FloatingActionButton mFab;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -50,9 +51,9 @@ public class StackFragment extends Fragment implements IToolbarHolder, IBackPres
 
         // setContentView(R.layout.activity_main);
 
-        v = inflater.inflate(R.layout.fragment_main, container, false);
+        mFragView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        mToolbar = (Toolbar) v.findViewById(R.id.toolbar);
+        mToolbar = (Toolbar) mFragView.findViewById(R.id.toolbar);
 
         if (getActivity() instanceof AppCompatActivity) {
             ((AppCompatActivity) getActivity()).setSupportActionBar(mToolbar);
@@ -60,8 +61,8 @@ public class StackFragment extends Fragment implements IToolbarHolder, IBackPres
 
 //        mToolbar.setTitle(R.string.app_name);
 
-        FloatingActionButton fab = (FloatingActionButton) v.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        mFab = (FloatingActionButton) mFragView.findViewById(R.id.fab);
+        mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -69,7 +70,7 @@ public class StackFragment extends Fragment implements IToolbarHolder, IBackPres
             }
         });
 
-        final DrawerLayout drawer = (DrawerLayout) v.findViewById(R.id.drawer_layout);
+        final DrawerLayout drawer = (DrawerLayout) mFragView.findViewById(R.id.drawer_layout);
         mToggle = new ActionBarDrawerToggle(
                 getActivity(), drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(mToggle);
@@ -78,7 +79,7 @@ public class StackFragment extends Fragment implements IToolbarHolder, IBackPres
         materialMenu = new MaterialMenuDrawable(getContext(), Color.WHITE, MaterialMenuDrawable.Stroke.THIN);
         mToolbar.setNavigationIcon(materialMenu);
 
-        final NavigationView navigationView = (NavigationView) v.findViewById(R.id.nav_view);
+        final NavigationView navigationView = (NavigationView) mFragView.findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -121,7 +122,7 @@ public class StackFragment extends Fragment implements IToolbarHolder, IBackPres
 
         BusMaster.getBus().register(this);
 
-        return v;
+        return mFragView;
     }
 
 
@@ -168,9 +169,9 @@ public class StackFragment extends Fragment implements IToolbarHolder, IBackPres
 
     public void onBackPressed() {
 
-        // v is the drawerlayout and you cannot find yourself
+        // mFragView is the drawerlayout and you cannot find yourself
 
-        DrawerLayout drawer = (DrawerLayout) v; // .findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) mFragView; // .findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -259,7 +260,7 @@ public class StackFragment extends Fragment implements IToolbarHolder, IBackPres
             setFragment(new ListDetailFragment());
         }
 
-        ((DrawerLayout) v).closeDrawer(GravityCompat.START);
+        ((DrawerLayout) mFragView).closeDrawer(GravityCompat.START);
 
         return true;
     }
@@ -314,10 +315,12 @@ public class StackFragment extends Fragment implements IToolbarHolder, IBackPres
     @Override
     public void showToolBar() {
         mToolbar.setVisibility(View.VISIBLE);
+        mFab.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideToolBar() {
         mToolbar.setVisibility(View.GONE);
+        mFab.setVisibility(View.GONE);
     }
 }

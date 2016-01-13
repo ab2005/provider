@@ -15,9 +15,18 @@
         xmlns:fresco="http://schemas.facebook.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        fresco:actualImageScaleType="focusCrop"
+        fresco:actualImageScaleType="fitXY"
         fresco:fadeDuration="300"
         />
+
+    <!--<com.seagate.alto.SeagateDraweeView-->
+        <!--android:id="@+id/image"-->
+        <!--xmlns:fresco="http://schemas.facebook.com/apk/res/android"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--fresco:actualImageScaleType="fitXY"-->
+        <!--fresco:fadeDuration="300"-->
+        <!--/>-->
 
     <TextView
         android:layout_width="match_parent"
