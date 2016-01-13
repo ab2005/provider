@@ -29,14 +29,14 @@ import com.seagate.alto.utils.LogUtils;
 
 import java.util.ArrayList;
 
-public class StackFragment extends Fragment implements IBackPressHandler, IFragmentStackHolder, NavigationView.OnNavigationItemSelectedListener {
+public class StackFragment extends Fragment implements IToolbarHolder, IBackPressHandler, IFragmentStackHolder, NavigationView.OnNavigationItemSelectedListener {
 
     private static String TAG = LogUtils.makeTag(StackFragment.class);
 
     private ActionBarDrawerToggle mToggle;
     private MaterialMenuDrawable materialMenu;
     private FragmentManager mFragmentManager;
-
+    private Toolbar mToolbar;
     private View v;
 
     @Override
@@ -52,13 +52,13 @@ public class StackFragment extends Fragment implements IBackPressHandler, IFragm
 
         v = inflater.inflate(R.layout.fragment_main, container, false);
 
-        Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
+        mToolbar = (Toolbar) v.findViewById(R.id.toolbar);
 
         if (getActivity() instanceof AppCompatActivity) {
-            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+            ((AppCompatActivity) getActivity()).setSupportActionBar(mToolbar);
         }
 
-//        toolbar.setTitle(R.string.app_name);
+//        mToolbar.setTitle(R.string.app_name);
 
         FloatingActionButton fab = (FloatingActionButton) v.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -71,17 +71,17 @@ public class StackFragment extends Fragment implements IBackPressHandler, IFragm
 
         final DrawerLayout drawer = (DrawerLayout) v.findViewById(R.id.drawer_layout);
         mToggle = new ActionBarDrawerToggle(
-                getActivity(), drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                getActivity(), drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(mToggle);
         mToggle.syncState();
 
         materialMenu = new MaterialMenuDrawable(getContext(), Color.WHITE, MaterialMenuDrawable.Stroke.THIN);
-        toolbar.setNavigationIcon(materialMenu);
+        mToolbar.setNavigationIcon(materialMenu);
 
         final NavigationView navigationView = (NavigationView) v.findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -253,12 +253,11 @@ public class StackFragment extends Fragment implements IBackPressHandler, IFragm
             setFragment(new TileDetailFragment());
         } else if (id == R.id.favorites) {
             setFragment(new CardDetailFragment());
+        } else if (id == R.id.photos) {
+            setFragment(new TileDetailFragment());
         } else {
             setFragment(new ListDetailFragment());
         }
-
-//        DrawerLayout drawer = (DrawerLayout) v.findViewById(R.id.drawer_layout);
-//        drawer.closeDrawer(GravityCompat.START);
 
         ((DrawerLayout) v).closeDrawer(GravityCompat.START);
 
@@ -310,5 +309,15 @@ public class StackFragment extends Fragment implements IBackPressHandler, IFragm
 
         transaction.commit();
 
+    }
+
+    @Override
+    public void showToolBar() {
+        mToolbar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideToolBar() {
+        mToolbar.setVisibility(View.GONE);
     }
 }

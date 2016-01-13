@@ -4,10 +4,8 @@ package com.seagate.alto;
 
 // add a class header comment here
 
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.transition.TransitionInflater;
 import android.util.Log;
 
 import com.seagate.alto.events.ItemSelectedEvent;
@@ -43,16 +41,17 @@ public class TileDetailFragment extends ListDetailFragment implements IBackStack
 
                 IFragmentStackHolder fsh = (IFragmentStackHolder) getParentFragment();
 
-                Fragment details = new DetailTileFragment();
+//                Fragment details = new DetailTileFragment();
+                Fragment details = new PhotoFragment();
 
                 Bundle args = new Bundle();
                 args.putInt(PlaceholderContent.INDEX, event.getPosition());
                 details.setArguments(args);
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    details.setSharedElementEnterTransition(TransitionInflater.from(getActivity()).inflateTransition(R.transition.trans_move));
-                    details.setSharedElementReturnTransition(TransitionInflater.from(getActivity()).inflateTransition(R.transition.trans_move));
-                }
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//                    details.setSharedElementEnterTransition(TransitionInflater.from(getActivity()).inflateTransition(R.transition.trans_move));
+//                    details.setSharedElementReturnTransition(TransitionInflater.from(getActivity()).inflateTransition(R.transition.trans_move));
+//                }
 
                 fsh.pushFragment(details, event.getPairs());
 
