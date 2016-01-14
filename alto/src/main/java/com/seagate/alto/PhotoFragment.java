@@ -15,7 +15,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.android.ZoomableDraweeView;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.drawable.ProgressBarDrawable;
+import com.facebook.drawee.drawable.ScalingUtils;
+import com.facebook.drawee.generic.GenericDraweeHierarchy;
+import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.seagate.alto.utils.LogUtils;
 
 public class PhotoFragment extends Fragment {
@@ -139,9 +144,21 @@ public class PhotoFragment extends Fragment {
                 index = args.getInt(PlaceholderContent.INDEX);
             }
 
-            SimpleDraweeView sdv = (SimpleDraweeView) v.findViewById(R.id.image);
-            if (sdv != null) {
-                sdv.setImageURI(PlaceholderContent.getUri(index));
+            ZoomableDraweeView zdv = (ZoomableDraweeView) v.findViewById(R.id.image);
+            if (zdv != null) {
+                zdv.setController(
+                        Fresco.newDraweeControllerBuilder()
+                                .setUri(PlaceholderContent.getUri(index))
+                                .build());
+
+                GenericDraweeHierarchy hierarchy =
+                        new GenericDraweeHierarchyBuilder(container.getResources())
+                                .setActualImageScaleType(ScalingUtils.ScaleType.FIT_CENTER)
+                                .setProgressBarImage(new ProgressBarDrawable())
+                                .build();
+
+                zdv.setHierarchy(hierarchy);
+
             }
 
             return v;
