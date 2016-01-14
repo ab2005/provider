@@ -2,7 +2,7 @@
 
 package com.seagate.alto;
 
-// display a full size photo
+// display a full screen photo in a view pager
 
 import android.graphics.drawable.Animatable;
 import android.os.Bundle;
@@ -39,9 +39,6 @@ public class PhotoFragment extends Fragment {
         ViewPager viewPager = (ViewPager) v.findViewById(R.id.viewpager);
         setupViewPager(viewPager);
 
-//        TabLayout tabs = (TabLayout) v.findViewById(R.id.tabs);
-//        tabs.setupWithViewPager(viewPager);
-
         return v;
     }
 
@@ -71,30 +68,13 @@ public class PhotoFragment extends Fragment {
             index = args.getInt(PlaceholderContent.INDEX);
         }
 
-
         // if you ARE a fragment and you HAVE fragments, use the ChildFragmentManager
         mAdapter = new Adapter(this.getChildFragmentManager());
-//        mAdapter.addFragment(new ListDetailFragment(), "List");
-//        mAdapter.addFragment(new TileDetailFragment(), "Tile");
-//        mAdapter.addFragment(new CardDetailFragment(), "Card");
         viewPager.setAdapter(mAdapter);
         viewPager.setCurrentItem(index);
     }
 
-//    @Override
-//    public String getBackStackName() {
-//        return "pager-fragment";
-//    }
-
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        Log.d(TAG, "onResume");
-//    }
-
     static class Adapter extends FragmentPagerAdapter {
-//        private final List<Fragment> mFragmentList = new ArrayList<>();
-//        private final List<String> mFragmentTitleList = new ArrayList<>();
 
         public Adapter(FragmentManager manager) {
             super(manager);
@@ -102,8 +82,6 @@ public class PhotoFragment extends Fragment {
 
         @Override
         public Fragment getItem(int position) {
-//            return mFragmentList.get(position);
-
             PhotoSubFragment pf = new PhotoSubFragment();
             Bundle args = new Bundle();
             args.putInt(PlaceholderContent.INDEX, position);
@@ -114,14 +92,8 @@ public class PhotoFragment extends Fragment {
 
         @Override
         public int getCount() {
-//            return mFragmentList.size();
             return PlaceholderContent.getCount();
         }
-
-//        public void addFragment(Fragment fragment, String title) {
-//            mFragmentList.add(fragment);
-//            mFragmentTitleList.add(title);
-//        }
 
         @Override
         public CharSequence getPageTitle(int position) {
@@ -160,24 +132,6 @@ public class PhotoFragment extends Fragment {
                 }
             });
             photoDraweeView.setController(controller.build());
-
-
-//            ZoomableDraweeView zdv = (ZoomableDraweeView) v.findViewById(R.id.image);
-//            if (zdv != null) {
-//                zdv.setController(
-//                        Fresco.newDraweeControllerBuilder()
-//                                .setUri(PlaceholderContent.getUri(index))
-//                                .build());
-//
-//                GenericDraweeHierarchy hierarchy =
-//                        new GenericDraweeHierarchyBuilder(container.getResources())
-//                                .setActualImageScaleType(ScalingUtils.ScaleType.FIT_CENTER)
-//                                .setProgressBarImage(new ProgressBarDrawable())
-//                                .build();
-//
-//                zdv.setHierarchy(hierarchy);
-//
-//            }
 
             return v;
         }
