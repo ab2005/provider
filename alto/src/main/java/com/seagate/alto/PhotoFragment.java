@@ -4,6 +4,7 @@ package com.seagate.alto;
 
 // display a full size photo
 
+import android.graphics.drawable.Animatable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,13 +16,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.facebook.android.ZoomableDraweeView;
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.drawable.ProgressBarDrawable;
-import com.facebook.drawee.drawable.ScalingUtils;
-import com.facebook.drawee.generic.GenericDraweeHierarchy;
-import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
+import com.facebook.drawee.backends.pipeline.PipelineDraweeControllerBuilder;
+import com.facebook.drawee.controller.BaseControllerListener;
+import com.facebook.imagepipeline.image.ImageInfo;
 import com.seagate.alto.utils.LogUtils;
+
+import me.relex.photodraweeview.PhotoDraweeView;
 
 public class PhotoFragment extends Fragment {
 
@@ -144,22 +145,39 @@ public class PhotoFragment extends Fragment {
                 index = args.getInt(PlaceholderContent.INDEX);
             }
 
-            ZoomableDraweeView zdv = (ZoomableDraweeView) v.findViewById(R.id.image);
-            if (zdv != null) {
-                zdv.setController(
-                        Fresco.newDraweeControllerBuilder()
-                                .setUri(PlaceholderContent.getUri(index))
-                                .build());
+            final PhotoDraweeView photoDraweeView = (PhotoDraweeView) v.findViewById(R.id.image);
+            PipelineDraweeControllerBuilder controller = Fresco.newDraweeControllerBuilder();
+            controller.setUri(PlaceholderContent.getUri(index));
+            controller.setOldController(photoDraweeView.getController());
+            controller.setControllerListener(new BaseControllerListener<ImageInfo>() {
+                @Override
+                public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
+                    super.onFinalImageSet(id, imageInfo, animatable);
+                    if (imageInfo == null) {
+                        return;
+                    }
+                    photoDraweeView.update(imageInfo.getWidth(), imageInfo.getHeight());
+                }
+            });
+            photoDraweeView.setController(controller.build());
 
-                GenericDraweeHierarchy hierarchy =
-                        new GenericDraweeHierarchyBuilder(container.getResources())
-                                .setActualImageScaleType(ScalingUtils.ScaleType.FIT_CENTER)
-                                .setProgressBarImage(new ProgressBarDrawable())
-                                .build();
 
-                zdv.setHierarchy(hierarchy);
-
-            }
+//            ZoomableDraweeView zdv = (ZoomableDraweeView) v.findViewById(R.id.image);
+//            if (zdv != null) {
+//                zdv.setController(
+//                        Fresco.newDraweeControllerBuilder()
+//                                .setUri(PlaceholderContent.getUri(index))
+//                                .build());
+//
+//                GenericDraweeHierarchy hierarchy =
+//                        new GenericDraweeHierarchyBuilder(container.getResources())
+//                                .setActualImageScaleType(ScalingUtils.ScaleType.FIT_CENTER)
+//                                .setProgressBarImage(new ProgressBarDrawable())
+//                                .build();
+//
+//                zdv.setHierarchy(hierarchy);
+//
+//            }
 
             return v;
         }
