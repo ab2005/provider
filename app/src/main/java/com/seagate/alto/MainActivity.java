@@ -23,14 +23,19 @@ import android.view.View;
 import android.view.Window;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
+import com.facebook.common.logging.FLog;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
+import com.facebook.imagepipeline.listener.RequestListener;
+import com.facebook.imagepipeline.listener.RequestLoggingListener;
 import com.seagate.alto.events.BusMaster;
 import com.seagate.alto.utils.LayoutQualifierUtils;
 import com.seagate.alto.utils.LogUtils;
 import com.seagate.alto.utils.ScreenUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements IFragmentStackHolder, NavigationView.OnNavigationItemSelectedListener {
 
@@ -159,6 +164,9 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
     }
 
     private void startFresco() {
+        Set<RequestListener> requestListeners = new HashSet<>();
+        requestListeners.add(new RequestLoggingListener());
+
 //        DiskCacheConfig diskCacheConfig = DiskCacheConfig.newBuilder()
 //                .setBaseDirectoryName("SeagateCloud/ImageCache")
 //                .setBaseDirectoryPath(getExternalFilesDir(Environment.DIRECTORY_PICTURES))
@@ -170,10 +178,12 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
 //                .setMaxCacheSize(10000000)
 //                .build();
         ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
+                .setRequestListeners(requestListeners)
 //                .setMainDiskCacheConfig(diskCacheConfig)
 //                .setSmallImageDiskCacheConfig(smallImageDiskCacheConfig)
                 .build();
         Fresco.initialize(this, config);
+        FLog.setMinimumLoggingLevel(FLog.VERBOSE);
     }
 
     @Override

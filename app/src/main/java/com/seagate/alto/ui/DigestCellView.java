@@ -9,7 +9,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -25,22 +24,25 @@ import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.DraweeHolder;
 import com.facebook.drawee.view.MultiDraweeHolder;
 import com.seagate.alto.PlaceholderContent;
+import com.seagate.alto.R;
+import com.seagate.alto.utils.ColorUtils;
 import com.seagate.alto.utils.LayoutUtils;
 import com.seagate.alto.utils.ScreenUtils;
 
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.Random;
 import java.util.TimeZone;
 
 public class DigestCellView extends View {
 
-    private DraweeHolder mFirstDraweeHolder;
-    private DraweeHolder mSecondDraweeHolder;
-    private DraweeHolder mThirdDraweeHolder;
-    private MultiDraweeHolder<GenericDraweeHierarchy> mMultiDraweeHolder;
-
     private final static String TAG = DigestCellView.class.getName();
+
+    private MultiDraweeHolder<GenericDraweeHierarchy> mMultiDraweeHolder;
+//    private DraweeHolder mInfoDraweeHolder;
+    private final InfoPanel mInfoPanel = new InfoPanel();
+
+
     private static final int CURSOR_WINDOW_SIZE = 20;
     private static final int MAX_CYCLING_RANGE = 20;
     private int mRetryCount = 0;
@@ -56,13 +58,15 @@ public class DigestCellView extends View {
     // Rotate stuff
     private final Paint mBackgroundPaint = new Paint();
 
-    private final InfoPanel mInfoPanel = new InfoPanel();
 
     private long mDigestId;
+    private int mImagePanelCount;
+    private int mInforPanelCount = 1;
     private int mPosition = 1;
     private Cursor mContentCursor;
     private int mContentCursorCount = 0;
-    private final Random mRandom = new Random();
+    private final Object mDigestCellItemsLock = new Object();
+
 
     final Rect mViewBounds = new Rect();
     final Rect mShadowBounds = new Rect();
@@ -88,59 +92,57 @@ public class DigestCellView extends View {
     }
 
     private void init(Context context) {
-//        int padding = 5;
-//        setPadding(padding, padding, padding, padding);
+        Log.d(TAG, "init()");
 
-        mFirstDraweeHolder = DraweeHolder.create(createDraweeHierarchy(), context);
-        mSecondDraweeHolder = DraweeHolder.create(createDraweeHierarchy(), context);
-        mThirdDraweeHolder = DraweeHolder.create(createDraweeHierarchy(), context);
         mMultiDraweeHolder = new MultiDraweeHolder<>();
+
+        Log.d(TAG, "mMultiDraweeHolder: " + mMultiDraweeHolder + ", size()" + mMultiDraweeHolder.size());
+
     }
 
 
     public void loadContent(int position) {
 
-
+        Log.d(TAG, "loadContent()");
         setMultiDraweeSource(position);
         invalidate();
+        Log.d(TAG, "invalidate()");
     }
 
 
     @Override
     public void onDetachedFromWindow() {
+        Log.d(TAG, "onDetachedFromWindow()");
         super.onDetachedFromWindow();
         detachdraweeHolders();
     }
 
     @Override
     public void onStartTemporaryDetach() {
+        Log.d(TAG, "onStartTemporaryDetach()");
         super.onStartTemporaryDetach();
         detachdraweeHolders();
     }
 
     @Override
     public void onAttachedToWindow() {
+        Log.d(TAG, "onAttachedToWindow()");
         super.onAttachedToWindow();
         attachDraweeHolders();
     }
 
     @Override
     public void onFinishTemporaryDetach() {
+        Log.d(TAG, "onFinishTEmporaryDetach()");
         super.onFinishTemporaryDetach();
         attachDraweeHolders();
     }
 
     private void detachdraweeHolders() {
-        mFirstDraweeHolder.onDetach();
-        mSecondDraweeHolder.onDetach();
-        mThirdDraweeHolder.onDetach();
         mMultiDraweeHolder.onDetach();
     }
 
     private void attachDraweeHolders() {
-        mFirstDraweeHolder.onAttach();
-        mSecondDraweeHolder.onAttach();
-        mThirdDraweeHolder.onAttach();
         mMultiDraweeHolder.onAttach();
     }
 
@@ -152,6 +154,7 @@ public class DigestCellView extends View {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        Log.d(TAG, "onMeasure()");
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         int size;
         ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) getLayoutParams();
@@ -162,7 +165,7 @@ public class DigestCellView extends View {
         }
         if (ScreenUtils.isPortrait()) {
             size = ScreenUtils.getWidthInPixels();
-        } else {
+        } else {        // FIXME: 1/11/16 landscape is not done yet.
             final TypedArray styledAttributes = getContext().getTheme().obtainStyledAttributes(new int[] { android.R.attr.actionBarSize });
             int actionBarHeight = (int) styledAttributes.getDimension(0, 0);
             styledAttributes.recycle();
@@ -176,28 +179,14 @@ public class DigestCellView extends View {
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        Log.d(TAG, "onLayout");
         super.onLayout(changed, left, top, right, bottom);
-//        mViewBounds.set(0, 0, getWidth(), getHeight());
-//
-//        mContentBackground = new Rect(mViewBounds);
-//        int shadowSize = Math.round(mContentBackground.height() * 0.02f);
-//        mContentBackground.inset(shadowSize, shadowSize);
-//        mShadowBounds.set(mContentBackground);
-//        mShadowBounds.bottom += shadowSize;
-//
-//        mContentBounds.set(mContentBackground);
-//        int borderSize = LayoutUtils.getBorderSize(mContentBounds.width());
-//        mContentBounds.inset(borderSize, borderSize);
-//
-//        if (!mLayoutComplete) {
-//            mLayoutComplete = true;
-////            refresh();
-//        }
 
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
+        Log.d(TAG, "onDraw()");
         // View might be in the process of being recycled. If so, it will be detached from it's parent.
         super.onDraw(canvas);
         if (getParent() == null) {
@@ -209,76 +198,86 @@ public class DigestCellView extends View {
             canvas.rotate(90, getWidth() / 2, getHeight() / 2);
         }
 
-//        setMultiDraweeSource(1);
-        // TODO: 1/7/16 Draw placeholder here, and replace with real photos in loadContent() call (not sure about this.)
+        synchronized (this) {
+            DigestCellLayout digestCellLayout = DigestCellLayouts.getLayoutForSize(mImagePanelCount, mPosition);
+            Rect layoutBounds = new Rect(0, 0, getWidth(), getHeight());
+            for (int i = 0; i < mImagePanelCount; i++) {
+                Drawable drawable = mMultiDraweeHolder.get(i).getTopLevelDrawable();
+                Rect childBounds = digestCellLayout.getPanelRect(i, layoutBounds);
+                drawable.setBounds(childBounds);
+                drawable.draw(canvas);
+            }
+//            mMultiDraweeHolder.draw(canvas);              // don't do MultiDraweeHolder.draw(canvas) here, because we may have more DraweeHolders than we want to display.
 
-        Drawable drawable;
+            Rect infoBounds = digestCellLayout.getInfoRect(layoutBounds);
 
-        drawable = mFirstDraweeHolder.getTopLevelDrawable();
-        drawable.setBounds(0, 0, getWidth() / 2, getHeight() / 2);
-        drawable.draw(canvas);
+            long offset = Timestamp.valueOf("2012-01-01 00:00:00").getTime();
+            long end = Timestamp.valueOf("2013-01-01 00:00:00").getTime();
+            long diff = end - offset + 1;
+            long rand = offset + (long)(Math.random() * diff);
 
-        drawable = mSecondDraweeHolder.getTopLevelDrawable();
-        drawable.setBounds(getWidth() / 2, 0, getWidth(), getHeight() / 2);
-        drawable.draw(canvas);
+            mInfoPanel.reset(rand, infoBounds);
+            drawInfo(canvas, 255);
+        }
 
-        drawable = mThirdDraweeHolder.getTopLevelDrawable();
-        drawable.setBounds(0, getHeight() / 2, getWidth(), getHeight());
-        drawable.draw(canvas);
+
 
     }
 
+
+    // draw
+    private void drawInfo(Canvas canvas, int alpha) {
+        mInfoPanel.draw(canvas, alpha);
+    }
 
 
     // Drawee stuff
 
     private GenericDraweeHierarchy createDraweeHierarchy() {
-        return new GenericDraweeHierarchyBuilder(getResources())
+        GenericDraweeHierarchy hierarchy = new GenericDraweeHierarchyBuilder(getResources())
                 .setActualImageScaleType(ScalingUtils.ScaleType.CENTER_CROP)
-                .setFadeDuration(0)
+                .setFadeDuration(10)
                 .build();
-    }
-
-    private void setFirstDraweeSource(Uri uri) {
-        DraweeController controller = Fresco.newDraweeControllerBuilder()
-                .setUri(uri)
-                .setOldController(mFirstDraweeHolder.getController())
-                .build();
-        mFirstDraweeHolder.setController(controller);
-        mMultiDraweeHolder.add(mFirstDraweeHolder);
-    }
-
-    private void setSecondDraweeSource(Uri uri) {
-        DraweeController controller = Fresco.newDraweeControllerBuilder()
-                .setUri(uri)
-                .setOldController(mSecondDraweeHolder.getController())
-                .build();
-        mSecondDraweeHolder.setController(controller);
-        mMultiDraweeHolder.add(mSecondDraweeHolder);
-    }
-
-    private void setThirdDraweeSource(Uri uri) {
-        DraweeController controller = Fresco.newDraweeControllerBuilder()
-                .setUri(uri)
-                .setOldController(mThirdDraweeHolder.getController())
-                .build();
-        mThirdDraweeHolder.setController(controller);
-        mMultiDraweeHolder.add(mThirdDraweeHolder);
+        hierarchy.setPlaceholderImage(R.drawable.photo_offline_large);
+        return hierarchy;
     }
 
     private void setMultiDraweeSource(int position) {
-        setFirstDraweeSource(PlaceholderContent.getUri(1 * (position+1)));
-        setSecondDraweeSource(PlaceholderContent.getUri(2 * (position+1)));
-        setThirdDraweeSource(PlaceholderContent.getUri(3 * (position+1)));
-        mFirstDraweeHolder.onAttach();
-        mSecondDraweeHolder.onAttach();
-        mThirdDraweeHolder.onAttach();
-        mMultiDraweeHolder.onAttach();
+        Log.d(TAG, "setMultiDraweeSource()");
+
+        synchronized (this) {
+            mImagePanelCount = position % MAX_COLLAGES_ON_SCREEN + 1;       // TODO: 1/14/16 get image panel count here.
+            Log.d(TAG, "mPanelCount = " + mImagePanelCount);
+            for (int i = 0; i < mImagePanelCount; i++) {
+
+                // TODO: 1/14/16 can we only set new uri to the same DraweeHolder instead of set new DraweeHolder??
+                DraweeController controller = Fresco.newDraweeControllerBuilder()
+                        .setUri(PlaceholderContent.getUri(((i + 1) * (position + 1))))
+                        .build();
+                if (i < mMultiDraweeHolder.size()) {        // there is a DraweeHolder available to be reuse: simply set a new controller to this DraweeHolder.
+                    DraweeHolder dh = mMultiDraweeHolder.get(i);
+                    dh.setController(controller);
+                } else {                                    // there is no DraweeHolder available to be reuse: create a new DraweeHolder, and add into the MultiDraweeHolder
+                    DraweeHolder dh = DraweeHolder.create(createDraweeHierarchy(), getContext());
+                    dh.setController(controller);
+                    mMultiDraweeHolder.add(dh);
+                }
+
+//                DraweeController controller = Fresco.newDraweeControllerBuilder()
+//                        .setUri(PlaceholderContent.getUri(((i + 1) * (position + 1))))
+//                        .build();
+//                DraweeHolder dh = DraweeHolder.create(createDraweeHierarchy(), getContext());
+//                dh.setController(controller);
+//                mMultiDraweeHolder.add(dh);
+            }
+
+            mMultiDraweeHolder.onAttach();
+            Log.d(TAG, "After setMultiDraweeSource -- mMultiDraweeHolder: " + mMultiDraweeHolder + ", size()" + mMultiDraweeHolder.size());
+
+        }
+
+
     }
-
-
-
-
 
     // private
 
@@ -286,25 +285,10 @@ public class DigestCellView extends View {
         return mContentCursorCount;     // = mContentCursor.getCount();
     }
 
-
-
-
-
-
-
-
-
-
-
-
     void drawBackground(Canvas canvas, int alpha) {
         mBackgroundPaint.setAlpha(alpha);
 //        mBackgroundPaint.setColor(ColorUtils.getCompanyColor(mPosition));
         canvas.drawRect(mContentBackground, mBackgroundPaint);
-    }
-
-    void drawInfo(Canvas canvas, int alpha) {
-        mInfoPanel.draw(canvas, alpha);
     }
 
 
@@ -363,6 +347,7 @@ public class DigestCellView extends View {
 
         private final TextPaint mDayPaint = new TextPaint();
         private final TextPaint mMonthPaint = new TextPaint();
+        private final Paint mColorPaint = new Paint();
 
         Rect mBounds;
         final Rect mTextBounds = new Rect();
@@ -382,6 +367,8 @@ public class DigestCellView extends View {
             mMonthPaint.setColor(Color.WHITE);
             mMonthPaint.setAntiAlias(true);
 //            mMonthPaint.setTypeface(FontUtils.getFont(family));
+
+            mColorPaint.setStyle(Paint.Style.FILL);
         }
 
         public void reset(long timestamp, Rect bounds) {
@@ -404,6 +391,9 @@ public class DigestCellView extends View {
             if (hasInfo()) {
                 mDayPaint.setAlpha(alpha);
                 mMonthPaint.setAlpha(alpha);
+                mColorPaint.setColor(ColorUtils.getCompanyColor(mPosition));
+                mColorPaint.setAlpha(128);
+                canvas.drawRect(mBounds, mColorPaint);
 
                 if (mOrientation == ORIENTATION_LANDSCAPE) {
                     setTextSizeLinear();

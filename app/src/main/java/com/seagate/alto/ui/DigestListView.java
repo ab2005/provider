@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -11,6 +12,7 @@ import com.seagate.alto.R;
 
 public class DigestListView extends RecyclerView {
 
+    private static String TAG = DigestListView.class.getName();
     private ContentAdapter mAdapter;
 
     public DigestListView(Context context) {
@@ -52,12 +54,14 @@ public class DigestListView extends RecyclerView {
 
         @Override
         public ContentAdapter.DigestCellViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            Log.d(TAG, "onCreateViewHolder");
             DigestCellViewHolder viewHolder = new DigestCellViewHolder(LayoutInflater.from(parent.getContext()), parent);
             return viewHolder;
         }
 
         @Override
         public void onBindViewHolder(DigestCellViewHolder holder, int position) {
+            Log.d(TAG, "onBindViewHolder()");
             // based on position, we should be able to get the date of images in this cell
             // Date date = getDateFromPosition(position);
             holder.digestCellView.loadContent(position);
