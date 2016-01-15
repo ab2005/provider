@@ -26,11 +26,8 @@ import com.balysv.materialmenu.MaterialMenuDrawable;
 import com.seagate.alto.events.BusMaster;
 import com.seagate.alto.utils.LayoutQualifierUtils;
 import com.seagate.alto.utils.LogUtils;
-import com.seagate.alto.utils.ScreenUtils;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 public class StackFragment extends Fragment implements IBackPressHandler, IFragmentStackHolder, NavigationView.OnNavigationItemSelectedListener {
 
@@ -55,11 +52,7 @@ public class StackFragment extends Fragment implements IBackPressHandler, IFragm
 
         v = inflater.inflate(R.layout.fragment_main, container, false);
 
-        ScreenUtils.init(this);
-
-        setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         if (getActivity() instanceof AppCompatActivity) {
             ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);

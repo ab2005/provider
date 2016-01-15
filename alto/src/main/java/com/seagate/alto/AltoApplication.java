@@ -13,6 +13,7 @@ import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.imagepipeline.listener.RequestListener;
 import com.facebook.imagepipeline.listener.RequestLoggingListener;
 import com.seagate.alto.utils.LogUtils;
+import com.seagate.alto.utils.ScreenUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -30,13 +31,14 @@ public class AltoApplication extends Application {
         Log.d(TAG, "onCreate");
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-             // I use comic-relief for testing
+                        // I use comic-relief for testing
 //             .setDefaultFontPath("fonts/ComicRelief.ttf")
-            .setDefaultFontPath("fonts/helveticaneueltw1g-roman.ttf")
-            .setFontAttrId(R.attr.fontPath)
-            .build()
+                        .setDefaultFontPath("fonts/helveticaneueltw1g-roman.ttf")
+                        .setFontAttrId(R.attr.fontPath)
+                        .build()
         );
 
+        ScreenUtils.init(this);
         startFresco();
     }
 
