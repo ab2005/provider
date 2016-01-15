@@ -26,7 +26,7 @@ public class SeagateReporter implements IMetricsReporter{
 
     private static final int WAIT_MINUTES = 1;      // time between dump sessions
 
-    private final boolean TESTING = true;
+    private final boolean TESTING = false;
 
     public SeagateReporter() {
         Log.d(TAG, "Construct");
