@@ -4,7 +4,7 @@ package com.seagate.alto.metrics;
 
 public interface IMetricsReporter {
 
-    void reportEvent(IMetricsEvent metricsEvent, long start, long duration);
+    void reportEvent(IMetricsEvent metricsEvent, long start);
     void flush();  // make sure to send the data
 
 }

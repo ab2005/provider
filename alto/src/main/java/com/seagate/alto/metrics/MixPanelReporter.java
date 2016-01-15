@@ -13,7 +13,7 @@ import com.seagate.alto.utils.LogUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MixpanelReporter implements IMetricsReporter{
+public class MixpanelReporter implements IMetricsReporter {
 
     private static final String TAG = LogUtils.makeTag(MixpanelReporter.class);
 
@@ -34,9 +34,9 @@ public class MixpanelReporter implements IMetricsReporter{
 
 
     @Override
-    public void reportEvent(IMetricsEvent metricsEvent, long start, long duration) {
+    public void reportEvent(IMetricsEvent metricsEvent, long start) {
 
-        Log.d(TAG, "report: " + metricsEvent.getEventName() + " start: " + start + " duration: " + duration);
+        Log.d(TAG, "report: " + metricsEvent.getEventName() + " start: " + start);
 
         JSONObject props = new JSONObject();
         try {
@@ -44,9 +44,9 @@ public class MixpanelReporter implements IMetricsReporter{
             // TODO: DATA-1080
 //            props.put(ACCOUNT_IDENTIFIER, accountId);
 //            props.put(AGENT_IDENTIFIER, agentId);
-            if (duration > 0) {
-                props.put("duration", duration);
-            }
+//            if (duration > 0) {
+//                props.put("duration", duration);
+//            }
 
         } catch (JSONException e) {
             e.printStackTrace();

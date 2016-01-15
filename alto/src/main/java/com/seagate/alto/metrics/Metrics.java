@@ -9,9 +9,7 @@ import android.util.Log;
 import com.seagate.alto.utils.LogUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 // each analytics service is separated into its own reporter
 
@@ -34,69 +32,42 @@ public class Metrics {
 
     private List<IMetricsReporter> mReporters = new ArrayList<>();
 
-    private Map<String, EventTracker> mDurationMap = new HashMap<>();
-
-    private class EventTracker {
-        long start;
-
-        // for debugging, we could store a stack trace
-
-        public EventTracker(long start) {
-            this.start = start;
-        }
-    }
-
     // manage reporters
 
     public void addReporter(IMetricsReporter reporter) {
         mReporters.add(reporter);
     }
-
     public void removeReporter(IMetricsReporter reporter) {
         mReporters.add(reporter);
     }
 
-    // when an event is started, create a duration object
-    // there can only be one duration object for each event
-
-    public void start(IMetricsEvent event) {
-
-        EventTracker duplicate = mDurationMap.get(event.getEventName());
-        if (duplicate != null) {
-            Log.e(TAG, "event already started");
-        }
-
-        EventTracker d = new EventTracker(System.currentTimeMillis());
-        mDurationMap.put(event.getEventName(), d);
-    }
+    // public calls for reporting
 
     public void report(IMetricsEvent event) {
+        report(event, System.currentTimeMillis());
+    }
 
-        long now = System.currentTimeMillis();
-
-        long start = 0;
-        long duration = 0;
-
-        EventTracker d = mDurationMap.get(event.getEventName());
-
-        if (d == null) {
-            start = now;
-        } else {
-            start = d.start;
-            duration = now - start;
-
-            mDurationMap.remove(d);
-        }
+    public void report(IMetricsEvent event, long when) {
 
         for (IMetricsReporter reporter : mReporters) {
-            reporter.reportEvent(event, start, duration);
+            try {
+                reporter.reportEvent(event, when);
+            } catch (Exception e) {
+                Log.e(TAG, "exception caught when reporting " + reporter);
+                e.printStackTrace();
+            }
         }
     }
 
     // flush the data to the servers
     public void flush() {
         for (IMetricsReporter reporter : mReporters) {
-            reporter.flush();
+            try {
+                reporter.flush();
+            } catch (Exception e) {
+                Log.e(TAG, "exception caught when flushing " + reporter);
+                e.printStackTrace();
+            }
         }
     }
 
