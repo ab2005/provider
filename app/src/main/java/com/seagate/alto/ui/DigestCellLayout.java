@@ -43,12 +43,18 @@ public class DigestCellLayout {
 
     public Rect getPanelRect(final int panelIndex, final Rect bounds) {
         RectF panelRect = getPanel(panelIndex);
+        int padding = 5;
 
         return new Rect(
-                Math.round(bounds.width() * panelRect.left),
-                Math.round(bounds.height() * panelRect.top),
-                Math.round(bounds.width() * panelRect.right),
-                Math.round(bounds.height() * panelRect.bottom)
+                Math.round(bounds.width() * panelRect.left) + padding,
+                Math.round(bounds.height() * panelRect.top) + padding,
+                Math.round(bounds.width() * panelRect.right) - padding,
+                Math.round(bounds.height() * panelRect.bottom) - padding
+
+//                Math.round(bounds.width() * panelRect.left),
+//                Math.round(bounds.height() * panelRect.top),
+//                Math.round(bounds.width() * panelRect.right),
+//                Math.round(bounds.height() * panelRect.bottom)
         );
     }
 }

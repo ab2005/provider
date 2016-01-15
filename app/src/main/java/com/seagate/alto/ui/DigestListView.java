@@ -69,7 +69,7 @@ public class DigestListView extends RecyclerView {
 
         @Override
         public int getItemCount() {
-            return 10;
+            return 60;
         }
 
     }

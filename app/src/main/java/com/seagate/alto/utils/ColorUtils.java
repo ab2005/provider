@@ -13,10 +13,6 @@ public class ColorUtils {
             Color.rgb(240, 35, 40),     // Red
     };
 
-    public static int getCompanyColor(CompanyColor color) {
-        return COMPANY_COLORS[color.ordinal()];
-    }
-
     public static int getCompanyColor(int index) {
         return COMPANY_COLORS[index % COMPANY_COLORS.length];
     }

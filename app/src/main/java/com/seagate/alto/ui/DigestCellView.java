@@ -62,7 +62,7 @@ public class DigestCellView extends View {
     private long mDigestId;
     private int mImagePanelCount;
     private int mInforPanelCount = 1;
-    private int mPosition = 1;
+    private int mPosition;
     private Cursor mContentCursor;
     private int mContentCursorCount = 0;
     private final Object mDigestCellItemsLock = new Object();
@@ -103,8 +103,9 @@ public class DigestCellView extends View {
 
     public void loadContent(int position) {
 
+        mPosition = position;
         Log.d(TAG, "loadContent()");
-        setMultiDraweeSource(position);
+        setMultiDraweeSource(mPosition);
         invalidate();
         Log.d(TAG, "invalidate()");
     }
@@ -214,13 +215,11 @@ public class DigestCellView extends View {
             long offset = Timestamp.valueOf("2012-01-01 00:00:00").getTime();
             long end = Timestamp.valueOf("2013-01-01 00:00:00").getTime();
             long diff = end - offset + 1;
-            long rand = offset + (long)(Math.random() * diff);
+            long rand = offset + (long)(Math.random() * diff);      // FIXME: 1/14/16 getTimeStamp here
 
             mInfoPanel.reset(rand, infoBounds);
             drawInfo(canvas, 255);
         }
-
-
 
     }
 
@@ -239,6 +238,9 @@ public class DigestCellView extends View {
                 .setFadeDuration(10)
                 .build();
         hierarchy.setPlaceholderImage(R.drawable.photo_offline_large);
+//        RoundingParams roundingParams = new RoundingParams();
+//        roundingParams.setBorder(R.color.red, 2.0f);
+//        hierarchy.setRoundingParams(roundingParams);
         return hierarchy;
     }
 
@@ -350,7 +352,7 @@ public class DigestCellView extends View {
         private final Paint mColorPaint = new Paint();
 
         Rect mBounds;
-        final Rect mTextBounds = new Rect();
+//        final Rect mTextBounds = new Rect();
         float mDayTextSize;
         float mMonthTextSize;
         String mDay;
@@ -383,7 +385,7 @@ public class DigestCellView extends View {
 
                 mOrientation = getOrientation(mBounds);
 
-                justifyTextBounds(mOrientation, mPosition);
+//                justifyTextBounds(mOrientation, mPosition);
             }
         }
 
@@ -395,110 +397,32 @@ public class DigestCellView extends View {
                 mColorPaint.setAlpha(128);
                 canvas.drawRect(mBounds, mColorPaint);
 
-                if (mOrientation == ORIENTATION_LANDSCAPE) {
-                    setTextSizeLinear();
-                    drawInfoLinear(canvas);
-                } else {
-                    setTextSizeStacked();
-                    drawInfoStacked(canvas);
-                }
+                setTextSizeStacked();
+                drawInfoStacked(canvas);
             }
-        }
-
-        void drawInfoLinear(Canvas canvas) {
-            int x = mTextBounds.left + mTextBounds.width() / 2;
-            int y = mTextBounds.bottom - mTextBounds.height() / 4;
-
-            mDayPaint.setTextAlign(Paint.Align.RIGHT);
-            mDayPaint.setTextSize(mDayTextSize);
-            canvas.drawText(mDay, x - mDayTextSize * 0.1f, y, mDayPaint);
-
-            mMonthPaint.setTextAlign(Paint.Align.LEFT);
-            mMonthPaint.setTextSize(mMonthTextSize);
-            canvas.drawText(mMonth, x + mMonthTextSize * 0.1f, y, mMonthPaint);
-        }
-
-        void setTextSizeLinear() {
-            int smallestDim = getSmallestDimension();
-            if (smallestDim == mBounds.width()) {
-                mDayTextSize = (float)smallestDim * 0.2f;
-            } else {
-                mDayTextSize = (float)smallestDim * 0.7f;
-            }
-
-            mMonthTextSize = mDayTextSize * 0.7f;
         }
 
         void drawInfoStacked(Canvas canvas) {
-            int x = mTextBounds.left + mTextBounds.width() / 2;
-            int y = mTextBounds.bottom - mTextBounds.height() / 2;
+            int xDay = mBounds.left + mBounds.width() / 2;
+            int yDay = mBounds.top + (int) (mBounds.height() / 2 - (mDayPaint.descent() + mDayPaint.ascent() / 2));
+            int xMonth = mBounds.left + mBounds.width() / 2;
+            int yMonth = mBounds.top + (int) (mBounds.height() / 2 - (mMonthPaint.descent() + mMonthPaint.ascent() / 2) + mMonthTextSize);
 
-            mDayPaint.setTextAlign(Paint.Align.CENTER);
-            mDayPaint.setTextSize(mDayTextSize);
+
             if (mDay != null && mMonth != null) {
-                canvas.drawText(mDay, x, y, mDayPaint);
+                mDayPaint.setTextAlign(Paint.Align.CENTER);
+                mDayPaint.setTextSize(mDayTextSize);
+                canvas.drawText(mDay, xDay, yDay, mDayPaint);
 
                 mMonthPaint.setTextAlign(Paint.Align.CENTER);
                 mMonthPaint.setTextSize(mMonthTextSize);
-                canvas.drawText(mMonth, x, y + mMonthTextSize, mMonthPaint);
+                canvas.drawText(mMonth, xMonth, yMonth, mMonthPaint);
             }
         }
 
         void setTextSizeStacked() {
-            mDayTextSize = mTextBounds.height() / 2 * 0.9f;
-            mMonthTextSize = mDayTextSize * 0.7f;
-        }
-
-        void justifyTextBounds(int orientation, int index) {
-            int justification = index % 3;
-            if (orientation == ORIENTATION_SQUARE) {
-                justification = JUSTIFICATION_CENTER;
-            }
-
-            initTextBounds(orientation);
-
-            if (orientation == ORIENTATION_SQUARE) {
-                return;
-            }
-
-            switch (justification) {
-                case JUSTIFICATION_TOPLEFT:
-                    break;
-
-                case JUSTIFICATION_CENTER:
-                    if (orientation == ORIENTATION_LANDSCAPE) {
-                        mTextBounds.offset(mTextBounds.width(), 0);
-                    } else {
-                        mTextBounds.offset(0, mTextBounds.height());
-                    }
-                    break;
-
-                case JUSTIFICATION_BOTOMRIGHT:
-                    if (orientation == ORIENTATION_LANDSCAPE) {
-                        mTextBounds.offset(mTextBounds.width() * 2, 0);
-                    } else {
-                        mTextBounds.offset(0, mTextBounds.height() * 2);
-                    }
-                    break;
-            }
-
-        }
-
-        void initTextBounds(int orientation) {
-            mTextBounds.left = mBounds.left;
-            mTextBounds.top = mBounds.top;
-            if (orientation == ORIENTATION_LANDSCAPE) {
-                mTextBounds.right = mTextBounds.left + mBounds.width() / 3;
-                mTextBounds.bottom = mTextBounds.top + mBounds.height();
-            } else if (orientation == ORIENTATION_PORTRAIT) {
-                mTextBounds.right = mTextBounds.left + mBounds.width();
-                mTextBounds.bottom = mTextBounds.top + mBounds.height() / 3;
-            } else {
-                mTextBounds.right = mTextBounds.left + mBounds.width();
-                mTextBounds.bottom = mTextBounds.top + mBounds.height();
-            }
-
-            mTextBounds.inset(mPadding, mPadding);
+            mDayTextSize = 120;
+            mMonthTextSize = 100;
         }
 
         int getOrientation(Rect bounds) {

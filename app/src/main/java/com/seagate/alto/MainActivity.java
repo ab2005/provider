@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
         // otherwise the fragment stack will be restored to previous state magically
 
         if (savedInstanceState == null) {
-            setFragment(new PagerFragment());
+            setFragment(new DigestFragment());
             navigationView.setCheckedItem(R.id.digest);
         } else {
             // the fragment stack is transferred over during rotation
