@@ -3,7 +3,6 @@ package com.seagate.alto.ui;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -39,25 +38,14 @@ public class DigestCellView extends View {
     private final static String TAG = DigestCellView.class.getName();
 
     private MultiDraweeHolder<GenericDraweeHierarchy> mMultiDraweeHolder;
-//    private DraweeHolder mInfoDraweeHolder;
     private final InfoPanel mInfoPanel = new InfoPanel();
-
-
-    private static final int CURSOR_WINDOW_SIZE = 20;
-    private static final int MAX_CYCLING_RANGE = 20;
-    private int mRetryCount = 0;
 
     enum TransitionType {None, Crossfade, FlipHorizontal, FlipVertical}
 
-    private static final int MAX_COLLAGES_ON_SCREEN = 5;
+    private static final int MAX_IMAGES_IN_CELL = 5;
     private static final int ROTATE_FREQUENCY = 5000; // ms
 
-    private static final Paint sPlaceholderPaint = new Paint();
-    private static final TextPaint sTextPaint = new TextPaint();
-
     // Rotate stuff
-    private final Paint mBackgroundPaint = new Paint();
-
 
     private long mDigestId;
     private int mImagePanelCount;
@@ -65,7 +53,6 @@ public class DigestCellView extends View {
     private int mPosition;
     private Cursor mContentCursor;
     private int mContentCursorCount = 0;
-    private final Object mDigestCellItemsLock = new Object();
 
     private int mCellBorder;
     private int mPanelPadding;
@@ -98,12 +85,18 @@ public class DigestCellView extends View {
 
 
     public void loadContent(int position) {
-
-        mPosition = position;
         Log.d(TAG, "loadContent()");
-        setMultiDraweeSource(mPosition);
-        invalidate();
-        Log.d(TAG, "invalidate()");
+
+        synchronized (this) {
+            mPosition = position;
+            // TODO: 1/14/16  mImagePanelCount = getImagePanelCount(position);
+            setMultiDraweeSource(mPosition);
+
+            // TODO: 1/14/16  is it really useful here???
+            invalidate();
+            Log.d(TAG, "invalidate()");
+        }
+
     }
 
 
@@ -161,12 +154,20 @@ public class DigestCellView extends View {
         }
         if (ScreenUtils.isPortrait()) {
             size = ScreenUtils.getWidthInPixels();
-        } else {        // FIXME: 1/11/16 landscape is not done yet.
+        } else {
             final TypedArray styledAttributes = getContext().getTheme().obtainStyledAttributes(new int[] { android.R.attr.actionBarSize });
             int actionBarHeight = (int) styledAttributes.getDimension(0, 0);
             styledAttributes.recycle();
-            size = ScreenUtils.getHeightInPixels() - actionBarHeight;
-//                    - LayoutUtils.getStatusBarHeight();
+            int statusBarHeight = 0;
+            int resourceId = getContext().getResources().getIdentifier("status_bar_height", "dimen", "android");
+            if (resourceId > 0) {
+                statusBarHeight = getContext().getResources().getDimensionPixelSize(resourceId);
+            }
+            size = ScreenUtils.getHeightInPixels()
+                    - actionBarHeight
+                    - statusBarHeight
+//                    - LayoutUtils.getStatusBarHeight()        // FIXME: 1/15/16
+                        ;
         }
 
         Log.i("DigestCellView", "onMeasure size: " + size);
@@ -183,15 +184,11 @@ public class DigestCellView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         Log.d(TAG, "onDraw()");
-        // View might be in the process of being recycled. If so, it will be detached from it's parent.
+
         super.onDraw(canvas);
         if (getParent() == null) {
             invalidate();
             return;
-        }
-
-        if (!ScreenUtils.isPortrait()) {
-            canvas.rotate(90, getWidth() / 2, getHeight() / 2);
         }
 
         synchronized (this) {
@@ -209,21 +206,19 @@ public class DigestCellView extends View {
 
             Rect infoBounds = digestCellLayout.getInfoRect(layoutBounds);
 
-            long offset = Timestamp.valueOf("2012-01-01 00:00:00").getTime();
-            long end = Timestamp.valueOf("2013-01-01 00:00:00").getTime();
+            long offset = Timestamp.valueOf("2015-01-01 00:00:00").getTime();
+            long end = Timestamp.valueOf("2016-01-01 00:00:00").getTime();
             long diff = end - offset + 1;
             long rand = offset + (long)(Math.random() * diff);      // FIXME: 1/14/16 getTimeStamp here
 
             mInfoPanel.reset(rand, infoBounds);
-            drawInfo(canvas, 255);
+            drawInfoPanel(canvas, 255, 128);
         }
 
     }
 
-
-    // draw
-    private void drawInfo(Canvas canvas, int alpha) {
-        mInfoPanel.draw(canvas, alpha);
+    private void drawInfoPanel(Canvas canvas, int alphaText, int alphaBackground) {
+        mInfoPanel.draw(canvas, alphaText, alphaBackground);
     }
 
 
@@ -234,10 +229,7 @@ public class DigestCellView extends View {
                 .setActualImageScaleType(ScalingUtils.ScaleType.CENTER_CROP)
                 .setFadeDuration(10)
                 .build();
-        hierarchy.setPlaceholderImage(R.drawable.photo_offline_large);
-//        RoundingParams roundingParams = new RoundingParams();
-//        roundingParams.setBorder(R.color.red, 2.0f);
-//        hierarchy.setRoundingParams(roundingParams);
+        hierarchy.setPlaceholderImage(getResources().getDrawable(R.drawable.photo_offline_large), ScalingUtils.ScaleType.CENTER_INSIDE);
         return hierarchy;
     }
 
@@ -245,7 +237,7 @@ public class DigestCellView extends View {
         Log.d(TAG, "setMultiDraweeSource()");
 
         synchronized (this) {
-            mImagePanelCount = position % MAX_COLLAGES_ON_SCREEN + 1;       // TODO: 1/14/16 get image panel count here.
+            mImagePanelCount = position % MAX_IMAGES_IN_CELL + 1;       // TODO: 1/14/16 get image panel count here.
             Log.d(TAG, "mPanelCount = " + mImagePanelCount);
             for (int i = 0; i < mImagePanelCount; i++) {
 
@@ -271,87 +263,28 @@ public class DigestCellView extends View {
             }
 
             mMultiDraweeHolder.onAttach();
-            Log.d(TAG, "After setMultiDraweeSource -- mMultiDraweeHolder: " + mMultiDraweeHolder + ", size()" + mMultiDraweeHolder.size());
 
         }
 
-
-    }
-
-    // private
-
-    private int getCursorCount() {
-        return mContentCursorCount;     // = mContentCursor.getCount();
-    }
-
-
-    class CollageItem {
-//        ContentItem mItem;
-        Rect mItemBounds;
-        int mViewPosition;
-        Cursor mCursor;
-        int mCursorPosition;
-        int mCollagePosition;
-        int[] mRotation = new int[2];
-        Bitmap[] mTransitionBitmaps = new Bitmap[2];
-        Paint[] mTransitionPaints = new Paint[2];
-        TransitionType mTransitionType;
-        boolean mTransitionFromCurrent;
-        boolean mTransitionInProgress;
-        long mTransitionStart;
-        boolean mChain;
-        boolean mUseLocal;
-//        final LoadInfo mLoadInfo;
-//        final ThumbnailLoadListener mLoadListener;
-
-        public CollageItem() {
-            mTransitionPaints[0] = new Paint();
-            mTransitionPaints[0].setAntiAlias(true);
-            mTransitionPaints[0].setFilterBitmap(true);
-            mTransitionPaints[0].setDither(true);
-            mTransitionPaints[0].setStyle(Paint.Style.FILL);
-            mTransitionPaints[0].setColor(Color.BLACK);
-
-            mTransitionPaints[1] = new Paint();
-            mTransitionPaints[1].setAntiAlias(true);
-            mTransitionPaints[1].setFilterBitmap(true);
-            mTransitionPaints[1].setDither(true);
-
-//            mLoadInfo = new LoadInfo();
-//            mLoadListener = new ThumbnailLoadListener(this);
-        }
-
-        public void reset(boolean transitionFromCurrent, boolean chain, boolean useLocal) {
-//            mLoadInfo.reset();
-            mTransitionFromCurrent = transitionFromCurrent;
-            mChain = chain;
-            mUseLocal = useLocal;
-        }
     }
 
     class InfoPanel {
-        final int ORIENTATION_SQUARE = -1;
-        final int ORIENTATION_PORTRAIT = 0;
-        final int ORIENTATION_LANDSCAPE = 1;
-
-        final int JUSTIFICATION_TOPLEFT = 0;
-        final int JUSTIFICATION_CENTER = 1;
-        final int JUSTIFICATION_BOTOMRIGHT = 2;
 
         private final TextPaint mDayPaint = new TextPaint();
         private final TextPaint mMonthPaint = new TextPaint();
         private final Paint mColorPaint = new Paint();
 
         Rect mBounds;
-//        final Rect mTextBounds = new Rect();
         float mDayTextSize;
         float mMonthTextSize;
         String mDay;
         String mMonth;
-        int mOrientation;
 
         public InfoPanel() {
 
+            mDayTextSize = 120;
+            mMonthTextSize = 100;
+            
             mDayPaint.setColor(Color.WHITE);
             mDayPaint.setAntiAlias(true);
 //            mDayPaint.setTypeface(FontUtils.getFont(family));
@@ -371,22 +304,17 @@ public class DigestCellView extends View {
                 mMonth = getMonthString(timestamp);
 
                 mBounds.inset(mPanelPadding, mPanelPadding);
-
-                mOrientation = getOrientation(mBounds);
-
-//                justifyTextBounds(mOrientation, mPosition);
             }
         }
 
-        void draw(Canvas canvas, int alpha) {
+        void draw(Canvas canvas, int alphaText, int alphaBackground) {
             if (hasInfo()) {
-                mDayPaint.setAlpha(alpha);
-                mMonthPaint.setAlpha(alpha);
+                mDayPaint.setAlpha(alphaText);
+                mMonthPaint.setAlpha(alphaText);
                 mColorPaint.setColor(ColorUtils.getCompanyColor(mPosition));
-                mColorPaint.setAlpha(128);
+                mColorPaint.setAlpha(alphaBackground);
                 canvas.drawRect(mBounds, mColorPaint);
 
-                setTextSizeStacked();
                 drawInfoStacked(canvas);
             }
         }
@@ -409,31 +337,8 @@ public class DigestCellView extends View {
             }
         }
 
-        void setTextSizeStacked() {
-            mDayTextSize = 120;
-            mMonthTextSize = 100;
-        }
-
-        int getOrientation(Rect bounds) {
-            int difference = Math.abs(bounds.width() - bounds.height());
-            // Allow for some rounding errors...
-            if (difference > 10) {
-                if (bounds.width() >= 2 * bounds.height()) {
-                    return ORIENTATION_LANDSCAPE;
-                } else if (bounds.height() >= 2 * bounds.width()) {
-                    return ORIENTATION_PORTRAIT;
-                }
-            }
-
-            return ORIENTATION_SQUARE;
-        }
-
         public boolean hasInfo() {
             return mBounds != null;
-        }
-
-        int getSmallestDimension() {
-            return Math.min(mBounds.width(), mBounds.height());
         }
 
         String getDayString(long timestamp) {
