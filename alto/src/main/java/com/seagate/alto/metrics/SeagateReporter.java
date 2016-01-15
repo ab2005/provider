@@ -10,6 +10,10 @@ import android.util.Log;
 
 import com.seagate.alto.utils.LogUtils;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -22,6 +26,8 @@ public class SeagateReporter implements IMetricsReporter{
 
     private static final int WAIT_MINUTES = 1;      // time between dump sessions
 
+    private final boolean TESTING = true;
+
     public SeagateReporter() {
         Log.d(TAG, "Construct");
 
@@ -29,9 +35,10 @@ public class SeagateReporter implements IMetricsReporter{
         new Thread(consumer).start();
 
         // used for testing
-        TestProducer tester = new TestProducer(mQueue);
-        new Thread(tester).start();
-
+        if (TESTING) {
+            TestProducer tester = new TestProducer(mQueue);
+            new Thread(tester).start();
+        }
     }
 
 
@@ -53,7 +60,6 @@ public class SeagateReporter implements IMetricsReporter{
         if (!mQueue.offer(new SeagateReport(metricsEvent, start))) {
             Log.e(TAG, "queue is full");
         }
-
     }
 
     @Override
@@ -78,18 +84,8 @@ public class SeagateReporter implements IMetricsReporter{
 
             while (true) {
 
-                while (!queue.isEmpty()) {
-                    try {
-                        SeagateReport sr = queue.take();
-
-                        // wait once a minute to blast these things over to the service
-                        if (sr != null) {
-                            Log.d(TAG, "report: " + sr.mEvent.getEventName() + " when: " + sr.mStart);
-                        }
-
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                if (!queue.isEmpty()) {
+                    uploadData();
                 }
 
                 // wait a bit then blast again
@@ -98,6 +94,55 @@ public class SeagateReporter implements IMetricsReporter{
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+            }
+
+
+        }
+
+        private void uploadData() {
+            JSONObject report = new JSONObject();
+
+            try {
+                report.put("account id", 94025);
+                report.put("device id", 42566);
+                report.put("platform", "android");
+
+
+                JSONArray eventArray = new JSONArray();
+
+                while (!queue.isEmpty()) {
+                    try {
+                        SeagateReport sr = queue.take();
+
+                        if (sr != null) {
+                            JSONArray event = new JSONArray();
+                            event.put(sr.mEvent.getEventValue());
+                            event.put(sr.mStart);
+
+                            eventArray.put(event);
+                        }
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                report.put("events", eventArray);
+
+
+                // push JSON to server HERE
+                upload(report);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private void upload(JSONObject report) {
+            try {
+                Log.d(TAG, report.toString(4));
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
 
 
