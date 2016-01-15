@@ -9,14 +9,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.seagate.alto.ui.DigestListView;
+import com.seagate.alto.ui.DigestRecyclerView;
 import com.seagate.alto.utils.ScreenUtils;
 
 public class DigestFragment extends Fragment implements IBackStackName {
 
     private static final String TAG = DigestFragment.class.getName();
 
-    private DigestListView mDigestListView;
+    private DigestRecyclerView mDigestRecyclerView;
 
     public DigestFragment() {
         super();
@@ -39,11 +39,11 @@ public class DigestFragment extends Fragment implements IBackStackName {
         super.onCreateView(inflater, container, savedInstanceState);
         Log.d(TAG, "onCreateView()");
         View view = inflater.inflate(R.layout.digest_view_shelf, container, false);
-        mDigestListView = (DigestListView) view.findViewById(R.id.digest_shelf);
+        mDigestRecyclerView = (DigestRecyclerView) view.findViewById(R.id.digest_shelf);
         if (!ScreenUtils.isPortrait()) {
             LinearLayoutManager layoutManager
                     = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-            mDigestListView.setLayoutManager(layoutManager);
+            mDigestRecyclerView.setLayoutManager(layoutManager);
         }
         return view;
     }

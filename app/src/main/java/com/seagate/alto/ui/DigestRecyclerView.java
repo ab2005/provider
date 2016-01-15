@@ -10,20 +10,20 @@ import android.view.ViewGroup;
 
 import com.seagate.alto.R;
 
-public class DigestListView extends RecyclerView {
+public class DigestRecyclerView extends RecyclerView {
 
-    private static String TAG = DigestListView.class.getName();
+    private static String TAG = DigestRecyclerView.class.getName();
     private ContentAdapter mAdapter;
 
-    public DigestListView(Context context) {
+    public DigestRecyclerView(Context context) {
         super(context);
     }
 
-    public DigestListView(Context context, AttributeSet attrs) {
+    public DigestRecyclerView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public DigestListView(Context context, AttributeSet attrs, int defStyle) {
+    public DigestRecyclerView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
