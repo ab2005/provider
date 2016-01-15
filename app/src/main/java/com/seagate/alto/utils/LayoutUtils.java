@@ -2,7 +2,7 @@ package com.seagate.alto.utils;
 
 public class LayoutUtils {
     private static final float PANEL_PADDING_FACTOR = 0.005f;
-    private static final float COLLAGE_BORDER_FACTOR = 0.005f;
+    private static final float DIGEST_BORDER_FACTOR = 0.01f;
     private static final int MINIMUM_ULTRA_LIGHT_SIZE = 640;
     private static int sActionBarHeight;
 
@@ -29,7 +29,7 @@ public class LayoutUtils {
     }
 
     public static int getBorderSize(int width) {
-        return Math.round(Math.max(2, width * COLLAGE_BORDER_FACTOR));
+        return Math.round(Math.max(4, width * DIGEST_BORDER_FACTOR));
     }
 
     public static int getActionBarHeight() {

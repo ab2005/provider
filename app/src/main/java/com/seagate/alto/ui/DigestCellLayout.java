@@ -46,15 +46,16 @@ public class DigestCellLayout {
         int padding = 5;
 
         return new Rect(
-                Math.round(bounds.width() * panelRect.left) + padding,
-                Math.round(bounds.height() * panelRect.top) + padding,
-                Math.round(bounds.width() * panelRect.right) - padding,
-                Math.round(bounds.height() * panelRect.bottom) - padding
+//                Math.round(bounds.width() * panelRect.left) + padding,
+//                Math.round(bounds.height() * panelRect.top) + padding,
+//                Math.round(bounds.width() * panelRect.right) - padding,
+//                Math.round(bounds.height() * panelRect.bottom) - padding
 
-//                Math.round(bounds.width() * panelRect.left),
-//                Math.round(bounds.height() * panelRect.top),
-//                Math.round(bounds.width() * panelRect.right),
-//                Math.round(bounds.height() * panelRect.bottom)
+                // // TODO: 1/14/16 WOW?! figure out what are bounds.left/top. It works.
+                Math.round(bounds.left + bounds.width() * panelRect.left),
+                Math.round(bounds.top + bounds.height() * panelRect.top),
+                Math.round(bounds.left + bounds.width() * panelRect.right),
+                Math.round(bounds.top + bounds.height() * panelRect.bottom)
         );
     }
 }

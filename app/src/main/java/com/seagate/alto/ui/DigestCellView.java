@@ -67,13 +67,9 @@ public class DigestCellView extends View {
     private int mContentCursorCount = 0;
     private final Object mDigestCellItemsLock = new Object();
 
+    private int mCellBorder;
+    private int mPanelPadding;
 
-    final Rect mViewBounds = new Rect();
-    final Rect mShadowBounds = new Rect();
-    final Rect mContentBounds = new Rect();
-    private Rect mContentBackground;
-    private boolean mLayoutComplete;
-    private boolean mFullyLoaded;
     private int mLastOrientation;
 
     public DigestCellView(Context context) {
@@ -96,8 +92,8 @@ public class DigestCellView extends View {
 
         mMultiDraweeHolder = new MultiDraweeHolder<>();
 
-        Log.d(TAG, "mMultiDraweeHolder: " + mMultiDraweeHolder + ", size()" + mMultiDraweeHolder.size());
-
+        mCellBorder = LayoutUtils.getBorderSize(getWidth());
+        mPanelPadding = LayoutUtils.getPanelPadding(getWidth());
     }
 
 
@@ -162,7 +158,6 @@ public class DigestCellView extends View {
         int margin = lp.leftMargin;
         if (ScreenUtils.getOrientation() != mLastOrientation) {
             mLastOrientation = ScreenUtils.getOrientation();
-            mLayoutComplete = false;
         }
         if (ScreenUtils.isPortrait()) {
             size = ScreenUtils.getWidthInPixels();
@@ -202,9 +197,11 @@ public class DigestCellView extends View {
         synchronized (this) {
             DigestCellLayout digestCellLayout = DigestCellLayouts.getLayoutForSize(mImagePanelCount, mPosition);
             Rect layoutBounds = new Rect(0, 0, getWidth(), getHeight());
+            layoutBounds.inset(mCellBorder, mCellBorder);
             for (int i = 0; i < mImagePanelCount; i++) {
                 Drawable drawable = mMultiDraweeHolder.get(i).getTopLevelDrawable();
                 Rect childBounds = digestCellLayout.getPanelRect(i, layoutBounds);
+                childBounds.inset(mPanelPadding, mPanelPadding);
                 drawable.setBounds(childBounds);
                 drawable.draw(canvas);
             }
@@ -287,12 +284,6 @@ public class DigestCellView extends View {
         return mContentCursorCount;     // = mContentCursor.getCount();
     }
 
-    void drawBackground(Canvas canvas, int alpha) {
-        mBackgroundPaint.setAlpha(alpha);
-//        mBackgroundPaint.setColor(ColorUtils.getCompanyColor(mPosition));
-        canvas.drawRect(mContentBackground, mBackgroundPaint);
-    }
-
 
     class CollageItem {
 //        ContentItem mItem;
@@ -358,7 +349,6 @@ public class DigestCellView extends View {
         String mDay;
         String mMonth;
         int mOrientation;
-        int mPadding;
 
         public InfoPanel() {
 
@@ -380,8 +370,7 @@ public class DigestCellView extends View {
                 mDay = getDayString(timestamp);
                 mMonth = getMonthString(timestamp);
 
-                mPadding = LayoutUtils.getPanelPadding(mBounds.width());
-                mBounds.inset(mPadding, mPadding);
+                mBounds.inset(mPanelPadding, mPanelPadding);
 
                 mOrientation = getOrientation(mBounds);
 

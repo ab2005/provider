@@ -13,8 +13,5 @@
     android:layout_marginLeft="@dimen/md_keylines"
     android:layout_marginRight="@dimen/md_keylines"
     android:clickable="true"
-    android:background="@color/lyve_blue_light"
+    android:background="@color/light_grey"
     />
-
-
-<!--todo:  set background color to light_grey later-->
