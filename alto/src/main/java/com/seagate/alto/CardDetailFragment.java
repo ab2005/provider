@@ -14,21 +14,21 @@ import com.seagate.alto.events.ItemSelectedEvent;
 import com.seagate.alto.utils.LogUtils;
 import com.squareup.otto.Subscribe;
 
-public class TileDetailFragment extends ListDetailFragment implements IBackStackName {
+public class CardDetailFragment extends ListDetailFragment implements IBackStackName {
 
     private String TAG = makeTag();
 
     protected String makeTag() {
-        return LogUtils.makeTag(TileDetailFragment.class);
+        return LogUtils.makeTag(CardDetailFragment.class);
     }
 
     protected int getLayout() {
-        return R.layout.tile_detail;
+        return R.layout.card_detail;
     }
 
     @Override
     public String getBackStackName() {
-        return "tile-detail:w600dp";
+        return "card-detail:w600dp";
     }
 
     // each class must subscribe to the event
@@ -39,11 +39,12 @@ public class TileDetailFragment extends ListDetailFragment implements IBackStack
         Log.d(TAG, "item selected: " + event.getPosition());
 
         if (mDetail == null) {
-            if (getActivity() instanceof IFragmentStackHolder) {
 
-                IFragmentStackHolder fsh = (IFragmentStackHolder) getActivity();
+            if (getParentFragment() instanceof IFragmentStackHolder) {
 
-                Fragment details = new DetailTileFragment();
+                IFragmentStackHolder fsh = (IFragmentStackHolder) getParentFragment();
+
+                Fragment details = new DetailCardFragment();
 
                 Bundle args = new Bundle();
                 args.putInt(PlaceholderContent.INDEX, event.getPosition());

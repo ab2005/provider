@@ -17,17 +17,12 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
+import android.view.ViewGroup;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
-import com.facebook.common.logging.FLog;
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.imagepipeline.core.ImagePipelineConfig;
-import com.facebook.imagepipeline.listener.RequestListener;
-import com.facebook.imagepipeline.listener.RequestLoggingListener;
 import com.seagate.alto.events.BusMaster;
 import com.seagate.alto.utils.LayoutQualifierUtils;
 import com.seagate.alto.utils.LogUtils;
@@ -37,29 +32,42 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class MainActivity extends AppCompatActivity implements IFragmentStackHolder, NavigationView.OnNavigationItemSelectedListener {
+public class StackFragment extends Fragment implements IBackPressHandler, IFragmentStackHolder, NavigationView.OnNavigationItemSelectedListener {
 
-    private static String TAG = LogUtils.makeTag(MainActivity.class);
+    private static String TAG = LogUtils.makeTag(StackFragment.class);
 
     private ActionBarDrawerToggle mToggle;
-
     private MaterialMenuDrawable materialMenu;
+    private FragmentManager mFragmentManager;
+
+    private View v;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // to enable cross-frag transitions
-        getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+        // getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
 
-        super.onCreate(savedInstanceState);
+//         super.onCreate(savedInstanceState);
+
+        super.onCreateView(inflater, container, savedInstanceState);
+
+        // setContentView(R.layout.activity_main);
+
+        v = inflater.inflate(R.layout.fragment_main, container, false);
 
         ScreenUtils.init(this);
 
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        if (getActivity() instanceof AppCompatActivity) {
+            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        toolbar.setTitle(R.string.app_name);
+
+        FloatingActionButton fab = (FloatingActionButton) v.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -68,16 +76,16 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
             }
         });
 
-        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        final DrawerLayout drawer = (DrawerLayout) v.findViewById(R.id.drawer_layout);
         mToggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                getActivity(), drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(mToggle);
         mToggle.syncState();
 
-        materialMenu = new MaterialMenuDrawable(this, Color.WHITE, MaterialMenuDrawable.Stroke.THIN);
+        materialMenu = new MaterialMenuDrawable(getContext(), Color.WHITE, MaterialMenuDrawable.Stroke.THIN);
         toolbar.setNavigationIcon(materialMenu);
 
-        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        final NavigationView navigationView = (NavigationView) v.findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -93,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
             }
         });
 
-        startFresco();
+        mFragmentManager = getChildFragmentManager();
 
         // if the savedInstanceState is null, we are being called for the first time
         // otherwise the fragment stack will be restored to previous state magically
@@ -109,8 +117,8 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
 
         // should we show a back arrow or a hamburger
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+        // FragmentManager mFragmentManager = getChildFragmentManager();
+        mFragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
             public void onBackStackChanged() {
                 setupHomeIcon();
@@ -119,7 +127,10 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
         });
 
         BusMaster.getBus().register(this);
+
+        return v;
     }
+
 
     private void setupHomeIcon() {
         if (isFragmentStackAtBottom()) {
@@ -131,64 +142,42 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
 
     private boolean isFragmentStackAtBottom() {
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        int fragCount = fragmentManager.getBackStackEntryCount();
+        int fragCount = mFragmentManager.getBackStackEntryCount();
 
         if (fragCount <= 1) return true;
 
         if (fragCount > 2) return false; // we should check if more than 2 screens are equivalent
 
         if (fragCount == 2) {
-            return topTwoEqual(fragmentManager, fragCount);
+            return topTwoEqual(mFragmentManager, fragCount);
         }
 
         return false;
     }
 
-    private boolean topTwoEqual(FragmentManager fragmentManager, int fragCount) {
+    private boolean topTwoEqual(FragmentManager mFragmentManager, int fragCount) {
 
         if (fragCount < 2) return false;
 
-        String top = fragmentManager.getBackStackEntryAt(fragCount-1).getName();
-        String next = fragmentManager.getBackStackEntryAt(fragCount - 2).getName();
+        String top = mFragmentManager.getBackStackEntryAt(fragCount-1).getName();
+        String next = mFragmentManager.getBackStackEntryAt(fragCount - 2).getName();
 
         if (top != null && top.equalsIgnoreCase(next)) {
 
             // the name is in two parts -- label:qualifier
             int colon = top.indexOf(":");
             String qualifier = top.substring(colon + 1, top.length());
-            return LayoutQualifierUtils.isQualified(this, qualifier);
+            return LayoutQualifierUtils.isQualified(getContext(), qualifier);
         }
 
         return false;
     }
 
-    private void startFresco() {
-        Set<RequestListener> requestListeners = new HashSet<>();
-        requestListeners.add(new RequestLoggingListener());
-
-//        DiskCacheConfig diskCacheConfig = DiskCacheConfig.newBuilder()
-//                .setBaseDirectoryName("SeagateCloud/ImageCache")
-//                .setBaseDirectoryPath(getExternalFilesDir(Environment.DIRECTORY_PICTURES))
-//                .setMaxCacheSize(50000000)
-//                .build();
-//        DiskCacheConfig smallImageDiskCacheConfig = DiskCacheConfig.newBuilder()
-//                .setBaseDirectoryName("SeagateCloud/SmallImageCache")
-//                .setBaseDirectoryPath(getExternalFilesDir(Environment.DIRECTORY_PICTURES))
-//                .setMaxCacheSize(10000000)
-//                .build();
-        ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
-                .setRequestListeners(requestListeners)
-//                .setMainDiskCacheConfig(diskCacheConfig)
-//                .setSmallImageDiskCacheConfig(smallImageDiskCacheConfig)
-                .build();
-        Fresco.initialize(this, config);
-        FLog.setMinimumLoggingLevel(FLog.VERBOSE);
-    }
-
-    @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        // v is the drawerlayout and you cannot find yourself
+
+        DrawerLayout drawer = (DrawerLayout) v; // .findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -205,43 +194,42 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
 
             boolean popTwo = false;
 
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            int fragCount = fragmentManager.getBackStackEntryCount();
+            int fragCount = mFragmentManager.getBackStackEntryCount();
 
-            popTwo = topTwoEqual(fragmentManager, fragCount);
+            popTwo = topTwoEqual(mFragmentManager, fragCount);
 
             if (popTwo) {
-                fragmentManager.popBackStackImmediate();
+                mFragmentManager.popBackStackImmediate();
             }
 
-            super.onBackPressed(); // this pops the other one
+            mFragmentManager.popBackStackImmediate();
 
             // finish if the stack is empty
-            if (fragmentManager.getBackStackEntryCount() == 0) {
-                finish();
+            if (mFragmentManager.getBackStackEntryCount() == 0) {
+                getActivity().finish();
             }
         }
     }
 
     private void logTheBackStack() {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        int fragCount = fragmentManager.getBackStackEntryCount();
+
+        int fragCount = mFragmentManager.getBackStackEntryCount();
         Log.d(TAG, "backstack: -------- ");
         Log.d(TAG, "backstack: count = " + fragCount);
 
         for (int i = 0; i < fragCount; i++) {
-            FragmentManager.BackStackEntry fbe = fragmentManager.getBackStackEntryAt(i);
+            FragmentManager.BackStackEntry fbe = mFragmentManager.getBackStackEntryAt(i);
             Log.d(TAG, "backstack: entry = " + i + " value = " + fbe.getName());
         }
         Log.d(TAG, "backstack: -------- ");
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        // Inflate the menu; this adds items to the action bar if it is present.
+//        getActivity().getMenuInflater().inflate(R.menu.main, menu);
+//        return true;
+//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -278,18 +266,20 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
             setFragment(new ListDetailFragment());
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+//        DrawerLayout drawer = (DrawerLayout) v.findViewById(R.id.drawer_layout);
+//        drawer.closeDrawer(GravityCompat.START);
+
+        ((DrawerLayout) v).closeDrawer(GravityCompat.START);
+
         return true;
     }
 
     private void setFragment(Fragment frag) {
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        FragmentTransaction transaction = mFragmentManager.beginTransaction();
 
         // clear the back stack
-        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        mFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
         transaction.replace(R.id.container, frag);
         String backStackName = null;
@@ -304,8 +294,7 @@ public class MainActivity extends AppCompatActivity implements IFragmentStackHol
     // the eltrans parameter is a list of hints for cool transitions
     public void pushFragment(Fragment frag, ArrayList<Pair<View, String>> eltrans) {
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        FragmentTransaction transaction = mFragmentManager.beginTransaction();
 
         transaction.replace(R.id.container, frag);
         String backStackName = null;
