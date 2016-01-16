@@ -22,6 +22,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 public class AltoApplication extends Application {
 
+    private static AltoApplication sMe;
     private static final String TAG = LogUtils.makeTag(AltoApplication.class);
 
     @Override
@@ -29,6 +30,7 @@ public class AltoApplication extends Application {
         super.onCreate();
 
         Log.d(TAG, "onCreate");
+        sMe = this;
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
                         // I use comic-relief for testing
@@ -40,6 +42,10 @@ public class AltoApplication extends Application {
 
         ScreenUtils.init(this);
         startFresco();
+    }
+
+    public static AltoApplication getInstance() {
+        return sMe;
     }
 
     private void startFresco() {

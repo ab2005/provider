@@ -1,7 +1,6 @@
 package com.seagate.alto.ui;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -155,19 +154,7 @@ public class DigestCellView extends View {
         if (ScreenUtils.isPortrait()) {
             size = ScreenUtils.getWidthInPixels();
         } else {
-            final TypedArray styledAttributes = getContext().getTheme().obtainStyledAttributes(new int[] { android.R.attr.actionBarSize });
-            int actionBarHeight = (int) styledAttributes.getDimension(0, 0);
-            styledAttributes.recycle();
-            int statusBarHeight = 0;
-            int resourceId = getContext().getResources().getIdentifier("status_bar_height", "dimen", "android");
-            if (resourceId > 0) {
-                statusBarHeight = getContext().getResources().getDimensionPixelSize(resourceId);
-            }
-            size = ScreenUtils.getHeightInPixels()
-                    - actionBarHeight
-                    - statusBarHeight
-//                    - LayoutUtils.getStatusBarHeight()        // FIXME: 1/15/16
-                        ;
+            size = ScreenUtils.getHeightInPixels() - LayoutUtils.getActionBarHeight() - LayoutUtils.getStatusBarHeight();
         }
 
         Log.i("DigestCellView", "onMeasure size: " + size);
@@ -284,7 +271,7 @@ public class DigestCellView extends View {
 
             mDayTextSize = 120;
             mMonthTextSize = 100;
-            
+
             mDayPaint.setColor(Color.WHITE);
             mDayPaint.setAntiAlias(true);
 //            mDayPaint.setTypeface(FontUtils.getFont(family));
