@@ -52,6 +52,8 @@ public class DigestCellView extends View {
     private int mPosition;
     private Cursor mContentCursor;
     private int mContentCursorCount = 0;
+    private Rect mLayoutBounds;
+    private DigestCellLayout mDigestCellLayout;
 
     private int mCellBorder;
     private int mPanelPadding;
@@ -78,6 +80,7 @@ public class DigestCellView extends View {
 
         mMultiDraweeHolder = new MultiDraweeHolder<>();
 
+
         mCellBorder = LayoutUtils.getBorderSize(getWidth());
         mPanelPadding = LayoutUtils.getPanelPadding(getWidth());
     }
@@ -95,6 +98,8 @@ public class DigestCellView extends View {
             invalidate();
             Log.d(TAG, "invalidate()");
         }
+
+        mDigestCellLayout = DigestCellLayouts.getLayoutForSize(mImagePanelCount, mPosition);
 
     }
 
@@ -158,7 +163,11 @@ public class DigestCellView extends View {
         }
 
         Log.i("DigestCellView", "onMeasure size: " + size);
-        setMeasuredDimension(size - 2 * margin, size - 2 * margin);
+        int length = size - 2 * margin;
+        setMeasuredDimension(length, length);
+
+        mLayoutBounds = new Rect(0, 0, length, length);
+        mLayoutBounds.inset(mCellBorder, mCellBorder);
     }
 
     @Override
@@ -179,19 +188,16 @@ public class DigestCellView extends View {
         }
 
         synchronized (this) {
-            DigestCellLayout digestCellLayout = DigestCellLayouts.getLayoutForSize(mImagePanelCount, mPosition);
-            Rect layoutBounds = new Rect(0, 0, getWidth(), getHeight());
-            layoutBounds.inset(mCellBorder, mCellBorder);
             for (int i = 0; i < mImagePanelCount; i++) {
                 Drawable drawable = mMultiDraweeHolder.get(i).getTopLevelDrawable();
-                Rect childBounds = digestCellLayout.getPanelRect(i, layoutBounds);
+                Rect childBounds = mDigestCellLayout.getPanelRect(i, mLayoutBounds);
                 childBounds.inset(mPanelPadding, mPanelPadding);
                 drawable.setBounds(childBounds);
                 drawable.draw(canvas);
             }
 //            mMultiDraweeHolder.draw(canvas);              // don't do MultiDraweeHolder.draw(canvas) here, because we may have more DraweeHolders than we want to display.
 
-            Rect infoBounds = digestCellLayout.getInfoRect(layoutBounds);
+            Rect infoBounds = mDigestCellLayout.getInfoRect(mLayoutBounds);
 
             long offset = Timestamp.valueOf("2015-01-01 00:00:00").getTime();
             long end = Timestamp.valueOf("2016-01-01 00:00:00").getTime();
