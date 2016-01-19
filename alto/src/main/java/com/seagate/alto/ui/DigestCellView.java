@@ -58,8 +58,6 @@ public class DigestCellView extends View {
     private int mCellBorder;
     private int mPanelPadding;
 
-    private int mLastOrientation;
-
     public DigestCellView(Context context) {
         super(context);
     }
@@ -72,7 +70,6 @@ public class DigestCellView extends View {
     public DigestCellView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
-
     }
 
     private void init(Context context) {
@@ -151,11 +148,9 @@ public class DigestCellView extends View {
         Log.d(TAG, "onMeasure()");
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         int size;
+        int realSize;
         ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) getLayoutParams();
         int margin = lp.leftMargin;
-        if (ScreenUtils.getOrientation() != mLastOrientation) {
-            mLastOrientation = ScreenUtils.getOrientation();
-        }
         if (ScreenUtils.isPortrait()) {
             size = ScreenUtils.getWidthInPixels();
         } else {
@@ -163,10 +158,10 @@ public class DigestCellView extends View {
         }
 
         Log.i("DigestCellView", "onMeasure size: " + size);
-        int length = size - 2 * margin;
-        setMeasuredDimension(length, length);
+        realSize = size - 2 * margin;
+        setMeasuredDimension(realSize, realSize);
 
-        mLayoutBounds = new Rect(0, 0, length, length);
+        mLayoutBounds = new Rect(0, 0, realSize, realSize);
         mLayoutBounds.inset(mCellBorder, mCellBorder);
     }
 
@@ -182,10 +177,6 @@ public class DigestCellView extends View {
         Log.d(TAG, "onDraw()");
 
         super.onDraw(canvas);
-        if (getParent() == null) {
-            invalidate();
-            return;
-        }
 
         synchronized (this) {
             for (int i = 0; i < mImagePanelCount; i++) {
@@ -254,8 +245,6 @@ public class DigestCellView extends View {
 //                dh.setController(controller);
 //                mMultiDraweeHolder.add(dh);
             }
-
-            mMultiDraweeHolder.onAttach();
 
         }
 
