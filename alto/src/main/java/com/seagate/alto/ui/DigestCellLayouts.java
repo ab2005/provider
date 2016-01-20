@@ -5,8 +5,10 @@ package com.seagate.alto.ui;
 import android.graphics.RectF;
 import android.util.Log;
 
+import com.seagate.alto.utils.LogUtils;
+
 public class DigestCellLayouts {
-    private static String TAG = DigestCellLayouts.class.getName();
+    private final static String TAG = LogUtils.makeTag(DigestCellLayouts.class);
     private static final DigestCellLayout[][] COLLAGE_LAYOUTS = {
             // Single item layouts
             {

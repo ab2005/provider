@@ -12,11 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.seagate.alto.ui.DigestRecyclerView;
+import com.seagate.alto.utils.LogUtils;
 import com.seagate.alto.utils.ScreenUtils;
 
 public class DigestFragment extends Fragment implements IBackStackName {
 
-    private static final String TAG = DigestFragment.class.getName();
+    private static final String TAG = LogUtils.makeTag(DigestFragment.class);
 
     private DigestRecyclerView mDigestRecyclerView;
 

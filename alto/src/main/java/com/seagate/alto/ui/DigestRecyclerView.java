@@ -11,10 +11,11 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.seagate.alto.R;
+import com.seagate.alto.utils.LogUtils;
 
 public class DigestRecyclerView extends RecyclerView {
 
-    private static String TAG = DigestRecyclerView.class.getName();
+    private final static String TAG = LogUtils.makeTag(DigestRecyclerView.class);
     private ContentAdapter mAdapter;
 
     public DigestRecyclerView(Context context) {

@@ -10,7 +10,6 @@ import android.view.WindowManager;
 
 public class ScreenUtils {
 
-    private static final String TAG = ScreenUtils.class.getName();
     private static ScreenUtils sMe;
     private static final DisplayMetrics sMetrics = new DisplayMetrics();
     private static Context sContext;

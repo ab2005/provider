@@ -5,7 +5,12 @@ package com.seagate.alto.ui;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
+import com.seagate.alto.utils.LogUtils;
+
 public class DigestCellLayout {
+
+    private final static String TAG = LogUtils.makeTag(DigestCellLayout.class);
+
     private RectF mInfoPanel;
     private final RectF[] mThumbnailPanels;
 

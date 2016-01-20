@@ -27,6 +27,7 @@ import com.seagate.alto.PlaceholderContent;
 import com.seagate.alto.R;
 import com.seagate.alto.utils.ColorUtils;
 import com.seagate.alto.utils.LayoutUtils;
+import com.seagate.alto.utils.LogUtils;
 import com.seagate.alto.utils.ScreenUtils;
 
 import java.sql.Timestamp;
@@ -36,7 +37,7 @@ import java.util.TimeZone;
 
 public class DigestCellView extends View {
 
-    private final static String TAG = DigestCellView.class.getName();
+    private final static String TAG = LogUtils.makeTag(DigestCellView.class);
 
     private MultiDraweeHolder<GenericDraweeHierarchy> mMultiDraweeHolder;
     private final InfoPanel mInfoPanel = new InfoPanel();
