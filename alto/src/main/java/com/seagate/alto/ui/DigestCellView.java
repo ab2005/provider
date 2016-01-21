@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -22,7 +23,6 @@ import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.DraweeHolder;
-import com.facebook.drawee.view.MultiDraweeHolder;
 import com.seagate.alto.PlaceholderContent;
 import com.seagate.alto.R;
 import com.seagate.alto.utils.ColorUtils;
@@ -31,6 +31,7 @@ import com.seagate.alto.utils.LogUtils;
 import com.seagate.alto.utils.ScreenUtils;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -39,10 +40,14 @@ public class DigestCellView extends View {
 
     private final static String TAG = LogUtils.makeTag(DigestCellView.class);
 
-    private MultiDraweeHolder<GenericDraweeHierarchy> mMultiDraweeHolder;
+//    private MultiDraweeHolder<GenericDraweeHierarchy> mMultiDraweeHolder;
+    private ArrayList<DraweeHolder> mMyMultiHolders;
     private final InfoPanel mInfoPanel = new InfoPanel();
 
     enum TransitionType {None, Crossfade, FlipHorizontal, FlipVertical}
+
+    // TODO: 1/20/16 multiple handler
+    private Handler transitionHandler = new Handler();
 
     private static final int MAX_IMAGES_IN_CELL = 5;
     private static final int ROTATE_FREQUENCY = 5000; // ms
@@ -78,8 +83,8 @@ public class DigestCellView extends View {
     private void init(Context context) {
         Log.d(TAG, "init()");
 
-        mMultiDraweeHolder = new MultiDraweeHolder<>();
-
+//        mMultiDraweeHolder = new MultiDraweeHolder<>();
+        mMyMultiHolders = new ArrayList<>();
 
         mCellBorder = LayoutUtils.getBorderSize(getWidth());
         mPanelPadding = LayoutUtils.getPanelPadding(getWidth());
@@ -92,14 +97,18 @@ public class DigestCellView extends View {
         synchronized (this) {
             mPosition = position;
             // TODO: 1/14/16  mImagePanelCount = getImagePanelCount(position);
+            mImagePanelCount = mPosition % MAX_IMAGES_IN_CELL + 1;
+            mDigestCellLayout = DigestCellLayouts.getLayoutForSize(mImagePanelCount, mPosition);
+
             setMultiDraweeSource(mPosition);
 
-            // TODO: 1/14/16  is it really useful here???
-            invalidate();
-            Log.d(TAG, "invalidate()");
-        }
+//            // TODO: 1/14/16  is it really useful here???
+//            invalidate();
+//            Log.d(TAG, "invalidate()");
 
-        mDigestCellLayout = DigestCellLayouts.getLayoutForSize(mImagePanelCount, mPosition);
+//            transitionHandler.postDelayed(transitionRunnable, 1000);
+
+        }
 
     }
 
@@ -109,6 +118,8 @@ public class DigestCellView extends View {
         Log.d(TAG, "onDetachedFromWindow()");
         super.onDetachedFromWindow();
         detachdraweeHolders();
+
+        transitionHandler.removeCallbacks(transitionRunnable);
     }
 
     @Override
@@ -133,11 +144,17 @@ public class DigestCellView extends View {
     }
 
     private void detachdraweeHolders() {
-        mMultiDraweeHolder.onDetach();
+//        mMultiDraweeHolder.onDetach();
+        for (DraweeHolder dh : mMyMultiHolders) {
+            dh.onDetach();
+        }
     }
 
     private void attachDraweeHolders() {
-        mMultiDraweeHolder.onAttach();
+//        mMultiDraweeHolder.onAttach();
+        for (DraweeHolder dh : mMyMultiHolders) {
+            dh.onAttach();
+        }
     }
 
 
@@ -183,7 +200,9 @@ public class DigestCellView extends View {
 
         synchronized (this) {
             for (int i = 0; i < mImagePanelCount; i++) {
-                Drawable drawable = mMultiDraweeHolder.get(i).getTopLevelDrawable();
+//                Drawable drawable = mMultiDraweeHolder.get(i).getTopLevelDrawable();
+                Drawable drawable = mMyMultiHolders.get(i).getTopLevelDrawable();
+
                 Rect childBounds = mDigestCellLayout.getPanelRect(i, mLayoutBounds);
                 childBounds.inset(mPanelPadding, mPanelPadding);
                 drawable.setBounds(childBounds);
@@ -208,6 +227,15 @@ public class DigestCellView extends View {
         mInfoPanel.draw(canvas, alphaText, alphaBackground);
     }
 
+    @Override
+    protected boolean verifyDrawable(Drawable who) {
+        for (int i = 0; i < mMyMultiHolders.size(); i++) {
+            if (who == mMyMultiHolders.get(i).getTopLevelDrawable()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     // Drawee stuff
 
@@ -224,34 +252,63 @@ public class DigestCellView extends View {
         Log.d(TAG, "setMultiDraweeSource()");
 
         synchronized (this) {
-            mImagePanelCount = position % MAX_IMAGES_IN_CELL + 1;       // TODO: 1/14/16 get image panel count here.
             Log.d(TAG, "mPanelCount = " + mImagePanelCount);
             for (int i = 0; i < mImagePanelCount; i++) {
 
-                // TODO: 1/14/16 can we only set new uri to the same DraweeHolder instead of set new DraweeHolder??
+                // have to build a new DraweeController if you want to set new URI. See setImageURI function in SimpleDraweeView.java for instance.
                 DraweeController controller = Fresco.newDraweeControllerBuilder()
                         .setUri(PlaceholderContent.getUri(((i + 1) * (position + 1))))
                         .build();
-                if (i < mMultiDraweeHolder.size()) {        // there is a DraweeHolder available to be reuse: simply set a new controller to this DraweeHolder.
-                    DraweeHolder dh = mMultiDraweeHolder.get(i);
+//                if (i < mMultiDraweeHolder.size()) {        // there is a DraweeHolder available to be reuse: simply set a new controller to this DraweeHolder.
+//                    DraweeHolder dh = mMultiDraweeHolder.get(i);
+//                    dh.setController(controller);
+//                } else {                                    // there is no DraweeHolder available to be reuse: create a new DraweeHolder, and add into the MultiDraweeHolder
+//                    DraweeHolder dh = DraweeHolder.create(createDraweeHierarchy(), getContext());
+//                    dh.setController(controller);
+//                    mMultiDraweeHolder.add(dh);
+//                }
+
+                if (i < mMyMultiHolders.size()) {        // there is a DraweeHolder available to be reuse: simply set a new controller to this DraweeHolder.
+                    DraweeHolder dh = mMyMultiHolders.get(i);
                     dh.setController(controller);
+                    dh.getTopLevelDrawable().setCallback(this);
                 } else {                                    // there is no DraweeHolder available to be reuse: create a new DraweeHolder, and add into the MultiDraweeHolder
                     DraweeHolder dh = DraweeHolder.create(createDraweeHierarchy(), getContext());
                     dh.setController(controller);
-                    mMultiDraweeHolder.add(dh);
+                    dh.getTopLevelDrawable().setCallback(this);
+                    mMyMultiHolders.add(dh);
                 }
 
-//                DraweeController controller = Fresco.newDraweeControllerBuilder()
-//                        .setUri(PlaceholderContent.getUri(((i + 1) * (position + 1))))
-//                        .build();
-//                DraweeHolder dh = DraweeHolder.create(createDraweeHierarchy(), getContext());
-//                dh.setController(controller);
-//                mMultiDraweeHolder.add(dh);
             }
 
         }
 
     }
+
+    private Runnable transitionRunnable = new Runnable() {
+        @Override
+        public void run() {
+            Log.d(TAG, "transitionRunnable(): position:" + mPosition);
+            synchronized (this) {
+//                DraweeHolder dh = mMultiDraweeHolder.get(0);
+
+                int index = 0;
+                DraweeHolder dh = mMyMultiHolders.get(index);
+
+                DraweeController controller = Fresco.newDraweeControllerBuilder()
+                        .setUri(PlaceholderContent.getUri((((int) (Math.random() * 10) + 1) * (mPosition + 1))))
+                        .build();
+                dh.setController(controller);
+                Log.d(TAG + "position:" + mPosition, "new dh set: " + dh.getTopLevelDrawable());
+
+                mMyMultiHolders.set(index, dh);         // there isn't a "set" function in Fresco's MultiDraweeHolder, so we use our own DraweeHolder arraylist instead.
+                Log.d(TAG + "position:" + mPosition, "showing now: " + mMyMultiHolders.get(index).getHierarchy().getTopLevelDrawable());
+
+//                invalidate();
+                transitionHandler.postDelayed(this, 2000);
+            }
+        }
+    };
 
     class InfoPanel {
 
@@ -338,5 +395,7 @@ public class DigestCellView extends View {
             return calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault());
         }
     }
+
+
 
 }
