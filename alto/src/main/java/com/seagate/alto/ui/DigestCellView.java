@@ -52,15 +52,19 @@ public class DigestCellView extends View {
     private static final int MAX_IMAGES_IN_CELL = 5;
     private static final int ROTATE_FREQUENCY = 5000; // ms
 
-    // Rotate stuff
-
+    // content
     private long mDigestId;
     private int mImagePanelCount;
     private int mInforPanelCount = 1;
     private int mPosition;
     private Cursor mContentCursor;
     private int mContentCursorCount = 0;
+    private long mTimestamp;
+
+    // layout
     private Rect mLayoutBounds;
+    private ArrayList<Rect> mChildrenBounds;
+    private Rect mInfoBounds;
     private DigestCellLayout mDigestCellLayout;
 
     private int mCellBorder;
@@ -83,7 +87,6 @@ public class DigestCellView extends View {
     private void init(Context context) {
         Log.d(TAG, "init()");
 
-//        mMultiDraweeHolder = new MultiDraweeHolder<>();
         mMyMultiHolders = new ArrayList<>();
 
         mCellBorder = LayoutUtils.getBorderSize(getWidth());
@@ -92,21 +95,24 @@ public class DigestCellView extends View {
 
 
     public void loadContent(int position) {
+        // load content only when viewHolder is bind. not gonna be called when you rotate the screen.
         Log.d(TAG, "loadContent()");
 
         synchronized (this) {
             mPosition = position;
             // TODO: 1/14/16  mImagePanelCount = getImagePanelCount(position);
             mImagePanelCount = mPosition % MAX_IMAGES_IN_CELL + 1;
-            mDigestCellLayout = DigestCellLayouts.getLayoutForSize(mImagePanelCount, mPosition);
+            mDigestCellLayout = DigestCellLayouts.getLayoutForSize(mImagePanelCount, mPosition);        // not gonna change when orientation changed.
 
+            // drawee source
             setMultiDraweeSource(mPosition);
 
-//            // TODO: 1/14/16  is it really useful here???
-//            invalidate();
-//            Log.d(TAG, "invalidate()");
-
-//            transitionHandler.postDelayed(transitionRunnable, 1000);
+            // date info
+            long offset = Timestamp.valueOf("2015-01-01 00:00:00").getTime();
+            long end = Timestamp.valueOf("2016-01-01 00:00:00").getTime();
+            long diff = end - offset + 1;
+            mTimestamp = offset + (long)(Math.random() * diff);      // TODO: 1/14/16 getTimeStamp here
+            mInfoPanel.setTimestamp(mTimestamp);
 
         }
 
@@ -117,7 +123,7 @@ public class DigestCellView extends View {
     public void onDetachedFromWindow() {
         Log.d(TAG, "onDetachedFromWindow()");
         super.onDetachedFromWindow();
-        detachdraweeHolders();
+        detachDraweeHolders();
 
         transitionHandler.removeCallbacks(transitionRunnable);
     }
@@ -126,7 +132,7 @@ public class DigestCellView extends View {
     public void onStartTemporaryDetach() {
         Log.d(TAG, "onStartTemporaryDetach()");
         super.onStartTemporaryDetach();
-        detachdraweeHolders();
+        detachDraweeHolders();
     }
 
     @Override
@@ -134,6 +140,8 @@ public class DigestCellView extends View {
         Log.d(TAG, "onAttachedToWindow()");
         super.onAttachedToWindow();
         attachDraweeHolders();
+
+        transitionHandler.postDelayed(transitionRunnable, (long) (Math.random() * 5000));
     }
 
     @Override
@@ -143,15 +151,13 @@ public class DigestCellView extends View {
         attachDraweeHolders();
     }
 
-    private void detachdraweeHolders() {
-//        mMultiDraweeHolder.onDetach();
+    private void detachDraweeHolders() {
         for (DraweeHolder dh : mMyMultiHolders) {
             dh.onDetach();
         }
     }
 
     private void attachDraweeHolders() {
-//        mMultiDraweeHolder.onAttach();
         for (DraweeHolder dh : mMyMultiHolders) {
             dh.onAttach();
         }
@@ -165,24 +171,36 @@ public class DigestCellView extends View {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        // gonna be called when rotating the screen. Recalculate the layouts/bounds/sizes here.
         Log.d(TAG, "onMeasure()");
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         int size;
         int realSize;
-        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) getLayoutParams();
-        int margin = lp.leftMargin;
-        if (ScreenUtils.isPortrait()) {
-            size = ScreenUtils.getWidthInPixels();
-        } else {
-            size = ScreenUtils.getHeightInPixels() - LayoutUtils.getActionBarHeight() - LayoutUtils.getStatusBarHeight();
-        }
 
-        Log.i("DigestCellView", "onMeasure size: " + size);
+        DigestRecyclerView parent = (DigestRecyclerView) getParent();
+        size = ScreenUtils.isPortrait() ? parent.getWidth(): parent.getHeight();
+        int margin = LayoutUtils.getDigestMargin(size);
+        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) getLayoutParams();
+        lp.leftMargin = margin;
+        lp.topMargin = margin;
+        lp.rightMargin = ScreenUtils.isPortrait()? margin : 0;
+        lp.bottomMargin = ScreenUtils.isPortrait()? 0 : margin;
+        setLayoutParams(lp);
+
         realSize = size - 2 * margin;
         setMeasuredDimension(realSize, realSize);
 
         mLayoutBounds = new Rect(0, 0, realSize, realSize);
         mLayoutBounds.inset(mCellBorder, mCellBorder);
+
+        mChildrenBounds = new ArrayList<>();
+        for (int i = 0; i < mImagePanelCount; i++) {
+            Rect childBounds = mDigestCellLayout.getPanelRect(i, mLayoutBounds);
+            childBounds.inset(mPanelPadding, mPanelPadding);
+            mChildrenBounds.add(childBounds);
+        }
+        mInfoBounds = mDigestCellLayout.getInfoRect(mLayoutBounds);
+        mInfoPanel.setBounds(mInfoBounds);
     }
 
     @Override
@@ -200,24 +218,13 @@ public class DigestCellView extends View {
 
         synchronized (this) {
             for (int i = 0; i < mImagePanelCount; i++) {
-//                Drawable drawable = mMultiDraweeHolder.get(i).getTopLevelDrawable();
                 Drawable drawable = mMyMultiHolders.get(i).getTopLevelDrawable();
-
-                Rect childBounds = mDigestCellLayout.getPanelRect(i, mLayoutBounds);
-                childBounds.inset(mPanelPadding, mPanelPadding);
-                drawable.setBounds(childBounds);
+                drawable.setBounds(mChildrenBounds.get(i));
                 drawable.draw(canvas);
             }
-//            mMultiDraweeHolder.draw(canvas);              // don't do MultiDraweeHolder.draw(canvas) here, because we may have more DraweeHolders than we want to display.
 
-            Rect infoBounds = mDigestCellLayout.getInfoRect(mLayoutBounds);
+//            Rect infoBounds = mDigestCellLayout.getInfoRect(mLayoutBounds);
 
-            long offset = Timestamp.valueOf("2015-01-01 00:00:00").getTime();
-            long end = Timestamp.valueOf("2016-01-01 00:00:00").getTime();
-            long diff = end - offset + 1;
-            long rand = offset + (long)(Math.random() * diff);      // FIXME: 1/14/16 getTimeStamp here
-
-            mInfoPanel.reset(rand, infoBounds);
             drawInfoPanel(canvas, 255, 128);
         }
 
@@ -229,6 +236,7 @@ public class DigestCellView extends View {
 
     @Override
     protected boolean verifyDrawable(Drawable who) {
+        super.verifyDrawable(who);
         Log.d(TAG, "verifyDrawable()");
         for (int i = 0; i < mMyMultiHolders.size(); i++) {
             if (who == mMyMultiHolders.get(i).getTopLevelDrawable()) {
@@ -255,19 +263,10 @@ public class DigestCellView extends View {
         synchronized (this) {
             Log.d(TAG, "mPanelCount = " + mImagePanelCount);
             for (int i = 0; i < mImagePanelCount; i++) {
-
                 // have to build a new DraweeController if you want to set new URI. See setImageURI function in SimpleDraweeView.java for instance.
                 DraweeController controller = Fresco.newDraweeControllerBuilder()
                         .setUri(PlaceholderContent.getUri(((i + 1) * (position + 1))))
                         .build();
-//                if (i < mMultiDraweeHolder.size()) {        // there is a DraweeHolder available to be reuse: simply set a new controller to this DraweeHolder.
-//                    DraweeHolder dh = mMultiDraweeHolder.get(i);
-//                    dh.setController(controller);
-//                } else {                                    // there is no DraweeHolder available to be reuse: create a new DraweeHolder, and add into the MultiDraweeHolder
-//                    DraweeHolder dh = DraweeHolder.create(createDraweeHierarchy(), getContext());
-//                    dh.setController(controller);
-//                    mMultiDraweeHolder.add(dh);
-//                }
 
                 if (i >= mMyMultiHolders.size()) {          // there is no DraweeHolder available to be reuse: create a new DraweeHolder, and add into the MultiDraweeHolder
                     DraweeHolder dh = DraweeHolder.create(createDraweeHierarchy(), getContext());
@@ -279,9 +278,7 @@ public class DigestCellView extends View {
                     DraweeHolder dh = mMyMultiHolders.get(i);
                     dh.setController(controller);
                 }
-
             }
-
         }
 
     }
@@ -300,13 +297,11 @@ public class DigestCellView extends View {
                         .setUri(PlaceholderContent.getUri((((int) (Math.random() * 10) + 1) * (mPosition + 1))))
                         .build();
                 dh.setController(controller);
-                Log.d(TAG + "position:" + mPosition, "new dh set: " + dh.getTopLevelDrawable());
 
-                mMyMultiHolders.set(index, dh);         // there isn't a "set" function in Fresco's MultiDraweeHolder, so we use our own DraweeHolder arraylist instead.
-                Log.d(TAG + "position:" + mPosition, "showing now: " + mMyMultiHolders.get(index).getHierarchy().getTopLevelDrawable());
+                mMyMultiHolders.set(index, dh);         // there is NOT a "set" function in Fresco's MultiDraweeHolder, so we use our own DraweeHolder arraylist instead.
 
 //                invalidate();
-                transitionHandler.postDelayed(this, 2000);
+                transitionHandler.postDelayed(this, ROTATE_FREQUENCY);
             }
         }
     };
@@ -330,24 +325,24 @@ public class DigestCellView extends View {
 
             mDayPaint.setColor(Color.WHITE);
             mDayPaint.setAntiAlias(true);
-//            mDayPaint.setTypeface(FontUtils.getFont(family));
 
             mMonthPaint.setColor(Color.WHITE);
             mMonthPaint.setAntiAlias(true);
-//            mMonthPaint.setTypeface(FontUtils.getFont(family));
 
             mColorPaint.setStyle(Paint.Style.FILL);
         }
 
-        public void reset(long timestamp, Rect bounds) {
+        public void setBounds(Rect bounds) {
             mBounds = bounds;
 
             if (mBounds != null) {
-                mDay = getDayString(timestamp);
-                mMonth = getMonthString(timestamp);
-
                 mBounds.inset(mPanelPadding, mPanelPadding);
             }
+        }
+
+        public void setTimestamp(long timestamp) {
+            mDay = getDayString(timestamp);
+            mMonth = getMonthString(timestamp);
         }
 
         void draw(Canvas canvas, int alphaText, int alphaBackground) {
