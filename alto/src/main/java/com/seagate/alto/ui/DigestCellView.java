@@ -229,6 +229,7 @@ public class DigestCellView extends View {
 
     @Override
     protected boolean verifyDrawable(Drawable who) {
+        Log.d(TAG, "verifyDrawable()");
         for (int i = 0; i < mMyMultiHolders.size(); i++) {
             if (who == mMyMultiHolders.get(i).getTopLevelDrawable()) {
                 return true;
@@ -268,15 +269,15 @@ public class DigestCellView extends View {
 //                    mMultiDraweeHolder.add(dh);
 //                }
 
-                if (i < mMyMultiHolders.size()) {        // there is a DraweeHolder available to be reuse: simply set a new controller to this DraweeHolder.
-                    DraweeHolder dh = mMyMultiHolders.get(i);
-                    dh.setController(controller);
-                    dh.getTopLevelDrawable().setCallback(this);
-                } else {                                    // there is no DraweeHolder available to be reuse: create a new DraweeHolder, and add into the MultiDraweeHolder
+                if (i >= mMyMultiHolders.size()) {          // there is no DraweeHolder available to be reuse: create a new DraweeHolder, and add into the MultiDraweeHolder
                     DraweeHolder dh = DraweeHolder.create(createDraweeHierarchy(), getContext());
                     dh.setController(controller);
-                    dh.getTopLevelDrawable().setCallback(this);
+                    dh.getTopLevelDrawable().setCallback(this);     // a holder is set to the view for the first time, set the callback to its top-level drawable.
+                    // FIXME: 1/20/16 where shall we clear the callback (setCallback(null))? when the view is not needed anymore. Call clear in DigestRecyclerView??
                     mMyMultiHolders.add(dh);
+                } else {        // there is a DraweeHolder available to be reuse: simply set a new controller to this DraweeHolder.
+                    DraweeHolder dh = mMyMultiHolders.get(i);
+                    dh.setController(controller);
                 }
 
             }
