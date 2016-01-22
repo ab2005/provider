@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015. Seagate Technology PLC. All rights reserved.
+ */
+
 package com.seagate.alto.provider.example;
 
 import com.dropbox.core.v2.DbxClientV2;

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015. Seagate Technology PLC. All rights reserved.
+ */
+
 package com.seagate.alto.provider.example;
 
 import android.content.SharedPreferences;
@@ -10,8 +14,8 @@ import com.seagate.alto.provider.Provider;
 
 
 /**
- * Base class for Activities that require auth tokens
- * Will redirect to auth flow if needed
+ * Base class for Activities that require auth tokens.
+ * Will redirect to auth flow if needed.
  */
 public abstract class AuthActivity extends AppCompatActivity {
     public static final String USER_AGENT = "Alto-Android/0.0.1";
