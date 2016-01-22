@@ -26,7 +26,7 @@ public class SeagateReporter implements IMetricsReporter{
 
     private static final int WAIT_MINUTES = 1;      // time between dump sessions
 
-    private final boolean TESTING = false;
+    private final boolean TESTING = true;
 
     public SeagateReporter() {
         Log.d(TAG, "Construct");
@@ -139,11 +139,48 @@ public class SeagateReporter implements IMetricsReporter{
         }
 
         private void upload(JSONObject report) {
-            try {
-                Log.d(TAG, report.toString(4));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+
+            final String ENDPOINT = "http://datacollection.dogfood.blackpearlsystems.net/datacollection/rest/v1/noauth/structured/";
+
+//            try {
+//                Log.d(TAG, report.toString(4));
+//
+//                // post json to the endpoint
+//                URL url = new URL(ENDPOINT);
+////                HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+//                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+////                conn.setReadTimeout(10000);
+////                conn.setConnectTimeout(15000);
+//                conn.setRequestMethod("POST");
+//                conn.setDoInput(true);
+//                conn.setDoOutput(true);
+//
+////                List<NameValuePair> params = new ArrayList<NameValuePair>();
+////                params.add(new BasicNameValuePair("firstParam", paramValue1));
+////                params.add(new BasicNameValuePair("secondParam", paramValue2));
+////                params.add(new BasicNameValuePair("thirdParam", paramValue3));
+//
+//                OutputStream os = conn.getOutputStream();
+//                BufferedWriter writer = new BufferedWriter(
+//                        new OutputStreamWriter(os, "UTF-8"));
+////                writer.write(getQuery(params));
+//                writer.write(report.toString());
+//                writer.flush();
+//                writer.close();
+//                os.close();
+//                conn.connect();
+//
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            } catch (MalformedURLException e) {
+//                e.printStackTrace();
+//            } catch (UnsupportedEncodingException e) {
+//                e.printStackTrace();
+//            } catch (ProtocolException e) {
+//                e.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
 
 
         }
