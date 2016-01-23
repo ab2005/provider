@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.concurrent.Executor;
 
 /**
- * Network fetcher that uses OkHttp as a backend for Dropbox calls.
+ * Network fetcher that uses OkHttp as a backend for {@Provider} calls.
  */
 public class OkHttpNetworkFetcher extends BaseNetworkFetcher<OkHttpNetworkFetcher.OkHttpNetworkFetchState> {
 
@@ -44,9 +44,7 @@ public class OkHttpNetworkFetcher extends BaseNetworkFetcher<OkHttpNetworkFetche
         public long responseTime;
         public long fetchCompleteTime;
 
-        public OkHttpNetworkFetchState(
-                Consumer<EncodedImage> consumer,
-                ProducerContext producerContext) {
+        public OkHttpNetworkFetchState(Consumer<EncodedImage> consumer, ProducerContext producerContext) {
             super(consumer, producerContext);
         }
     }
@@ -63,6 +61,7 @@ public class OkHttpNetworkFetcher extends BaseNetworkFetcher<OkHttpNetworkFetche
 
     /**
      * @param okHttpClient client to use
+     * @param provider provider instance
      */
     public OkHttpNetworkFetcher(OkHttpClient okHttpClient, Provider provider) {
         mOkHttpClient = okHttpClient;
@@ -77,11 +76,14 @@ public class OkHttpNetworkFetcher extends BaseNetworkFetcher<OkHttpNetworkFetche
         return new OkHttpNetworkFetchState(consumer, context);
     }
 
-    static interface Call extends Runnable {
+    /**
+     * A runner for submitting cancelable network requests.
+     */
+    public interface Call extends Runnable {
         void cancel();
     }
 
-    /**
+    /*
      * Handles exceptions from {@link com.squareup.okhttp.Call}.
      * <p/>
      * <p> OkHttp notifies callers of cancellations via an IOException. If IOException is caught
@@ -153,46 +155,22 @@ public class OkHttpNetworkFetcher extends BaseNetworkFetcher<OkHttpNetworkFetche
                 });
     }
 
-    private class DbxFilesCall implements Call {
+    private static class DbxFilesCall implements Call {
         private final OkHttpNetworkFetchState fetchState;
         private final Callback callback;
+        private final DbxProvider provider;
         private DbxDownloader<DbxFiles.FileMetadata> downloader = null;
 
-        DbxFilesCall(final OkHttpNetworkFetchState fetchState, final Callback callback) {
+        DbxFilesCall(final OkHttpNetworkFetchState fetchState, final Callback callback, DbxProvider provider) {
             this.fetchState = fetchState;
             this.callback = callback;
+            this.provider = provider;
         }
 
         @Override
         public void run() {
-            Uri uri = fetchState.getUri();
-            final String path = uri.getPath();
-            String strFormat = uri.getQueryParameter("format");
-            String strSize = uri.getQueryParameter("size");
-            DbxFiles.ThumbnailFormat format = DbxFiles.ThumbnailFormat.jpeg;
-            DbxFiles.ThumbnailSize size = DbxFiles.ThumbnailSize.w128h128;
-
-            if ("png".equalsIgnoreCase(strFormat)) {
-                format = DbxFiles.ThumbnailFormat.png;
-            }
-
-            if ("w32h32".equals(strSize)) {
-                size = DbxFiles.ThumbnailSize.w32h32;
-            } else if ("w64h64".equals(strSize)) {
-                size = DbxFiles.ThumbnailSize.w64h64;
-            } else if ("w128h128".equals(strSize)) {
-                size = DbxFiles.ThumbnailSize.w128h128;
-            } else if ("w640h480".equals(strSize)) {
-                size = DbxFiles.ThumbnailSize.w640h480;
-            } else if ("w1024h768".equals(strSize)) {
-                size = DbxFiles.ThumbnailSize.w1024h768;
-            }
-
-            DbxFiles mFilesClient = ((DbxProvider) mProvider).getFilesClient();
-
-            // TODO: separate thumbnail download from full size image download
             try {
-                downloader = mFilesClient.getThumbnailBuilder(path).format(format).size(size).start();
+                downloader = downloader();
                 fetchState.responseTime = SystemClock.elapsedRealtime();
                 callback.onResponse(downloader.body, (int) downloader.result.size);
             } catch (DbxException | IOException e) {
@@ -214,22 +192,65 @@ public class OkHttpNetworkFetcher extends BaseNetworkFetcher<OkHttpNetworkFetche
                 try {
                     downloader.close();
                 } catch (IllegalStateException e) {
-                    // nothing
+                    // ignore
                 }
                 downloader = null;
                 callback.onCancellation();
             }
         }
+
+        private DbxDownloader<DbxFiles.FileMetadata> downloader() throws DbxException {
+            Uri uri = fetchState.getUri();
+            if (isFullSize()) {
+                return provider.getFilesClient()
+                        .downloadBuilder(uri.getPath())
+                        .rev(uri.getQueryParameter("rev"))
+                        .start();
+            } else {
+                return provider.getFilesClient()
+                        .getThumbnailBuilder(uri.getPath())
+                        .format(thumbnailFormat())
+                        .size(thumbnailSize())
+                        .start();
+            }
+        }
+
+        private boolean isFullSize() {
+            Uri uri = fetchState.getUri();
+            return (uri.getQueryParameter("format") == null) && (uri.getQueryParameter("size") == null);
+        }
+
+        private DbxFiles.ThumbnailFormat thumbnailFormat() {
+            String format = fetchState.getUri().getQueryParameter("format");
+            if (format == null) {
+                format = "jpeg";
+            }
+            switch(format) {
+                case "png": return DbxFiles.ThumbnailFormat.png;
+                default:case "jpeg": return DbxFiles.ThumbnailFormat.jpeg;
+            }
+        }
+
+        private DbxFiles.ThumbnailSize thumbnailSize() {
+            String size = fetchState.getUri().getQueryParameter("size");
+            if (size == null) {
+                size = "w128h128";
+            }
+            switch(size) {
+                case "w32h32": return DbxFiles.ThumbnailSize.w32h32;
+                case "w64h64": return DbxFiles.ThumbnailSize.w64h64;
+                default:case "w128h128": return DbxFiles.ThumbnailSize.w128h128;
+                case "w640h480": return DbxFiles.ThumbnailSize.w640h480;
+                case "w1024h768": return DbxFiles.ThumbnailSize.w1024h768;
+            }
+        }
     }
 
     private Call buildCall(final OkHttpNetworkFetchState fetchState, final Callback callback) {
-        final Uri uri = fetchState.getUri();
-        final String domain = uri.getAuthority();
-
-        // TODO: add providers
+        final String domain = fetchState.getUri().getAuthority();
         switch(domain) {
-            case "seagate": return new DbxFilesCall(fetchState, callback);
-            case "dropbox": return new DbxFilesCall(fetchState, callback);
+            case "seagate":
+            case "dropbox": return new DbxFilesCall(fetchState, callback, (DbxProvider) mProvider);
             default: return null;
         }
     }

@@ -12,11 +12,13 @@ import com.seagate.alto.provider.Provider;
 import com.squareup.okhttp.OkHttpClient;
 
 /**
- * Drawees for getting an {@link ImagePipelineConfig} that uses
+ * Creates ImagePipeline configuration that uses {@link }OkHttpNetworkFetcher}
+ * with OkHttp as a backend for {@link Provider} calls.
  */
 public class OkHttpImagePipelineConfigFactory {
-
     public static ImagePipelineConfig.Builder newBuilder(Context context, OkHttpClient okHttpClient, Provider provider) {
-        return ImagePipelineConfig.newBuilder(context).setNetworkFetcher(new OkHttpNetworkFetcher(okHttpClient, provider));
+        return ImagePipelineConfig
+                .newBuilder(context)
+                .setNetworkFetcher(new OkHttpNetworkFetcher(okHttpClient, provider));
     }
 }
