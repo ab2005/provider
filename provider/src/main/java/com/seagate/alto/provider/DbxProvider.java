@@ -19,21 +19,28 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * Dropbox provider
+ * Dropbox provider implementation.
  */
 public class DbxProvider implements Provider {
     private static final String REPO_URL = "https://content.dropboxapi.com/2/files/";
 
     private final DbxClientV2 mDbxClient;
 
+    /**
+     * Constructs a Dropbox provider.
+     *
+     * @param accessToken
+     *      authenticator token retrieved from the login or previous session
+     * @param clientIdentifier
+     *      An identifier for the API client, typically of the form "Name/Version".
+     *      This is used to set the HTTP {@code User-Agent} header when making API requests.
+     *      The exact format of the {@code User-Agent} header is described in
+     *      <a href="http://tools.ietf.org/html/rfc2616#section-3.8">section 3.8 of the HTTP specification</a>.
+     */
     public DbxProvider(String accessToken, String clientIdentifier) {
         String userLocale = Locale.getDefault().toString();
         DbxRequestConfig requestConfig = new DbxRequestConfig(clientIdentifier, userLocale, OkHttpRequestor.Instance);
         mDbxClient = new DbxClientV2(requestConfig, accessToken, DbxHost.Default);
-    }
-
-    public Provider createProvider(String accessToken, String clientIdentifier) {
-        return new DbxProvider(accessToken, clientIdentifier);
     }
 
     @Override

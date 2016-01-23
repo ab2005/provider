@@ -14,19 +14,6 @@ import android.util.Size;
  */
 public interface Provider {
     /**
-     * Constructs a provider.
-     *
-     * @param accessToken
-     *      authenticator token retrieved from the login or previous session
-     * @param clientIdentifier
-     *      An identifier for the API client, typically of the form "Name/Version".
-     *      This is used to set the HTTP {@code User-Agent} header when making API requests.
-     *      The exact format of the {@code User-Agent} header is described in
-     *      <a href="http://tools.ietf.org/html/rfc2616#section-3.8">section 3.8 of the HTTP specification</a>.
-     */
-    Provider createProvider(@NonNull String accessToken, @NonNull String clientIdentifier);
-
-    /**
      * Creates a folder at a given path.
      */
     FolderMetadata createFolder(@NonNull String path) throws ProviderException;
