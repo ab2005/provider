@@ -3,10 +3,10 @@
 <!-- Copyright (c) 2015. Seagate Technology PLC. All rights reserved. -->
 
 <resources>
-    <color name="seagate_green">#6fbe50</color>
-    <color name="seagate_grey">#868589</color>
 
-    <color name="lyve_blue">#ff33b5f5</color>
+    <color name="lyve_blue_dark">#1267c0</color>
+    <color name="lyve_blue">#3489e2</color>
+    <color name="lyve_grey">#888888</color>
 
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>

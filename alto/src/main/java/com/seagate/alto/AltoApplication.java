@@ -11,8 +11,6 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.seagate.alto.utils.LogUtils;
 
-import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
-
 public class AltoApplication extends Application {
 
     private static final String TAG = LogUtils.makeTag(AltoApplication.class);
@@ -23,13 +21,13 @@ public class AltoApplication extends Application {
 
         Log.d(TAG, "onCreate");
 
-        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-             // I use comic-relief for testing
-//             .setDefaultFontPath("fonts/ComicRelief.ttf")
-            .setDefaultFontPath("fonts/helveticaneueltw1g-roman.ttf")
-            .setFontAttrId(R.attr.fontPath)
-            .build()
-        );
+//        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+//             // I use comic-relief for testing
+////             .setDefaultFontPath("fonts/ComicRelief.ttf")
+//            .setDefaultFontPath("fonts/helveticaneueltw1g-roman.ttf")
+//            .setFontAttrId(R.attr.fontPath)
+//            .build()
+//        );
 
         startFresco();
     }
