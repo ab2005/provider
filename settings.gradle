@@ -1,4 +1,4 @@
 /*
  * Copyright (C) 2015 Seagate LLC
  */
-include ':alto', ':provider', ':provider-app'
+include ':alto', ':provider' // , ':provider-app'
