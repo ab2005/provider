@@ -21,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
 import com.seagate.alto.events.BusMaster;
@@ -309,18 +310,23 @@ public class StackFragment extends Fragment implements IToolbarHolder, IBackPres
 //        }
 
         transaction.commit();
-
     }
 
     @Override
     public void showToolBar() {
         mToolbar.setVisibility(View.VISIBLE);
         mFab.setVisibility(View.VISIBLE);
+
+        // show status
+        getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
     @Override
     public void hideToolBar() {
         mToolbar.setVisibility(View.GONE);
         mFab.setVisibility(View.GONE);
+
+        // hide status
+        getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 }
