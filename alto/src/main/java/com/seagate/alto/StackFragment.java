@@ -21,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
 import com.seagate.alto.events.BusMaster;
@@ -29,15 +30,16 @@ import com.seagate.alto.utils.LogUtils;
 
 import java.util.ArrayList;
 
-public class StackFragment extends Fragment implements IBackPressHandler, IFragmentStackHolder, NavigationView.OnNavigationItemSelectedListener {
+public class StackFragment extends Fragment implements IToolbarHolder, IBackPressHandler, IFragmentStackHolder, NavigationView.OnNavigationItemSelectedListener {
 
     private static String TAG = LogUtils.makeTag(StackFragment.class);
 
     private ActionBarDrawerToggle mToggle;
     private MaterialMenuDrawable materialMenu;
     private FragmentManager mFragmentManager;
-
-    private View v;
+    private Toolbar mToolbar;
+    private View mFragView;
+    private FloatingActionButton mFab;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -50,18 +52,18 @@ public class StackFragment extends Fragment implements IBackPressHandler, IFragm
 
         // setContentView(R.layout.activity_main);
 
-        v = inflater.inflate(R.layout.fragment_main, container, false);
+        mFragView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
+        mToolbar = (Toolbar) mFragView.findViewById(R.id.toolbar);
 
         if (getActivity() instanceof AppCompatActivity) {
-            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+            ((AppCompatActivity) getActivity()).setSupportActionBar(mToolbar);
         }
 
-//        toolbar.setTitle(R.string.app_name);
+//        mToolbar.setTitle(R.string.app_name);
 
-        FloatingActionButton fab = (FloatingActionButton) v.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        mFab = (FloatingActionButton) mFragView.findViewById(R.id.fab);
+        mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -69,19 +71,19 @@ public class StackFragment extends Fragment implements IBackPressHandler, IFragm
             }
         });
 
-        final DrawerLayout drawer = (DrawerLayout) v.findViewById(R.id.drawer_layout);
+        final DrawerLayout drawer = (DrawerLayout) mFragView.findViewById(R.id.drawer_layout);
         mToggle = new ActionBarDrawerToggle(
-                getActivity(), drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                getActivity(), drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(mToggle);
         mToggle.syncState();
 
         materialMenu = new MaterialMenuDrawable(getContext(), Color.WHITE, MaterialMenuDrawable.Stroke.THIN);
-        toolbar.setNavigationIcon(materialMenu);
+        mToolbar.setNavigationIcon(materialMenu);
 
-        final NavigationView navigationView = (NavigationView) v.findViewById(R.id.nav_view);
+        final NavigationView navigationView = (NavigationView) mFragView.findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -121,7 +123,7 @@ public class StackFragment extends Fragment implements IBackPressHandler, IFragm
 
         BusMaster.getBus().register(this);
 
-        return v;
+        return mFragView;
     }
 
 
@@ -168,9 +170,9 @@ public class StackFragment extends Fragment implements IBackPressHandler, IFragm
 
     public void onBackPressed() {
 
-        // v is the drawerlayout and you cannot find yourself
+        // mFragView is the drawerlayout and you cannot find yourself
 
-        DrawerLayout drawer = (DrawerLayout) v; // .findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) mFragView; // .findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -253,14 +255,13 @@ public class StackFragment extends Fragment implements IBackPressHandler, IFragm
             setFragment(new TileDetailFragment());
         } else if (id == R.id.favorites) {
             setFragment(new CardDetailFragment());
+        } else if (id == R.id.photos) {
+            setFragment(new TileDetailFragment());
         } else {
             setFragment(new ListDetailFragment());
         }
 
-//        DrawerLayout drawer = (DrawerLayout) v.findViewById(R.id.drawer_layout);
-//        drawer.closeDrawer(GravityCompat.START);
-
-        ((DrawerLayout) v).closeDrawer(GravityCompat.START);
+        ((DrawerLayout) mFragView).closeDrawer(GravityCompat.START);
 
         return true;
     }
@@ -309,6 +310,23 @@ public class StackFragment extends Fragment implements IBackPressHandler, IFragm
 //        }
 
         transaction.commit();
+    }
 
+    @Override
+    public void showToolBar() {
+        mToolbar.setVisibility(View.VISIBLE);
+        mFab.setVisibility(View.VISIBLE);
+
+        // show status
+        getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    }
+
+    @Override
+    public void hideToolBar() {
+        mToolbar.setVisibility(View.GONE);
+        mFab.setVisibility(View.GONE);
+
+        // hide status
+        getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 }
