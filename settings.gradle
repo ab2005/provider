@@ -1,1 +1,4 @@
-include ':alto'
+/*
+ * Copyright (C) 2015 Seagate LLC
+ */
+include ':alto', ':provider' // , ':provider-app'
