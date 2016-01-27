@@ -6,7 +6,7 @@
 
     <color name="lyve_blue_dark">#1267c0</color>
     <color name="lyve_blue">#3489e2</color>
-    <color name="lyve_grey">#888888</color>
+    <color name="highlight">#c8d1da</color>
 
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
