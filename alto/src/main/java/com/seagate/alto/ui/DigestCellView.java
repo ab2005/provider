@@ -40,17 +40,18 @@ public class DigestCellView extends View {
 
     private final static String TAG = LogUtils.makeTag(DigestCellView.class);
 
-//    private MultiDraweeHolder<GenericDraweeHierarchy> mMultiDraweeHolder;
-    private ArrayList<DraweeHolder> mMyMultiHolders;
-    private final InfoPanel mInfoPanel = new InfoPanel();
-
     enum TransitionType {None, Crossfade, FlipHorizontal, FlipVertical}
 
     // TODO: 1/20/16 multiple handler
     private Handler transitionHandler = new Handler();
 
+    private static final int CROSSFADE_DURATION = 2000;
+    private static final int FADEIN_DURATION = 300;
+    private static final int FLIP_DURATION = 250;
+
     private static final int MAX_IMAGES_IN_CELL = 5;
     private static final int ROTATE_FREQUENCY = 5000; // ms
+    private long mCurrentTransStartTime;
 
     // content
     private long mDigestId;
@@ -66,6 +67,10 @@ public class DigestCellView extends View {
     private ArrayList<Rect> mChildrenBounds;
     private Rect mInfoBounds;
     private DigestCellLayout mDigestCellLayout;
+
+    //    private MultiDraweeHolder<GenericDraweeHierarchy> mMultiDraweeHolder;
+    private ArrayList<DraweeHolder> mMyMultiHolders;
+    private final InfoPanel mInfoPanel = new InfoPanel();
 
     private int mCellBorder;
     private int mPanelPadding;
@@ -88,6 +93,13 @@ public class DigestCellView extends View {
         Log.d(TAG, "init()");
 
         mMyMultiHolders = new ArrayList<>();
+
+        for (int i = 0; i < MAX_IMAGES_IN_CELL; i++) {
+            GenericDraweeHierarchy hierarchy = createDraweeHierarchy();
+            DraweeHolder dh = DraweeHolder.create(hierarchy, getContext());
+            dh.getTopLevelDrawable().setCallback(this);
+            mMyMultiHolders.add(dh);
+        }
 
         mCellBorder = LayoutUtils.getBorderSize(getWidth());
         mPanelPadding = LayoutUtils.getPanelPadding(getWidth());
@@ -141,7 +153,7 @@ public class DigestCellView extends View {
         super.onAttachedToWindow();
         attachDraweeHolders();
 
-        transitionHandler.postDelayed(transitionRunnable, (long) (Math.random() * 5000));
+        transitionHandler.postDelayed(transitionRunnable, 5000);
     }
 
     @Override
@@ -223,7 +235,7 @@ public class DigestCellView extends View {
                 drawable.draw(canvas);
             }
 
-//            Rect infoBounds = mDigestCellLayout.getInfoRect(mLayoutBounds);
+            handleTransition(mMyMultiHolders.get(0), mCurrentTransStartTime);
 
             drawInfoPanel(canvas, 255, 128);
         }
@@ -263,21 +275,12 @@ public class DigestCellView extends View {
         synchronized (this) {
             Log.d(TAG, "mPanelCount = " + mImagePanelCount);
             for (int i = 0; i < mImagePanelCount; i++) {
-                // have to build a new DraweeController if you want to set new URI. See setImageURI function in SimpleDraweeView.java for instance.
+                // have to build a new DraweeController if you want to set new URI.
                 DraweeController controller = Fresco.newDraweeControllerBuilder()
                         .setUri(PlaceholderContent.getUri(((i + 1) * (position + 1))))
                         .build();
 
-                if (i >= mMyMultiHolders.size()) {          // there is no DraweeHolder available to be reuse: create a new DraweeHolder, and add into the MultiDraweeHolder
-                    DraweeHolder dh = DraweeHolder.create(createDraweeHierarchy(), getContext());
-                    dh.setController(controller);
-                    dh.getTopLevelDrawable().setCallback(this);     // a holder is set to the view for the first time, set the callback to its top-level drawable.
-                    // FIXME: 1/20/16 where shall we clear the callback (setCallback(null))? when the view is not needed anymore. Call clear in DigestRecyclerView??
-                    mMyMultiHolders.add(dh);
-                } else {        // there is a DraweeHolder available to be reuse: simply set a new controller to this DraweeHolder.
-                    DraweeHolder dh = mMyMultiHolders.get(i);
-                    dh.setController(controller);
-                }
+                mMyMultiHolders.get(i).setController(controller);
             }
         }
 
@@ -288,15 +291,17 @@ public class DigestCellView extends View {
         public void run() {
             Log.d(TAG, "transitionRunnable(): position:" + mPosition);
             synchronized (this) {
-//                DraweeHolder dh = mMultiDraweeHolder.get(0);
 
                 int index = 0;
                 DraweeHolder dh = mMyMultiHolders.get(index);
 
-                DraweeController controller = Fresco.newDraweeControllerBuilder()
-                        .setUri(PlaceholderContent.getUri((((int) (Math.random() * 10) + 1) * (mPosition + 1))))
-                        .build();
-                dh.setController(controller);
+                mCurrentTransStartTime = System.currentTimeMillis();
+                handleTransition(mMyMultiHolders.get(0), mCurrentTransStartTime);
+
+//                DraweeController controller = Fresco.newDraweeControllerBuilder()
+//                        .setUri(PlaceholderContent.getUri((((int) (Math.random() * 10) + 1) * (mPosition + 1))))
+//                        .build();
+//                dh.setController(controller);
 
                 mMyMultiHolders.set(index, dh);         // there is NOT a "set" function in Fresco's MultiDraweeHolder, so we use our own DraweeHolder arraylist instead.
 
@@ -305,6 +310,20 @@ public class DigestCellView extends View {
             }
         }
     };
+
+    void handleTransition(DraweeHolder draweeHolder, long startingTime) {
+        Drawable drawable = draweeHolder.getTopLevelDrawable().mutate();
+//        FadeDrawable fadeDrawable = new FadeDrawable(drawable);
+        int duration = 2000;
+        long currTime = System.currentTimeMillis();
+        Log.d(TAG, "currTime: " + currTime + "\tstartingTime: " + startingTime);
+        int diff = (int) ((currTime - startingTime) % duration);
+        int toAlpha = Math.max(0, 255 - (255 * diff / duration));
+        Log.d(TAG, "toAlpha::: " + toAlpha);
+        drawable.setAlpha(toAlpha);
+        invalidate();
+    }
+
 
     class InfoPanel {
 
