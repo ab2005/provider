@@ -47,7 +47,7 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
-        Metrics.getInstance().report(AltoMetricsEvent.ShowSplash);
+//        Metrics.getInstance().report(AltoMetricsEvent.ShowSplash);
 
         // if we're logged in, move on
         String username = mSharedPreferences.getString("username", null);
@@ -133,7 +133,7 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
 
     private void doneSplash() {
 
-        Metrics.getInstance().report(AltoMetricsEvent.ShowSplash);
+//        Metrics.getInstance().report(AltoMetricsEvent.ShowSplash);
 
         // switch to the main fragment
         if (getActivity() instanceof IContentSwitcher) {

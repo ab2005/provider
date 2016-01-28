@@ -9,7 +9,6 @@ import android.util.Log;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
-import com.seagate.alto.metrics.AltoMetricsEvent;
 import com.seagate.alto.metrics.Metrics;
 import com.seagate.alto.metrics.MixpanelReporter;
 import com.seagate.alto.metrics.SeagateReporter;
@@ -47,7 +46,7 @@ public class AltoApplication extends Application {
         MixpanelReporter mixPanelReporter = new MixpanelReporter(getApplicationContext());
         Metrics.getInstance().addReporter(mixPanelReporter);
 
-        Metrics.getInstance().report(AltoMetricsEvent.Startup);
+//        Metrics.getInstance().report(AltoMetricsEvent.Startup);
     }
 
     private void startFresco() {

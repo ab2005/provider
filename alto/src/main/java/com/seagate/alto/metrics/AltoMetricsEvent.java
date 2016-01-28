@@ -13,10 +13,6 @@ public enum AltoMetricsEvent implements IMetricsEvent {
     ReplaceDrive(3),
     EmptyTrash(4),
 
-    // test events
-    Startup(100),
-    ShowSplash(10000),
-
     ;  // end of constants
 
     private final int mId;

@@ -45,7 +45,7 @@ public class SeagateReporter implements IMetricsReporter{
 
     private static final int WAIT_MINUTES = 1;      // time between dump sessions
 
-    private final boolean TESTING = true;
+    private final boolean TESTING = false;
 
     private final Context mContext;
 
@@ -100,6 +100,15 @@ public class SeagateReporter implements IMetricsReporter{
 
     private static class Consumer implements Runnable {
 
+        public static final String REQUEST_TYPE = "request_type";
+        public static final String REQUEST_TIMESTAMP = "request_ts";
+        public static final String ACCOUNT_ID = "account_id";
+        public static final String CLIENT_ID = "client_id";
+        public static final String ACTIVITY_ID = "activity_id";
+        public static final String TIMESTAMP = "timestamp";
+        public static final String HEADER = "header";
+        public static final String PAYLOAD = "payload";
+
         protected BlockingQueue<SeagateReport> queue = null;
         private String mAndroidId;
 
@@ -114,8 +123,8 @@ public class SeagateReporter implements IMetricsReporter{
             while (true) {
 
                 if (!queue.isEmpty()) {
-                    JSONObject report = makeData();
-                    sendData(report);
+                    JSONObject report = makeReport();
+                    sendReport(report);
                 }
 
                 // wait a bit then blast again
@@ -127,19 +136,19 @@ public class SeagateReporter implements IMetricsReporter{
             }
         }
 
-        private JSONObject makeData() {
+        private JSONObject makeReport() {
             JSONObject report = new JSONObject();
 
             try {
                 JSONObject header = new JSONObject();
 
-                header.put("request_type", "LyvePhotosActivity");
-                header.put("request_ts", System.currentTimeMillis());
-                header.put("account_id", "94025");
+                header.put(REQUEST_TYPE, "LyvePhotosActivity");
+                header.put(REQUEST_TIMESTAMP, System.currentTimeMillis());
+                header.put(ACCOUNT_ID, "94025");
 
                 // using android_id as the device id -
                 // http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id
-                header.put("client_id", mAndroidId);
+                header.put(CLIENT_ID, mAndroidId);
 
                 JSONArray eventArray = new JSONArray();
 
@@ -149,8 +158,8 @@ public class SeagateReporter implements IMetricsReporter{
 
                         if (sr != null) {
                             JSONObject event = new JSONObject();
-                            event.put("activity_id", sr.mEvent.getEventValue());
-                            event.put("timestamp", sr.mStart);
+                            event.put(ACTIVITY_ID, sr.mEvent.getEventValue());
+                            event.put(TIMESTAMP, sr.mStart);
                             eventArray.put(event);
                         }
 
@@ -159,8 +168,8 @@ public class SeagateReporter implements IMetricsReporter{
                     }
                 }
 
-                report.put("header", header);
-                report.put("payload", eventArray);
+                report.put(HEADER, header);
+                report.put(PAYLOAD, eventArray);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -169,7 +178,7 @@ public class SeagateReporter implements IMetricsReporter{
             return report;
         }
 
-        private void sendData(JSONObject report) {
+        private void sendReport(JSONObject report) {
 
             final String DEVENDPOINT = "https://datacollection.dev.blackpearlsystems.net/datacollection/rest/v1/noauth/structured/";
 //            final String ENDPOINT = "https://datacollection.dogfood.blackpearlsystems.net/datacollection/rest/v1/noauth/structured/";
@@ -183,13 +192,7 @@ public class SeagateReporter implements IMetricsReporter{
 //                conn.setReadTimeout(10000);
 //                conn.setConnectTimeout(15000);
                 conn.setRequestMethod("POST");
-//                conn.setDoInput(true);
                 conn.setDoOutput(true);
-
-//                List<NameValuePair> params = new ArrayList<NameValuePair>();
-//                params.add(new BasicNameValuePair("firstParam", paramValue1));
-//                params.add(new BasicNameValuePair("secondParam", paramValue2));
-//                params.add(new BasicNameValuePair("thirdParam", paramValue3));
 
                 OutputStream os = conn.getOutputStream();
                 BufferedWriter writer = new BufferedWriter(
@@ -203,7 +206,6 @@ public class SeagateReporter implements IMetricsReporter{
                 Log.d(TAG, "response: " + responseCode);
 
                 os.close();
-//                conn.connect();
 
             } catch (JSONException e) {
                 e.printStackTrace();
