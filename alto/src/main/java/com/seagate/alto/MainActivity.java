@@ -2,7 +2,6 @@
 
 package com.seagate.alto;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,8 +14,6 @@ import com.seagate.alto.metrics.Metrics;
 import com.seagate.alto.utils.LogUtils;
 
 import java.util.List;
-
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 // this activity switches between the splash fragment and the main fragment
 
@@ -49,10 +46,10 @@ public class MainActivity extends AppCompatActivity implements IContentSwitcher 
         Metrics.getInstance().flush();
     }
 
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
+//    @Override
+//    protected void attachBaseContext(Context newBase) {
+//        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+//    }
 
     private void setFragment(Fragment frag) {
         FragmentTransaction transaction = mFragmentManager.beginTransaction();

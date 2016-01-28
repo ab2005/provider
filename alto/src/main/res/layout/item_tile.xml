@@ -35,5 +35,7 @@
         android:gravity="center"
         android:text="@string/item_title"
         android:textColor="@color/white"
-        android:textSize="@dimen/article_titles" />
+        android:textSize="@dimen/article_titles"
+        android:visibility="gone"/>
+
 </RelativeLayout>
