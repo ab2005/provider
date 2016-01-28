@@ -41,7 +41,7 @@ public class AltoApplication extends Application {
     }
 
     private void startMetrics() {
-        SeagateReporter seagateReporter = new SeagateReporter();
+        SeagateReporter seagateReporter = new SeagateReporter(this);
         Metrics.getInstance().addReporter(seagateReporter);
 
         MixpanelReporter mixPanelReporter = new MixpanelReporter(getApplicationContext());

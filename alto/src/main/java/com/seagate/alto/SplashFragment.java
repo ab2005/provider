@@ -86,7 +86,7 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
                         e.putString("pass." + username, passw);
                         e.apply();
 
-                        Metrics.getInstance().report(AltoMetricsEvent.LogintoExistingAccount);
+                        Metrics.getInstance().report(AltoMetricsEvent.Login);
 
                         // DropboxProducer.setCurrent(username, token, uid);
                         doneSplash();

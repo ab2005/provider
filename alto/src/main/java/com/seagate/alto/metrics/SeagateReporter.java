@@ -6,6 +6,8 @@ package com.seagate.alto.metrics;
 
 // put reports on a queue and push it to the server when it is connected
 
+import android.content.Context;
+import android.provider.Settings;
 import android.util.Log;
 
 import com.seagate.alto.utils.LogUtils;
@@ -14,9 +16,26 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 public class SeagateReporter implements IMetricsReporter{
 
@@ -28,10 +47,16 @@ public class SeagateReporter implements IMetricsReporter{
 
     private final boolean TESTING = true;
 
-    public SeagateReporter() {
+    private final Context mContext;
+
+    public SeagateReporter(Context context) {
         Log.d(TAG, "Construct");
 
-        Consumer consumer = new Consumer(mQueue);
+        mContext = context;
+
+        String androidId = Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        Consumer consumer = new Consumer(mQueue, androidId);
         new Thread(consumer).start();
 
         // used for testing
@@ -39,6 +64,8 @@ public class SeagateReporter implements IMetricsReporter{
             TestProducer tester = new TestProducer(mQueue);
             new Thread(tester).start();
         }
+
+        disableSSLCertificateChecking();
     }
 
 
@@ -74,9 +101,11 @@ public class SeagateReporter implements IMetricsReporter{
     private static class Consumer implements Runnable {
 
         protected BlockingQueue<SeagateReport> queue = null;
+        private String mAndroidId;
 
-        public Consumer(BlockingQueue<SeagateReport> queue) {
+        public Consumer(BlockingQueue<SeagateReport> queue, String androidId) {
             this.queue = queue;
+            this.mAndroidId = androidId;
         }
 
         @Override
@@ -85,7 +114,8 @@ public class SeagateReporter implements IMetricsReporter{
             while (true) {
 
                 if (!queue.isEmpty()) {
-                    uploadData();
+                    JSONObject report = makeData();
+                    sendData(report);
                 }
 
                 // wait a bit then blast again
@@ -95,18 +125,21 @@ public class SeagateReporter implements IMetricsReporter{
                     e.printStackTrace();
                 }
             }
-
-
         }
 
-        private void uploadData() {
+        private JSONObject makeData() {
             JSONObject report = new JSONObject();
 
             try {
-                report.put("account id", 94025);
-                report.put("device id", 42566);
-                report.put("platform", "android");
+                JSONObject header = new JSONObject();
 
+                header.put("request_type", "LyvePhotosActivity");
+                header.put("request_ts", System.currentTimeMillis());
+                header.put("account_id", "94025");
+
+                // using android_id as the device id -
+                // http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id
+                header.put("client_id", mAndroidId);
 
                 JSONArray eventArray = new JSONArray();
 
@@ -115,10 +148,9 @@ public class SeagateReporter implements IMetricsReporter{
                         SeagateReport sr = queue.take();
 
                         if (sr != null) {
-                            JSONArray event = new JSONArray();
-                            event.put(sr.mEvent.getEventValue());
-                            event.put(sr.mStart);
-
+                            JSONObject event = new JSONObject();
+                            event.put("activity_id", sr.mEvent.getEventValue());
+                            event.put("timestamp", sr.mStart);
                             eventArray.put(event);
                         }
 
@@ -127,64 +159,94 @@ public class SeagateReporter implements IMetricsReporter{
                     }
                 }
 
-                report.put("events", eventArray);
-
-
-                // push JSON to server HERE
-                upload(report);
+                report.put("header", header);
+                report.put("payload", eventArray);
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
+            return report;
         }
 
-        private void upload(JSONObject report) {
+        private void sendData(JSONObject report) {
 
-            final String ENDPOINT = "http://datacollection.dogfood.blackpearlsystems.net/datacollection/rest/v1/noauth/structured/";
+            final String DEVENDPOINT = "https://datacollection.dev.blackpearlsystems.net/datacollection/rest/v1/noauth/structured/";
+//            final String ENDPOINT = "https://datacollection.dogfood.blackpearlsystems.net/datacollection/rest/v1/noauth/structured/";
 
-//            try {
-//                Log.d(TAG, report.toString(4));
-//
-//                // post json to the endpoint
-//                URL url = new URL(ENDPOINT);
-////                HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-//                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-////                conn.setReadTimeout(10000);
-////                conn.setConnectTimeout(15000);
-//                conn.setRequestMethod("POST");
+            try {
+                Log.d(TAG, report.toString(4));
+
+                // post json to the endpoint
+                URL url = new URL(DEVENDPOINT);
+                HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+//                conn.setReadTimeout(10000);
+//                conn.setConnectTimeout(15000);
+                conn.setRequestMethod("POST");
 //                conn.setDoInput(true);
-//                conn.setDoOutput(true);
-//
-////                List<NameValuePair> params = new ArrayList<NameValuePair>();
-////                params.add(new BasicNameValuePair("firstParam", paramValue1));
-////                params.add(new BasicNameValuePair("secondParam", paramValue2));
-////                params.add(new BasicNameValuePair("thirdParam", paramValue3));
-//
-//                OutputStream os = conn.getOutputStream();
-//                BufferedWriter writer = new BufferedWriter(
-//                        new OutputStreamWriter(os, "UTF-8"));
-////                writer.write(getQuery(params));
-//                writer.write(report.toString());
-//                writer.flush();
-//                writer.close();
-//                os.close();
+                conn.setDoOutput(true);
+
+//                List<NameValuePair> params = new ArrayList<NameValuePair>();
+//                params.add(new BasicNameValuePair("firstParam", paramValue1));
+//                params.add(new BasicNameValuePair("secondParam", paramValue2));
+//                params.add(new BasicNameValuePair("thirdParam", paramValue3));
+
+                OutputStream os = conn.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(
+                        new OutputStreamWriter(os, "UTF-8"));
+//                writer.write(getQuery(params));
+                writer.write(report.toString());
+                writer.flush();
+                writer.close();
+
+                int responseCode = conn.getResponseCode();
+                Log.d(TAG, "response: " + responseCode);
+
+                os.close();
 //                conn.connect();
-//
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            } catch (MalformedURLException e) {
-//                e.printStackTrace();
-//            } catch (UnsupportedEncodingException e) {
-//                e.printStackTrace();
-//            } catch (ProtocolException e) {
-//                e.printStackTrace();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
 
         }
     }
+
+    // borrowed from arcus
+    private static void disableSSLCertificateChecking() {
+        TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+            public X509Certificate[] getAcceptedIssuers() {
+                return null;
+            }
+            @Override
+            public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+                // Not implemented
+            }
+            @Override
+            public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+                // Not implemented
+            }
+        } };
+        try {
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     // used to generate and put test events in the queue
     private static class TestProducer implements Runnable {
