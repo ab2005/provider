@@ -13,7 +13,6 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
@@ -59,8 +58,8 @@ public class DigestCellView extends RelativeLayout {
     private DigestCellLayout mDigestCellLayout;
 
     //    private MultiDraweeHolder<GenericDraweeHierarchy> mMultiDraweeHolder;
-    private ImageSwitchView mImageSwitchView;
-    private ArrayList<ImageSwitchView> mImageSwitchViews;
+//    private ImageSwitchView mImageSwitchView;
+    private ImageSwitchView[] mImageSwitchViews;
     private final InfoPanel mInfoPanel = new InfoPanel();
 
     private int mCellBorder;
@@ -85,14 +84,13 @@ public class DigestCellView extends RelativeLayout {
     private void init(Context context) {
         Log.d(TAG, "init()");
 
-        mImageSwitchViews = new ArrayList<>();
+        mImageSwitchViews = new ImageSwitchView[MAX_IMAGES_IN_CELL];
 
-//        for (int i = 0; i < MAX_IMAGES_IN_CELL; i++) {
-
-        mImageSwitchView = new ImageSwitchView(context);
-        this.addView(mImageSwitchView);
-        mImageSwitchViews.add(mImageSwitchView);
-//        }
+        for (int i = 0; i < MAX_IMAGES_IN_CELL; i++) {
+            ImageSwitchView isw = new ImageSwitchView(context);
+            this.addView(isw, -1);
+            mImageSwitchViews[i] = isw;
+        }
 
         mCellBorder = LayoutUtils.getBorderSize(getWidth());
         mPanelPadding = LayoutUtils.getPanelPadding(getWidth());
@@ -115,10 +113,23 @@ public class DigestCellView extends RelativeLayout {
             // date info
             setInfoPanelDate(mPosition);
 
-            transitionHandler.postDelayed(transitionRunnable, ROTATE_FREQUENCY);
 
         }
 
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        Log.d(TAG, "onAttachedToWindow(), position: " + mPosition + "| imagePanelCount: " + mImagePanelCount);
+        super.onAttachedToWindow();
+        transitionHandler.postDelayed(transitionRunnable, ROTATE_FREQUENCY);
+    }
+
+    @Override
+    public void onDetachedFromWindow() {
+        Log.d(TAG, "onDetachedFromWindow()");
+        super.onDetachedFromWindow();
+        transitionHandler.removeCallbacks(transitionRunnable);
     }
 
     @Override
@@ -164,14 +175,17 @@ public class DigestCellView extends RelativeLayout {
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
 
-        final int count = getChildCount();
-        for (int i = 0; i < count; i++) {
-            View child = getChildAt(i);
-            if (child instanceof ImageSwitchView) {
-                ((ImageSwitchView)child).setBounds(mChildrenBounds.get(i));
+        synchronized (this) {
+            for (int i = 0; i < MAX_IMAGES_IN_CELL; i++) {
+                if (i < mImagePanelCount) {
+                    mImageSwitchViews[i].setVisibility(VISIBLE);
+                    mImageSwitchViews[i].setBounds(mChildrenBounds.get(i));
+                } else {
+                    mImageSwitchViews[i].setVisibility(GONE);
+                }
             }
-
         }
+
     }
 
     @Override
@@ -181,10 +195,6 @@ public class DigestCellView extends RelativeLayout {
         super.onDraw(canvas);
 
         synchronized (this) {
-
-            Log.d(TAG, "Current drawable of imageSwitchView: " + ((ImageSwitchView) this.getChildAt(0)).getCurrentDrawable());
-            Log.d(TAG, "Current drawable of imageSwitchView: " + this.getChildAt(0).getLeft() + "/" + this.getChildAt(0).getTop() + "/" + this.getChildAt(0).getRight() + "/" + this.getChildAt(0).getBottom());
-
 
             drawInfoPanel(canvas, 255, 128);
         }
@@ -200,16 +210,17 @@ public class DigestCellView extends RelativeLayout {
 
         synchronized (this) {
             Log.d(TAG, "mPanelCount = " + mImagePanelCount);
-//            for (int i = 0; i < mImagePanelCount; i++) {
+            for (int i = 0; i < mImagePanelCount; i++) {
                 // have to build a new DraweeController if you want to set new URI.
                 DraweeController controller = Fresco.newDraweeControllerBuilder()
-                        .setUri(PlaceholderContent.getUri(((0 + 1) * (position + 1))))
+                        .setUri(PlaceholderContent.getUri(((i + 1) * (position + 1))))
                         .build();
 
-                mImageSwitchViews.get(0).loadContent(controller);
+                mImageSwitchViews[i].loadContent(controller);
 
+                Log.d(TAG, "Current drawable of imageSwitchView(" + i + "): " + mImageSwitchViews[i].getCurrentDrawable());
 
-//            }
+            }
         }
 
     }
@@ -222,17 +233,16 @@ public class DigestCellView extends RelativeLayout {
         mInfoPanel.setTimestamp(mTimestamp);
     }
 
+    // FIXME: 1/29/16 which of the imageSwitchView should switch? when?
     private Runnable transitionRunnable = new Runnable() {
         @Override
         public void run() {
-            Log.d(TAG, "transitionRunnable(): position:" + mPosition);
             synchronized (this) {
 
                 DraweeController controller = Fresco.newDraweeControllerBuilder()
                         .setUri(PlaceholderContent.getUri((((int) (Math.random() * 10) + 1) * (mPosition + 1))))
                         .build();
-
-                mImageSwitchViews.get(0).loadNextImage(controller);
+                mImageSwitchViews[0].loadNextImage(controller);
 
 //                invalidate();
                 transitionHandler.postDelayed(this, ROTATE_FREQUENCY);
