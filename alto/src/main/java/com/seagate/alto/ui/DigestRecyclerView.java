@@ -47,7 +47,7 @@ public class DigestRecyclerView extends RecyclerView {
 
             public DigestCellViewHolder(LayoutInflater inflater, final ViewGroup parent) {
                 super(inflater.inflate(R.layout.digest_view_cell, parent, false));
-                digestCellView = (DigestCellView) itemView.findViewById(R.id.group);
+                digestCellView = (DigestCellView) itemView.findViewById(R.id.digest_cell);
             }
         }
 
