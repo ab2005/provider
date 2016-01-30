@@ -5,11 +5,8 @@ package com.seagate.alto.ui;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Handler;
-import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -19,16 +16,12 @@ import android.widget.RelativeLayout;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.seagate.alto.PlaceholderContent;
-import com.seagate.alto.utils.ColorUtils;
 import com.seagate.alto.utils.LayoutUtils;
 import com.seagate.alto.utils.LogUtils;
 import com.seagate.alto.utils.ScreenUtils;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Locale;
-import java.util.TimeZone;
 
 public class DigestCellView extends RelativeLayout {
 
@@ -57,10 +50,8 @@ public class DigestCellView extends RelativeLayout {
     private Rect mInfoBounds;
     private DigestCellLayout mDigestCellLayout;
 
-    //    private MultiDraweeHolder<GenericDraweeHierarchy> mMultiDraweeHolder;
-//    private ImageSwitchView mImageSwitchView;
     private ImageSwitchView[] mImageSwitchViews;
-    private final InfoPanel mInfoPanel = new InfoPanel();
+    private InfoPanelView mInfoPanelView;
 
     private int mCellBorder;
     private int mPanelPadding;
@@ -85,12 +76,14 @@ public class DigestCellView extends RelativeLayout {
         Log.d(TAG, "init()");
 
         mImageSwitchViews = new ImageSwitchView[MAX_IMAGES_IN_CELL];
-
         for (int i = 0; i < MAX_IMAGES_IN_CELL; i++) {
             ImageSwitchView isw = new ImageSwitchView(context);
-            this.addView(isw, -1);
+            this.addView(isw);
             mImageSwitchViews[i] = isw;
         }
+
+        mInfoPanelView = new InfoPanelView(context);
+        this.addView(mInfoPanelView);
 
         mCellBorder = LayoutUtils.getBorderSize(getWidth());
         mPanelPadding = LayoutUtils.getPanelPadding(getWidth());
@@ -112,7 +105,6 @@ public class DigestCellView extends RelativeLayout {
 
             // date info
             setInfoPanelDate(mPosition);
-
 
         }
 
@@ -167,9 +159,6 @@ public class DigestCellView extends RelativeLayout {
             childBounds.inset(mPanelPadding, mPanelPadding);
             mChildrenBounds.add(childBounds);
         }
-        mInfoBounds = mDigestCellLayout.getInfoRect(mLayoutBounds);
-        mInfoPanel.setBounds(mInfoBounds);
-
     }
 
     @Override
@@ -184,6 +173,9 @@ public class DigestCellView extends RelativeLayout {
                     mImageSwitchViews[i].setVisibility(GONE);
                 }
             }
+            mInfoBounds = mDigestCellLayout.getInfoRect(mLayoutBounds);
+            mInfoBounds.inset(mPanelPadding, mPanelPadding);
+            mInfoPanelView.setBounds(mInfoBounds);
         }
 
     }
@@ -191,19 +183,9 @@ public class DigestCellView extends RelativeLayout {
     @Override
     protected void onDraw(Canvas canvas) {
         Log.d(TAG, "onDraw()");
-
         super.onDraw(canvas);
-
-        synchronized (this) {
-
-            drawInfoPanel(canvas, 255, 128);
-        }
-
     }
 
-    private void drawInfoPanel(Canvas canvas, int alphaText, int alphaBackground) {
-        mInfoPanel.draw(canvas, alphaText, alphaBackground);
-    }
 
     private void setMultiDraweeSource(int position) {
         Log.d(TAG, "setMultiDraweeSource()");
@@ -215,9 +197,7 @@ public class DigestCellView extends RelativeLayout {
                 DraweeController controller = Fresco.newDraweeControllerBuilder()
                         .setUri(PlaceholderContent.getUri(((i + 1) * (position + 1))))
                         .build();
-
                 mImageSwitchViews[i].loadContent(controller);
-
                 Log.d(TAG, "Current drawable of imageSwitchView(" + i + "): " + mImageSwitchViews[i].getCurrentDrawable());
 
             }
@@ -230,7 +210,7 @@ public class DigestCellView extends RelativeLayout {
         long end = Timestamp.valueOf("2016-01-01 00:00:00").getTime();
         long diff = end - offset + 1;
         mTimestamp = offset + (long)(Math.random() * diff);      // TODO: 1/14/16 getTimeStamp here
-        mInfoPanel.setTimestamp(mTimestamp);
+        mInfoPanelView.setTimestamp(mTimestamp);
     }
 
     // FIXME: 1/29/16 which of the imageSwitchView should switch? when?
@@ -238,103 +218,16 @@ public class DigestCellView extends RelativeLayout {
         @Override
         public void run() {
             synchronized (this) {
-
                 DraweeController controller = Fresco.newDraweeControllerBuilder()
                         .setUri(PlaceholderContent.getUri((((int) (Math.random() * 10) + 1) * (mPosition + 1))))
                         .build();
                 mImageSwitchViews[0].loadNextImage(controller);
 
-//                invalidate();
                 transitionHandler.postDelayed(this, ROTATE_FREQUENCY);
             }
         }
     };
 
-    class InfoPanel {
-
-        private final TextPaint mDayPaint = new TextPaint();
-        private final TextPaint mMonthPaint = new TextPaint();
-        private final Paint mColorPaint = new Paint();
-
-        Rect mBounds;
-        float mDayTextSize;
-        float mMonthTextSize;
-        String mDay;
-        String mMonth;
-
-        public InfoPanel() {
-
-            mDayTextSize = 120;
-            mMonthTextSize = 100;
-
-            mDayPaint.setColor(Color.WHITE);
-            mDayPaint.setAntiAlias(true);
-
-            mMonthPaint.setColor(Color.WHITE);
-            mMonthPaint.setAntiAlias(true);
-
-            mColorPaint.setStyle(Paint.Style.FILL);
-        }
-
-        public void setBounds(Rect bounds) {
-            mBounds = bounds;
-
-            if (mBounds != null) {
-                mBounds.inset(mPanelPadding, mPanelPadding);
-            }
-        }
-
-        public void setTimestamp(long timestamp) {
-            mDay = getDayString(timestamp);
-            mMonth = getMonthString(timestamp);
-        }
-
-        void draw(Canvas canvas, int alphaText, int alphaBackground) {
-            if (hasInfo()) {
-                mDayPaint.setAlpha(alphaText);
-                mMonthPaint.setAlpha(alphaText);
-                mColorPaint.setColor(ColorUtils.getCompanyColor(mPosition));
-                mColorPaint.setAlpha(alphaBackground);
-                canvas.drawRect(mBounds, mColorPaint);
-
-                drawInfoStacked(canvas);
-            }
-        }
-
-        void drawInfoStacked(Canvas canvas) {
-            int xDay = mBounds.left + mBounds.width() / 2;
-            int yDay = mBounds.top + (int) (mBounds.height() / 2 - (mDayPaint.descent() + mDayPaint.ascent() / 2));
-            int xMonth = mBounds.left + mBounds.width() / 2;
-            int yMonth = mBounds.top + (int) (mBounds.height() / 2 - (mMonthPaint.descent() + mMonthPaint.ascent() / 2) + mMonthTextSize);
-
-
-            if (mDay != null && mMonth != null) {
-                mDayPaint.setTextAlign(Paint.Align.CENTER);
-                mDayPaint.setTextSize(mDayTextSize);
-                canvas.drawText(mDay, xDay, yDay, mDayPaint);
-
-                mMonthPaint.setTextAlign(Paint.Align.CENTER);
-                mMonthPaint.setTextSize(mMonthTextSize);
-                canvas.drawText(mMonth, xMonth, yMonth, mMonthPaint);
-            }
-        }
-
-        public boolean hasInfo() {
-            return mBounds != null;
-        }
-
-        String getDayString(long timestamp) {
-            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-            calendar.setTimeInMillis(timestamp);
-            return String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
-        }
-
-        String getMonthString(long timestamp) {
-            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-            calendar.setTimeInMillis(timestamp);
-            return calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault());
-        }
-    }
 
 
 
