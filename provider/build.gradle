@@ -37,8 +37,15 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+
     compile 'com.fasterxml.jackson.core:jackson-core:2.5.4'
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.5.4'
+
+    // TODO: replace google with jackson
+    compile 'com.google.code.gson:gson:2.2.4'
+
+    compile 'com.squareup.retrofit2:retrofit:2.0.0-beta3'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta3'
 
     testCompile 'junit:junit:4.12'
 

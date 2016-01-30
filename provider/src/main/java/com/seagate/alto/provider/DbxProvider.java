@@ -169,7 +169,7 @@ public class DbxProvider implements Provider {
         public ArrayList<Metadata> matches() {
             ArrayList<Metadata> entries = new ArrayList<Metadata>();
             for (final DbxFiles.SearchMatch item : sr.matches) {
-                entries.add(new MetadataImpl(item));
+                entries.add(new FileMetadataImpl(item));
             }
             return entries;
         }
@@ -264,6 +264,10 @@ public class DbxProvider implements Provider {
                 public Tag tag() {return mediaInfo.tag();}
                 public MediaMetadata metadata() {return mediaInfo.metadata();}
             };
+        }
+
+        public FileMetadataImpl(DbxFiles.SearchMatch item) {
+            super(item);
         }
 
         @Override
