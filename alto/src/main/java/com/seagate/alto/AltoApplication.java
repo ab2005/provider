@@ -18,8 +18,6 @@ import com.seagate.alto.utils.ScreenUtils;
 import java.util.HashSet;
 import java.util.Set;
 
-import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
-
 public class AltoApplication extends Application {
 
     private static AltoApplication sMe;
@@ -32,13 +30,13 @@ public class AltoApplication extends Application {
         Log.d(TAG, "onCreate");
         sMe = this;
 
-        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                        // I use comic-relief for testing
-//             .setDefaultFontPath("fonts/ComicRelief.ttf")
-                        .setDefaultFontPath("fonts/helveticaneueltw1g-roman.ttf")
-                        .setFontAttrId(R.attr.fontPath)
-                        .build()
-        );
+//        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+//             // I use comic-relief for testing
+////             .setDefaultFontPath("fonts/ComicRelief.ttf")
+//            .setDefaultFontPath("fonts/helveticaneueltw1g-roman.ttf")
+//            .setFontAttrId(R.attr.fontPath)
+//            .build()
+//        );
 
         ScreenUtils.init(this);
         startFresco();

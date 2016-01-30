@@ -6,12 +6,12 @@
     <!-- Base application theme. -->
     <style name="SeagateTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/seagate_green</item>
-        <item name="colorPrimaryDark">@color/seagate_grey</item>
+        <item name="colorPrimary">@color/lyve_blue</item>
+        <item name="colorPrimaryDark">@color/lyve_blue_dark</item>
         <item name="colorAccent">@color/colorAccent</item>
 
-        <item name="colorControlNormal">@color/seagate_grey</item>
-        <item name="colorControlHighlight">@color/seagate_grey</item>
+        <item name="colorControlNormal">@color/highlight</item>
+        <item name="colorControlHighlight">@color/highlight</item>
         <item name="colorControlActivated">@color/lyve_blue</item>
     </style>
     <style name="SeagateTheme.NoActionBar">

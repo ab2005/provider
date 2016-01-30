@@ -1,0 +1,11 @@
+<!--
+  ~ Copyright (c) 2015. Seagate Technology PLC. All rights reserved.
+  -->
+
+<resources>
+    <string name="app_name">Provider Example App</string>
+    <string name="title_activity_files">Provider Files</string>
+
+    <!-- Change this to your Auth key!! -->
+    <string name="app_key">r0gjlmroi389lg3</string>
+</resources>
