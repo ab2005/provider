@@ -3,6 +3,7 @@ package com.seagate.alto.ui;
 import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -22,6 +23,8 @@ import com.seagate.alto.utils.LayoutUtils;
 import com.seagate.alto.utils.LogUtils;
 import com.seagate.alto.utils.ScreenUtils;
 
+import java.util.Random;
+
 public class ImageSwitchView extends ImageView {
 
     private final static String TAG = LogUtils.makeTag(ImageSwitchView.class);
@@ -30,10 +33,14 @@ public class ImageSwitchView extends ImageView {
     private MultiDraweeHolder<GenericDraweeHierarchy> mMultiDraweeHolder;
     private FadeDrawable mFadeDrawable;
     private int mCurrentIndex;
+    private Handler mImageLoopingHandler = new Handler();
+
+    private Random mRandom = new Random();
 
     private final static int CROSSFADE_DURATION = 2000;
-    private static final int FADEIN_DURATION = 300;
+    private static final int FADEIN_DURATION = 800;
     private static final int FLIP_DURATION = 250;
+    private static final int ROTATE_FREQUENCY = 5000; // ms
 
     public ImageSwitchView(Context context) {
         super(context);
@@ -62,7 +69,6 @@ public class ImageSwitchView extends ImageView {
             drawables[i] = hierarchy.getTopLevelDrawable();
         }
         mFadeDrawable = new FadeDrawable(drawables);
-        mFadeDrawable.setTransitionDuration(CROSSFADE_DURATION);
         // no need to override onDraw, ImageView superclass will correctly draw our fade drawable if we set it like this:
         super.setImageDrawable(mFadeDrawable);
         mCurrentIndex = 0;
@@ -73,17 +79,6 @@ public class ImageSwitchView extends ImageView {
 //        Log.d(TAG, "loadContent(): " + controller.getHierarchy().getTopLevelDrawable());
         mMultiDraweeHolder.get(mCurrentIndex).setController(controller);
     }
-
-    public void loadContent(int position) {
-        Log.d(TAG, "ImageSwitchView size: " + this.getWidth() + "/" + this.getHeight());
-        DraweeController controller = Fresco.newDraweeControllerBuilder()
-                .setUri(PlaceholderContent.getUri(((0 + 1) * (position + 1))))
-                .build();
-        mMultiDraweeHolder.get(mCurrentIndex).setController(controller);
-        Log.d(TAG, "loadContent(): " + mMultiDraweeHolder.get(mCurrentIndex).getTopLevelDrawable());
-
-    }
-
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -109,12 +104,23 @@ public class ImageSwitchView extends ImageView {
         invalidate();
     }
 
+    @Override
+    public void onAttachedToWindow() {
+        Log.d(TAG, "onAttachedToWindow()");
+        super.onAttachedToWindow();
+        attachDraweeHolders();
+
+        int startingTime = mRandom.nextInt(3 * ROTATE_FREQUENCY);
+        mImageLoopingHandler.postDelayed(doImageTransition, startingTime);
+    }
 
     @Override
     public void onDetachedFromWindow() {
         Log.d(TAG, "onDetachedFromWindow()");
         super.onDetachedFromWindow();
         detachDraweeHolders();
+
+        mImageLoopingHandler.removeCallbacks(doImageTransition);
     }
 
     @Override
@@ -125,16 +131,8 @@ public class ImageSwitchView extends ImageView {
     }
 
     @Override
-    public void onAttachedToWindow() {
-        Log.d(TAG, "onAttachedToWindow()");
-        super.onAttachedToWindow();
-        attachDraweeHolders();
-
-    }
-
-    @Override
     public void onFinishTemporaryDetach() {
-        Log.d(TAG, "onFinishTEmporaryDetach()");
+        Log.d(TAG, "onFinishTemporaryDetach()");
         super.onFinishTemporaryDetach();
         attachDraweeHolders();
     }
@@ -163,10 +161,17 @@ public class ImageSwitchView extends ImageView {
         return false;
     }
 
-    void loadNextImage(DraweeController controller) {
+    private void loadNextImage(DraweeController controller) {
         mCurrentIndex = (mCurrentIndex + 1) % 2;
         mMultiDraweeHolder.get(mCurrentIndex).setController(controller);
+
+        // crossfade transition
+        mFadeDrawable.setTransitionDuration(CROSSFADE_DURATION);
         mFadeDrawable.fadeToLayer(mCurrentIndex);
+
+//        // fadein transition
+//        mFadeDrawable.setTransitionDuration(FADEIN_DURATION);
+//        mFadeDrawable.fadeInLayer(mCurrentIndex);
     }
 
     private GenericDraweeHierarchy createDraweeHierarchy() {
@@ -185,4 +190,16 @@ public class ImageSwitchView extends ImageView {
     public void setBounds(Rect bounds) {
         this.layout(bounds.left, bounds.top, bounds.right, bounds.bottom);
     }
+
+    private Runnable doImageTransition = new Runnable() {
+        @Override
+        public void run() {
+            DraweeController controller = Fresco.newDraweeControllerBuilder()
+                    .setUri(PlaceholderContent.getUri(((int) (Math.random() * 200) + 1)))
+                    .build();
+            loadNextImage(controller);
+
+            mImageLoopingHandler.postDelayed(this, ROTATE_FREQUENCY);
+        }
+    };
 }

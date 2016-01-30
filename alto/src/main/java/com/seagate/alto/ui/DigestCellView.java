@@ -6,7 +6,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -27,18 +26,12 @@ public class DigestCellView extends RelativeLayout {
 
     private final static String TAG = LogUtils.makeTag(DigestCellView.class);
 
-
-    // TODO: 1/20/16 multiple handler
-    private Handler transitionHandler = new Handler();
-
     private static final int MAX_IMAGES_IN_CELL = 5;
-    private static final int ROTATE_FREQUENCY = 5000; // ms
-    private long mCurrentTransStartTime;
 
     // content
     private long mDigestId;
     private int mImagePanelCount;
-    private int mInforPanelCount = 1;
+    private int mInfoPanelCount = 1;
     private int mPosition;
     private Cursor mContentCursor;
     private int mContentCursorCount = 0;
@@ -100,28 +93,21 @@ public class DigestCellView extends RelativeLayout {
             mImagePanelCount = mPosition % MAX_IMAGES_IN_CELL + 1;
             mDigestCellLayout = DigestCellLayouts.getLayoutForSize(mImagePanelCount, mPosition);        // not gonna change when orientation changed.
 
-            // drawee source
+            // set drawee source
             setMultiDraweeSource(mPosition);
-
-            // date info
+            // set date info
             setInfoPanelDate(mPosition);
-
         }
-
     }
 
     @Override
     protected void onAttachedToWindow() {
-        Log.d(TAG, "onAttachedToWindow(), position: " + mPosition + "| imagePanelCount: " + mImagePanelCount);
         super.onAttachedToWindow();
-        transitionHandler.postDelayed(transitionRunnable, ROTATE_FREQUENCY);
     }
 
     @Override
     public void onDetachedFromWindow() {
-        Log.d(TAG, "onDetachedFromWindow()");
         super.onDetachedFromWindow();
-        transitionHandler.removeCallbacks(transitionRunnable);
     }
 
     @Override
@@ -186,7 +172,6 @@ public class DigestCellView extends RelativeLayout {
         super.onDraw(canvas);
     }
 
-
     private void setMultiDraweeSource(int position) {
         Log.d(TAG, "setMultiDraweeSource()");
 
@@ -212,23 +197,5 @@ public class DigestCellView extends RelativeLayout {
         mTimestamp = offset + (long)(Math.random() * diff);      // TODO: 1/14/16 getTimeStamp here
         mInfoPanelView.setTimestamp(mTimestamp);
     }
-
-    // FIXME: 1/29/16 which of the imageSwitchView should switch? when?
-    private Runnable transitionRunnable = new Runnable() {
-        @Override
-        public void run() {
-            synchronized (this) {
-                DraweeController controller = Fresco.newDraweeControllerBuilder()
-                        .setUri(PlaceholderContent.getUri((((int) (Math.random() * 10) + 1) * (mPosition + 1))))
-                        .build();
-                mImageSwitchViews[0].loadNextImage(controller);
-
-                transitionHandler.postDelayed(this, ROTATE_FREQUENCY);
-            }
-        }
-    };
-
-
-
 
 }
