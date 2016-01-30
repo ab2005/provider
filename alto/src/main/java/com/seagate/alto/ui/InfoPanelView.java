@@ -7,9 +7,11 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.seagate.alto.utils.ColorUtils;
+import com.seagate.alto.utils.LogUtils;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -18,6 +20,7 @@ import java.util.TimeZone;
 
 public class InfoPanelView extends ImageView {
 
+    private final static String TAG = LogUtils.makeTag(InfoPanelView.class);
     private final TextPaint mDayPaint = new TextPaint();
     private final TextPaint mMonthPaint = new TextPaint();
     private final Paint mColorPaint = new Paint();
@@ -26,6 +29,9 @@ public class InfoPanelView extends ImageView {
     float mMonthTextSize;
     String mDay;
     String mMonth;
+
+    private int mPosition;      // TODO: 1/29/16 set position somewhere
+    private boolean mHasInfo;
 
     public InfoPanelView(Context context) {
         super(context);
@@ -43,7 +49,7 @@ public class InfoPanelView extends ImageView {
     }
 
     private void init() {
-        Random random = new Random();
+        Log.d(TAG, "init()" + this);
 
         mDayTextSize = 120;
         mMonthTextSize = 100;
@@ -55,8 +61,6 @@ public class InfoPanelView extends ImageView {
         mMonthPaint.setAntiAlias(true);
 
         mColorPaint.setStyle(Paint.Style.FILL);
-        mColorPaint.setColor(ColorUtils.getCompanyColor(random.nextInt(100)));
-
     }
 
 
@@ -66,9 +70,16 @@ public class InfoPanelView extends ImageView {
         draw(canvas, 128);
     }
 
-
     public void setBounds(Rect bounds) {
         this.layout(bounds.left, bounds.top, bounds.right, bounds.bottom);
+    }
+
+    public void setPosition(int position) {
+        mPosition = position;
+    }
+
+    public void setHasInfo(boolean has) {
+        mHasInfo = has;
     }
 
     public void setTimestamp(long timestamp) {
@@ -77,9 +88,11 @@ public class InfoPanelView extends ImageView {
     }
 
     private void draw(Canvas canvas, int alphaBackground) {
-        if (hasInfo()) {
+        Random random = new Random();
+        if (mHasInfo) {
             // draw background color
             // TODO: 1/29/16 set appropriate color here
+            mColorPaint.setColor(ColorUtils.getCompanyColor(mPosition));
             mColorPaint.setAlpha(alphaBackground);
             canvas.drawPaint(mColorPaint);
 
@@ -99,10 +112,6 @@ public class InfoPanelView extends ImageView {
                 canvas.drawText(mMonth, xMonth, yMonth, mMonthPaint);
             }
         }
-    }
-
-    public boolean hasInfo() {
-        return true;
     }
 
     String getDayString(long timestamp) {

@@ -67,6 +67,7 @@ public class ImageSwitchView extends ImageView {
             GenericDraweeHierarchy hierarchy = createDraweeHierarchy();
             mMultiDraweeHolder.add(DraweeHolder.create(hierarchy, getContext()));
             drawables[i] = hierarchy.getTopLevelDrawable();
+            drawables[i].setCallback(this);
         }
         mFadeDrawable = new FadeDrawable(drawables);
         // no need to override onDraw, ImageView superclass will correctly draw our fade drawable if we set it like this:
@@ -161,17 +162,12 @@ public class ImageSwitchView extends ImageView {
         return false;
     }
 
-    private void loadNextImage(DraweeController controller) {
+    private void setNextImage(DraweeController controller) {
         mCurrentIndex = (mCurrentIndex + 1) % 2;
         mMultiDraweeHolder.get(mCurrentIndex).setController(controller);
 
-        // crossfade transition
         mFadeDrawable.setTransitionDuration(CROSSFADE_DURATION);
         mFadeDrawable.fadeToLayer(mCurrentIndex);
-
-//        // fadein transition
-//        mFadeDrawable.setTransitionDuration(FADEIN_DURATION);
-//        mFadeDrawable.fadeInLayer(mCurrentIndex);
     }
 
     private GenericDraweeHierarchy createDraweeHierarchy() {
@@ -197,7 +193,7 @@ public class ImageSwitchView extends ImageView {
             DraweeController controller = Fresco.newDraweeControllerBuilder()
                     .setUri(PlaceholderContent.getUri(((int) (Math.random() * 200) + 1)))
                     .build();
-            loadNextImage(controller);
+            setNextImage(controller);
 
             mImageLoopingHandler.postDelayed(this, ROTATE_FREQUENCY);
         }

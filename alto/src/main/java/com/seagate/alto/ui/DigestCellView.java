@@ -66,7 +66,7 @@ public class DigestCellView extends RelativeLayout {
 
 
     private void init(Context context) {
-        Log.d(TAG, "init()");
+        Log.d(TAG, "init()" + this);
 
         mImageSwitchViews = new ImageSwitchView[MAX_IMAGES_IN_CELL];
         for (int i = 0; i < MAX_IMAGES_IN_CELL; i++) {
@@ -96,7 +96,7 @@ public class DigestCellView extends RelativeLayout {
             // set drawee source
             setMultiDraweeSource(mPosition);
             // set date info
-            setInfoPanelDate(mPosition);
+            setInfoPanel(mPosition);
         }
     }
 
@@ -190,12 +190,15 @@ public class DigestCellView extends RelativeLayout {
 
     }
 
-    private void setInfoPanelDate(int position) {
+    private void setInfoPanel(int position) {
+        mInfoPanelView.setPosition(position);
         long offset = Timestamp.valueOf("2015-01-01 00:00:00").getTime();
         long end = Timestamp.valueOf("2016-01-01 00:00:00").getTime();
         long diff = end - offset + 1;
-        mTimestamp = offset + (long)(Math.random() * diff);      // TODO: 1/14/16 getTimeStamp here
+        mTimestamp = offset + (long)(diff * (position + 1) / 100);      // TODO: 1/14/16 getTimeStamp here
         mInfoPanelView.setTimestamp(mTimestamp);
+
+        mInfoPanelView.setHasInfo(true);
     }
 
 }
