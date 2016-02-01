@@ -78,17 +78,13 @@ public class TileContentView extends RecyclerView {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
 //                if (parent.getContext() instanceof MainActivity) {
-
                     ArrayList<Pair<View, String>> pairs = new ArrayList<Pair<View, String>>();
                     Pair<View, String> imagePair = Pair.create((View) drawee, "tThumbnail");
                     pairs.add(imagePair);
                     Pair<View, String> titlePair = Pair.create((View) title, "tTitle");
                     pairs.add(titlePair);
-
                     BusMaster.getBus().post(new ItemSelectedEvent(position, pairs));
-
 //                }
                 }
             });
@@ -118,7 +114,7 @@ public class TileContentView extends RecyclerView {
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
 
-            Uri uri = PlaceholderContent.getUri(position);
+            Uri uri = PlaceholderContent.getThumbnailUri(position);
             holder.drawee.setImageURI(uri);
 
             Log.d("seagate-tile", "uri=" + uri);

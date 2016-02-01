@@ -113,7 +113,7 @@ public class ProviderFilesAdapter extends RecyclerView.Adapter<ProviderFilesAdap
                 // Load based on file path
                 // Prepending a magic scheme to get it to
                 // be picked up by provider's RequestHandler
-                Uri uri = ((Provider.FileMetadata) item).thumbnailUri("jpeg", "w64h64");
+                Uri uri = ((Provider.FileMetadata) item).thumbnailUri("jpeg", "w1024h780");
                 if (type != null && type.startsWith("image/")) {
                     loadImage(uri);
                 } else {

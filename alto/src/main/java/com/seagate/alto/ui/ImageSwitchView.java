@@ -3,6 +3,7 @@ package com.seagate.alto.ui;
 import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -162,14 +163,6 @@ public class ImageSwitchView extends ImageView {
         return false;
     }
 
-    private void setNextImage(DraweeController controller) {
-        mCurrentIndex = (mCurrentIndex + 1) % 2;
-        mMultiDraweeHolder.get(mCurrentIndex).setController(controller);
-
-        mFadeDrawable.setTransitionDuration(CROSSFADE_DURATION);
-        mFadeDrawable.fadeToLayer(mCurrentIndex);
-    }
-
     private GenericDraweeHierarchy createDraweeHierarchy() {
         GenericDraweeHierarchy hierarchy = new GenericDraweeHierarchyBuilder(getResources())
                 .setActualImageScaleType(ScalingUtils.ScaleType.CENTER_CROP)
@@ -190,11 +183,17 @@ public class ImageSwitchView extends ImageView {
     private Runnable doImageTransition = new Runnable() {
         @Override
         public void run() {
+            mCurrentIndex = (mCurrentIndex + 1) % 2;
+            DraweeHolder<GenericDraweeHierarchy> drawee = mMultiDraweeHolder.get(mCurrentIndex);
+            int position = (int)(PlaceholderContent.getCount() * Math.random());
+            Uri uri = PlaceholderContent.getThumbnailUri(position);
             DraweeController controller = Fresco.newDraweeControllerBuilder()
-                    .setUri(PlaceholderContent.getUri(((int) (Math.random() * 200) + 1)))
+                    .setOldController(drawee.getController())
+                    .setUri(uri)
                     .build();
-            setNextImage(controller);
-
+            drawee.setController(controller);
+            mFadeDrawable.setTransitionDuration(CROSSFADE_DURATION);
+            mFadeDrawable.fadeToLayer(mCurrentIndex);
             mImageLoopingHandler.postDelayed(this, ROTATE_FREQUENCY);
         }
     };

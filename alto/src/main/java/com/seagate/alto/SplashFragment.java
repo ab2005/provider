@@ -22,7 +22,14 @@ import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.seagate.alto.provider.DropboxClient;
+import com.seagate.alto.provider.FrescoClient;
+import com.seagate.alto.provider.ListFolderTask;
+import com.seagate.alto.provider.Provider;
 import com.seagate.alto.utils.LogUtils;
+
+import java.util.ArrayList;
 
 // Splash is used at the beginning of the app to get things started -- includes sign in for now
 
@@ -40,7 +47,6 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
-
         mFragView = inflater.inflate(R.layout.sign_in, container, false);
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
@@ -52,6 +58,39 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
             String uid = mSharedPreferences.getString("uid."+username, null);
             if (token != null) {
                 // DropboxProducer.setCurrent(username, token, uid);
+                if (DropboxClient.Provider() == null) {
+                    Log.d(TAG, "Initializing Dropbox provider ...");
+                    DropboxClient.init(token);
+                    FrescoClient.init(getContext(), DropboxClient.Provider());
+                    Fresco.getImagePipeline().clearMemoryCaches();
+//                    new SearchImagesTask(DropboxClient.Provider(), new SearchImagesTask.Callback() {
+//                        @Override
+//                        public void onDataLoaded(Provider.SearchResult result) {
+//                            Log.d(TAG, "Data loaded!");
+//                            ArrayList<Provider.Metadata> list = result.matches();
+//                            PlaceholderContent.setContent(list);
+//                        }
+//
+//                        @Override
+//                        public void onError(Exception e) {
+//                            Log.d(TAG, "Error searching images on Dropbox:" + e);
+//                        }
+//                    }).execute("");
+                    new ListFolderTask(DropboxClient.Provider(), new ListFolderTask.Callback() {
+                        @Override
+                        public void onDataLoaded(Provider.ListFolderResult result) {
+                            Log.d(TAG, "Data loaded!");
+                            ArrayList<Provider.Metadata> list = result.entries();
+                            PlaceholderContent.setContent(list);
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            Log.d(TAG, "Error searching images on Dropbox:" + e);
+                        }
+                    }).execute("/camera uploads");
+                }
+
                 doneSplash();
                 return null;
             }

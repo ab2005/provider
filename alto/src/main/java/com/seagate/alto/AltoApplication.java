@@ -7,8 +7,6 @@ package com.seagate.alto;
 import android.app.Application;
 import android.util.Log;
 
-import com.facebook.common.logging.FLog;
-import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.imagepipeline.listener.RequestListener;
 import com.facebook.imagepipeline.listener.RequestLoggingListener;
@@ -39,7 +37,7 @@ public class AltoApplication extends Application {
 //        );
 
         ScreenUtils.init(this);
-        startFresco();
+//        startFresco();
     }
 
     public static AltoApplication getInstance() {
@@ -65,8 +63,8 @@ public class AltoApplication extends Application {
 //                .setMainDiskCacheConfig(diskCacheConfig)
 //                .setSmallImageDiskCacheConfig(smallImageDiskCacheConfig)
                 .build();
-        Fresco.initialize(this, config);
-        FLog.setMinimumLoggingLevel(FLog.VERBOSE);
+//        Fresco.initialize(this, config);
+//        FLog.setMinimumLoggingLevel(FLog.VERBOSE);
     }
 
 

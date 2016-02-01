@@ -49,7 +49,7 @@ public class OkHttpNetworkFetcher extends BaseNetworkFetcher<OkHttpNetworkFetche
         }
     }
 
-    private static final String TAG = "OkHttpNetworkFetchProducer";
+    private static final String TAG = "NetworkFetchProducer";
     private static final String QUEUE_TIME = "queue_time";
     private static final String FETCH_TIME = "fetch_time";
     private static final String TOTAL_TIME = "total_time";
@@ -172,7 +172,7 @@ public class OkHttpNetworkFetcher extends BaseNetworkFetcher<OkHttpNetworkFetche
             try {
                 downloader = downloader();
                 fetchState.responseTime = SystemClock.elapsedRealtime();
-                callback.onResponse(downloader.body, (int) downloader.result.size);
+                callback.onResponse(downloader.body, -1);
             } catch (DbxException | IOException e) {
                 if (downloader != null) {
                     try {

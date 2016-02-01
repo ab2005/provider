@@ -128,7 +128,7 @@ public class CardContentView extends RecyclerView {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            Uri uri = PlaceholderContent.getUri(position);
+            Uri uri = PlaceholderContent.getThumbnailUri(position);
             holder.drawee.setImageURI(uri);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 holder.drawee.setTransitionName("CardThumb"+position);

@@ -19,7 +19,6 @@ import com.seagate.alto.utils.LayoutUtils;
 import com.seagate.alto.utils.LogUtils;
 import com.seagate.alto.utils.ScreenUtils;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class DigestCellView extends RelativeLayout {
@@ -180,11 +179,10 @@ public class DigestCellView extends RelativeLayout {
             for (int i = 0; i < mImagePanelCount; i++) {
                 // have to build a new DraweeController if you want to set new URI.
                 DraweeController controller = Fresco.newDraweeControllerBuilder()
-                        .setUri(PlaceholderContent.getUri(((i + 1) * (position + 1))))
+                        .setUri(PlaceholderContent.getThumbnailUri(((i + 1) * (position + 1))))
                         .build();
                 mImageSwitchViews[i].loadContent(controller);
                 Log.d(TAG, "Current drawable of imageSwitchView(" + i + "): " + mImageSwitchViews[i].getCurrentDrawable());
-
             }
         }
 
@@ -192,10 +190,12 @@ public class DigestCellView extends RelativeLayout {
 
     private void setInfoPanel(int position) {
         mInfoPanelView.setPosition(position);
-        long offset = Timestamp.valueOf("2015-01-01 00:00:00").getTime();
-        long end = Timestamp.valueOf("2016-01-01 00:00:00").getTime();
-        long diff = end - offset + 1;
-        mTimestamp = offset + (long)(diff * (position + 1) / 100);      // TODO: 1/14/16 getTimeStamp here
+//        long offset = Timestamp.valueOf("2015-01-01 00:00:00").getTime();
+//        long end = Timestamp.valueOf("2016-01-01 00:00:00").getTime();
+//        long diff = end - offset + 1;
+//        mTimestamp = offset + (long)(diff * (position + 1) / 100);      // TODO: 1/14/16 getTimeStamp here
+        mTimestamp = PlaceholderContent.getTimestamp(position);
+
         mInfoPanelView.setTimestamp(mTimestamp);
 
         mInfoPanelView.setHasInfo(true);
