@@ -10,6 +10,9 @@ import android.util.Log;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.imagepipeline.listener.RequestListener;
 import com.facebook.imagepipeline.listener.RequestLoggingListener;
+import com.seagate.alto.metrics.Metrics;
+import com.seagate.alto.metrics.MixpanelReporter;
+import com.seagate.alto.metrics.SeagateReporter;
 import com.seagate.alto.utils.LogUtils;
 import com.seagate.alto.utils.ScreenUtils;
 
@@ -28,6 +31,8 @@ public class AltoApplication extends Application {
         Log.d(TAG, "onCreate");
         sMe = this;
 
+        startMetrics();
+
 //        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
 //             // I use comic-relief for testing
 ////             .setDefaultFontPath("fonts/ComicRelief.ttf")
@@ -42,6 +47,16 @@ public class AltoApplication extends Application {
 
     public static AltoApplication getInstance() {
         return sMe;
+    }
+
+    private void startMetrics() {
+        SeagateReporter seagateReporter = new SeagateReporter(this);
+        Metrics.getInstance().addReporter(seagateReporter);
+
+        MixpanelReporter mixPanelReporter = new MixpanelReporter(getApplicationContext());
+        Metrics.getInstance().addReporter(mixPanelReporter);
+
+//        Metrics.getInstance().report(AltoMetricsEvent.Startup);
     }
 
     private void startFresco() {

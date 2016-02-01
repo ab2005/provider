@@ -27,6 +27,7 @@ import com.seagate.alto.provider.DropboxClient;
 import com.seagate.alto.provider.FrescoClient;
 import com.seagate.alto.provider.ListFolderTask;
 import com.seagate.alto.provider.Provider;
+
 import com.seagate.alto.utils.LogUtils;
 
 import java.util.ArrayList;
@@ -50,6 +51,8 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
         mFragView = inflater.inflate(R.layout.sign_in, container, false);
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+
+//        Metrics.getInstance().report(AltoMetricsEvent.ShowSplash);
 
         // if we're logged in, move on
         String username = mSharedPreferences.getString("username", null);
