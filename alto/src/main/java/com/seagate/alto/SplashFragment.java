@@ -57,41 +57,9 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
             String token = mSharedPreferences.getString("token."+username, null);
             String uid = mSharedPreferences.getString("uid."+username, null);
             if (token != null) {
-                // DropboxProducer.setCurrent(username, token, uid);
-                if (DropboxClient.Provider() == null) {
-                    Log.d(TAG, "Initializing Dropbox provider ...");
-                    DropboxClient.init(token);
-                    FrescoClient.init(getContext(), DropboxClient.Provider());
-                    Fresco.getImagePipeline().clearMemoryCaches();
-//                    new SearchImagesTask(DropboxClient.Provider(), new SearchImagesTask.Callback() {
-//                        @Override
-//                        public void onDataLoaded(Provider.SearchResult result) {
-//                            Log.d(TAG, "Data loaded!");
-//                            ArrayList<Provider.Metadata> list = result.matches();
-//                            PlaceholderContent.setContent(list);
-//                        }
-//
-//                        @Override
-//                        public void onError(Exception e) {
-//                            Log.d(TAG, "Error searching images on Dropbox:" + e);
-//                        }
-//                    }).execute("");
-                    new ListFolderTask(DropboxClient.Provider(), new ListFolderTask.Callback() {
-                        @Override
-                        public void onDataLoaded(Provider.ListFolderResult result) {
-                            Log.d(TAG, "Data loaded!");
-                            ArrayList<Provider.Metadata> list = result.entries();
-                            PlaceholderContent.setContent(list);
-                        }
 
-                        @Override
-                        public void onError(Exception e) {
-                            Log.d(TAG, "Error searching images on Dropbox:" + e);
-                        }
-                    }).execute("/camera uploads");
-                }
 
-                doneSplash();
+                doneSplash(token);
                 return null;
             }
         }
@@ -122,7 +90,7 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
                         e.apply();
 
                         // DropboxProducer.setCurrent(username, token, uid);
-                        doneSplash();
+                        doneSplash(token);
                     }
                     return true;
                 }
@@ -145,7 +113,7 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
                     if (token != null) {
 
                         // DropboxProducer.setCurrent(username, token, uid);
-                        doneSplash();
+                        doneSplash(token);
                         return;
                     }
                 }
@@ -164,7 +132,46 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
         return mFragView;
     }
 
-    private void doneSplash() {
+    private void startClients(String token) {
+        // DropboxProducer.setCurrent(username, token, uid);
+        if (DropboxClient.Provider() == null) {
+            Log.d(TAG, "Initializing Dropbox provider ...");
+            DropboxClient.init(token);
+            FrescoClient.init(getContext(), DropboxClient.Provider());
+            Fresco.getImagePipeline().clearMemoryCaches();
+//                    new SearchImagesTask(DropboxClient.Provider(), new SearchImagesTask.Callback() {
+//                        @Override
+//                        public void onDataLoaded(Provider.SearchResult result) {
+//                            Log.d(TAG, "Data loaded!");
+//                            ArrayList<Provider.Metadata> list = result.matches();
+//                            PlaceholderContent.setContent(list);
+//                        }
+//
+//                        @Override
+//                        public void onError(Exception e) {
+//                            Log.d(TAG, "Error searching images on Dropbox:" + e);
+//                        }
+//                    }).execute("");
+            new ListFolderTask(DropboxClient.Provider(), new ListFolderTask.Callback() {
+                @Override
+                public void onDataLoaded(Provider.ListFolderResult result) {
+                    Log.d(TAG, "Data loaded!");
+                    ArrayList<Provider.Metadata> list = result.entries();
+                    PlaceholderContent.setContent(list);
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.d(TAG, "Error searching images on Dropbox:" + e);
+                }
+            }).execute("/camera uploads");
+        }
+    }
+
+    private void doneSplash(String token) {
+
+        startClients(token);
+
         // switch to the main fragment
         if (getActivity() instanceof IContentSwitcher) {
             ((IContentSwitcher) getActivity()).switchToMain();
@@ -202,7 +209,7 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
                 e.apply();
 
                 // DropboxProducer.setCurrent(username, token, uid);
-                doneSplash();
+                doneSplash(token);
 
             }
             // invoke cookie monster :P
