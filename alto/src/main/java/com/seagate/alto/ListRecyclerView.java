@@ -123,7 +123,7 @@ public class ListRecyclerView extends RecyclerView {
 
             @Override
             public void onBindViewHolder(ViewHolder holder, int position) {
-                Uri uri = PlaceholderContent.getUri(position);
+                Uri uri = PlaceholderContent.getThumbnailUri(position, 128);
                 holder.drawee.setImageURI(uri);
 
                 Log.d(TAG, "uri=" + uri);

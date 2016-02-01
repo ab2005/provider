@@ -5,6 +5,7 @@
 package com.seagate.alto.provider;
 
 import android.net.Uri;
+import android.util.Size;
 
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxHost;
@@ -80,7 +81,8 @@ public class DbxProvider implements Provider {
     public SearchResult search(String path, String query) throws ProviderException {
         final DbxFiles.SearchResult sr;
         try {
-            sr = mDbxClient.files.search(path, query);
+            sr = mDbxClient.files.searchBuilder(path, query).maxResults(1000).mode(DbxFiles.SearchMode.filename).start();
+            //sr = mDbxClient.files.search(path, query);
         } catch (DbxException e) {
             throw new ProviderException("Failed to search at " + path + " with query " + query, e);
         }
@@ -169,7 +171,7 @@ public class DbxProvider implements Provider {
         public ArrayList<Metadata> matches() {
             ArrayList<Metadata> entries = new ArrayList<Metadata>();
             for (final DbxFiles.SearchMatch item : sr.matches) {
-                entries.add(new MetadataImpl(item));
+                entries.add(new FileMetadataImpl(item));
             }
             return entries;
         }
@@ -252,7 +254,7 @@ public class DbxProvider implements Provider {
         private long size;
         private MediaInfo mediaInfo;
 
-        public FileMetadataImpl(DbxFiles.FileMetadata item) {
+        public FileMetadataImpl(final DbxFiles.FileMetadata item) {
             super(item);
             this.id = item.id;
             this.clientModified = item.clientModified;
@@ -262,8 +264,35 @@ public class DbxProvider implements Provider {
 
             this.mediaInfo = new MediaInfo() {
                 public Tag tag() {return mediaInfo.tag();}
-                public MediaMetadata metadata() {return mediaInfo.metadata();}
+                public MediaMetadata metadata() {
+                    return new MediaMetadata() {
+                        @Override
+                        public Size dimensions() {
+                            return null;
+                        }
+
+                        @Override
+                        public double latitude() {
+                            return item.mediaInfo.getMetadata().location.latitude;
+                        }
+
+                        @Override
+                        public double longitude() {
+                            return item.mediaInfo.getMetadata().location.longitude;
+                        }
+
+                        @Override
+                        public Date timeTaken() {
+                            DbxFiles.MediaInfo mi = item.mediaInfo;
+                            return item.clientModified;
+                        }
+                    };
+                }
             };
+        }
+
+        public FileMetadataImpl(DbxFiles.SearchMatch item) {
+            super(item);
         }
 
         @Override
