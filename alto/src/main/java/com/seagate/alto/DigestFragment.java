@@ -63,11 +63,15 @@ public class DigestFragment extends Fragment implements IBackStackName {
 
     @Override
     public void onPause() {
+        Log.d(TAG, "onPause()");
         super.onPause();
+        mDigestRecyclerView.pauseView();
     }
 
     @Override
     public void onResume() {
+        Log.d(TAG, "onResume()");
         super.onResume();
+        mDigestRecyclerView.resumeView();
     }
 }

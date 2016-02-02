@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 import com.seagate.alto.R;
 import com.seagate.alto.utils.LogUtils;
 
+import java.util.ArrayList;
+
 public class DigestRecyclerView extends RecyclerView {
 
     private final static String TAG = LogUtils.makeTag(DigestRecyclerView.class);
@@ -40,7 +42,33 @@ public class DigestRecyclerView extends RecyclerView {
         setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
+    public ContentAdapter getAdapter() {
+        return mAdapter;
+    }
+
+    public void resumeView() {
+        Log.d(TAG, "resumeView()");
+        ArrayList<DigestCellView> digestCellViews = mAdapter.getAllDigestCellViews();
+        for (DigestCellView dcv : digestCellViews) {
+            dcv.resumeView();
+        }
+    }
+
+    public void pauseView() {
+        Log.d(TAG, "pauseView()");
+        ArrayList<DigestCellView> digestCellViews = mAdapter.getAllDigestCellViews();
+        for (DigestCellView dcv : digestCellViews) {
+            dcv.pauseView();
+        }
+    }
+
     public static class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.DigestCellViewHolder> {
+
+        private ArrayList<DigestCellView> mAllDigestCellViews = new ArrayList<>();
+
+        public ArrayList<DigestCellView> getAllDigestCellViews() {
+            return mAllDigestCellViews;
+        }
 
         public static class DigestCellViewHolder extends RecyclerView.ViewHolder {
             DigestCellView digestCellView;
@@ -59,6 +87,7 @@ public class DigestRecyclerView extends RecyclerView {
         public ContentAdapter.DigestCellViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             Log.d(TAG, "onCreateViewHolder");
             DigestCellViewHolder viewHolder = new DigestCellViewHolder(LayoutInflater.from(parent.getContext()), parent);
+            mAllDigestCellViews.add(viewHolder.digestCellView);
             return viewHolder;
         }
 
@@ -73,6 +102,11 @@ public class DigestRecyclerView extends RecyclerView {
         @Override
         public int getItemCount() {
             return 60;
+        }
+
+
+        public void onResume() {
+
         }
 
     }
