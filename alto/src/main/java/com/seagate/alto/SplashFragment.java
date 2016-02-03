@@ -23,6 +23,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.seagate.alto.metrics.AltoMetricsEvent;
+import com.seagate.alto.metrics.Metrics;
 import com.seagate.alto.provider.DropboxClient;
 import com.seagate.alto.provider.FrescoClient;
 import com.seagate.alto.provider.ListFolderTask;
@@ -33,8 +35,6 @@ import com.seagate.alto.utils.LogUtils;
 import java.util.ArrayList;
 
 // Splash is used at the beginning of the app to get things started -- includes sign in for now
-
-// DropboxProducer has not been brought over from Arcus yet
 
 public class SplashFragment extends Fragment implements View.OnClickListener {
 
@@ -92,7 +92,8 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
                         e.putString("pass." + username, passw);
                         e.apply();
 
-                        // DropboxProducer.setCurrent(username, token, uid);
+                        Metrics.getInstance().report(AltoMetricsEvent.Login);
+
                         doneSplash(token);
                     }
                     return true;
@@ -114,8 +115,6 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
                     String token = mSharedPreferences.getString("token."+username, null);
                     String uid = mSharedPreferences.getString("uid."+username, null);
                     if (token != null) {
-
-                        // DropboxProducer.setCurrent(username, token, uid);
                         doneSplash(token);
                         return;
                     }
@@ -211,9 +210,7 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
                 e.putBoolean("logged", true);
                 e.apply();
 
-                // DropboxProducer.setCurrent(username, token, uid);
                 doneSplash(token);
-
             }
             // invoke cookie monster :P
             CookieManager.getInstance().removeAllCookie();
