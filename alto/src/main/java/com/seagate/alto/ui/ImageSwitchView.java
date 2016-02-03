@@ -41,7 +41,7 @@ public class ImageSwitchView extends ImageView {
     private final static int CROSSFADE_DURATION = 2000;
     private static final int FADEIN_DURATION = 800;
     private static final int FLIP_DURATION = 250;
-    private static final int ROTATE_FREQUENCY = 5000; // ms
+    private static final int ROTATE_FREQUENCY = 10000; // ms
 
     public ImageSwitchView(Context context) {
         super(context);
@@ -112,8 +112,7 @@ public class ImageSwitchView extends ImageView {
         super.onAttachedToWindow();
         attachDraweeHolders();
 
-        int startingTime = mRandom.nextInt(3 * ROTATE_FREQUENCY);
-        mImageLoopingHandler.postDelayed(doImageTransition, startingTime);
+        resumeSwitching();
     }
 
     @Override
@@ -122,7 +121,7 @@ public class ImageSwitchView extends ImageView {
         super.onDetachedFromWindow();
         detachDraweeHolders();
 
-        mImageLoopingHandler.removeCallbacks(doImageTransition);
+        pauseSwitching();
     }
 
     @Override
@@ -149,6 +148,17 @@ public class ImageSwitchView extends ImageView {
         for (int i = 0; i < mMultiDraweeHolder.size(); i++) {
             mMultiDraweeHolder.get(i).onAttach();
         }
+    }
+
+    public void resumeSwitching() {
+        Log.d(TAG, "resumeSwitching()");
+        int startingTime = mRandom.nextInt(3 * ROTATE_FREQUENCY);
+        mImageLoopingHandler.postDelayed(doImageTransition, startingTime);
+    }
+
+    public void pauseSwitching() {
+        Log.d(TAG, "pauseSwitching()");
+        mImageLoopingHandler.removeCallbacks(doImageTransition);
     }
 
     @Override
@@ -183,6 +193,7 @@ public class ImageSwitchView extends ImageView {
     private Runnable doImageTransition = new Runnable() {
         @Override
         public void run() {
+//            Log.d(TAG, "doImageTransition runnable...");
             mCurrentIndex = (mCurrentIndex + 1) % 2;
             DraweeHolder<GenericDraweeHierarchy> drawee = mMultiDraweeHolder.get(mCurrentIndex);
             int position = (int)(PlaceholderContent.getCount() * Math.random());

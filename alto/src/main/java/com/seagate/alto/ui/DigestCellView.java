@@ -188,6 +188,24 @@ public class DigestCellView extends RelativeLayout {
 
     }
 
+    public void resumeView() {
+        Log.d(TAG, "resumeView()");
+        synchronized (this) {
+            for (ImageSwitchView isv : mImageSwitchViews) {
+                isv.resumeSwitching();
+            }
+        }
+    }
+
+    public void pauseView() {
+        Log.d(TAG, "pauseView()");
+        synchronized (this) {
+            for (ImageSwitchView isv : mImageSwitchViews) {
+                isv.pauseSwitching();
+            }
+        }
+    }
+
     private void setInfoPanel(int position) {
         mInfoPanelView.setPosition(position);
 //        long offset = Timestamp.valueOf("2015-01-01 00:00:00").getTime();
