@@ -66,12 +66,12 @@ public class FileMetadata implements Provider.FileMetadata, Provider.Metadata {
 
     @Override
     public Date clientModified() {
-        return new Date(clientModified);
+        return LyveCloudProvider.dateFromString(clientModified);
     }
 
     @Override
     public Date serverModified() {
-        return new Date(serverModified);
+        return LyveCloudProvider.dateFromString(serverModified);
     }
 
     @Override

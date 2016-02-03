@@ -19,6 +19,9 @@ import com.seagate.alto.provider.lyve.response.SearchResponse;
 import com.seagate.alto.provider.lyve.response.Token;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import retrofit2.Response;
 
@@ -163,5 +166,16 @@ public class LyveCloudProvider implements Provider {
     @Override
     public String getToken() {
         return mAccessToken;
+    }
+
+    public static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyyMMdd'T'HHmmss.SSS'Z'");
+    private static Date NO_DATE = new Date(1961, 5, 12); // Gagarin
+    public static Date dateFromString(String dateString) {
+        try {
+            return DATE_FORMATTER.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return NO_DATE;
     }
 }
