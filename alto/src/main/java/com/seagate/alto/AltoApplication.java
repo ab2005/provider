@@ -9,6 +9,9 @@ import android.util.Log;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
+import com.seagate.alto.metrics.Metrics;
+import com.seagate.alto.metrics.MixpanelReporter;
+import com.seagate.alto.metrics.SeagateReporter;
 import com.seagate.alto.utils.LogUtils;
 
 public class AltoApplication extends Application {
@@ -21,6 +24,8 @@ public class AltoApplication extends Application {
 
         Log.d(TAG, "onCreate");
 
+        startMetrics();
+
 //        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
 //             // I use comic-relief for testing
 ////             .setDefaultFontPath("fonts/ComicRelief.ttf")
@@ -29,7 +34,18 @@ public class AltoApplication extends Application {
 //            .build()
 //        );
 
+
         startFresco();
+    }
+
+    private void startMetrics() {
+        SeagateReporter seagateReporter = new SeagateReporter(this);
+        Metrics.getInstance().addReporter(seagateReporter);
+
+        MixpanelReporter mixPanelReporter = new MixpanelReporter(getApplicationContext());
+        Metrics.getInstance().addReporter(mixPanelReporter);
+
+//        Metrics.getInstance().report(AltoMetricsEvent.Startup);
     }
 
     private void startFresco() {
