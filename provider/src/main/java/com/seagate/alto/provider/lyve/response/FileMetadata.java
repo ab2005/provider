@@ -15,7 +15,7 @@ import com.seagate.alto.provider.Provider;
 
 import java.util.Date;
 
-public class FileMetadata implements Provider.FileMetadata, Provider.Metadata {
+public class FileMetadata implements Provider.FileMetadata {
     @SerializedName("parent")
     @Expose
     public String parent;
