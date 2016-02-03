@@ -64,6 +64,11 @@ public interface Provider {
     Uri getUri(@NonNull String path, @Nullable String rev) throws ProviderException;
 
     /**
+     * Get authentication token.
+     * */
+    String getToken();
+
+    /**
      * The base exception thrown by Provider API calls.
      */
     public class ProviderException extends Exception {
@@ -122,7 +127,7 @@ public interface Provider {
         /**
          * The files and (direct) subfolders in the folder.
          */
-        java.util.ArrayList<Metadata> entries();
+        java.util.List<Metadata> entries();
         /**
          * Pass the cursor into {@link Provider#listFolderContinue(String)} to
          * see what's changed in the folder since your previous query.
@@ -217,7 +222,7 @@ public interface Provider {
     }
 
     /**
-     * Metadata for a photo or video.
+     * MediaMetadata for a photo or video.
      */
     public interface MediaMetadata {
         /**

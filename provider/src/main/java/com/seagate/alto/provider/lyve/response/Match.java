@@ -8,13 +8,13 @@ package com.seagate.alto.provider.lyve.response;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Dimensions {
+public class Match {
 
-    @SerializedName("width")
+    @SerializedName("match_type")
     @Expose
-    public Integer width;
-    @SerializedName("height")
+    public String matchType;
+    @SerializedName("metadata")
     @Expose
-    public Integer height;
+    public Metadata metadata;
 
 }

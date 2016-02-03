@@ -4,10 +4,7 @@
 
 package com.seagate.alto.provider.lyve.request;
 
-import com.seagate.alto.provider.lyve.Client;
-import com.seagate.alto.provider.lyve.Name;
-
-public class AccountRequest {
+public class CreateAccountRequest {
     private String email;
     private String password;
     private Name name;
@@ -32,7 +29,7 @@ public class AccountRequest {
         this.email = email;
     }
 
-    public AccountRequest withEmail(String email) {
+    public CreateAccountRequest withEmail(String email) {
         this.email = email;
         return this;
     }
@@ -55,7 +52,7 @@ public class AccountRequest {
         this.password = password;
     }
 
-    public AccountRequest withPassword(String password) {
+    public CreateAccountRequest withPassword(String password) {
         this.password = password;
         return this;
     }
@@ -78,7 +75,7 @@ public class AccountRequest {
         this.name = name;
     }
 
-    public AccountRequest withName(Name name) {
+    public CreateAccountRequest withName(Name name) {
         this.name = name;
         return this;
     }
@@ -101,7 +98,7 @@ public class AccountRequest {
         this.client = client;
     }
 
-    public AccountRequest withClient(Client client) {
+    public CreateAccountRequest withClient(Client client) {
         this.client = client;
         return this;
     }
@@ -124,7 +121,7 @@ public class AccountRequest {
         this.isInternal = isInternal;
     }
 
-    public AccountRequest withIsInternal(Boolean isInternal) {
+    public CreateAccountRequest withIsInternal(Boolean isInternal) {
         this.isInternal = isInternal;
         return this;
     }

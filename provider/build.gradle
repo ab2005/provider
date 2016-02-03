@@ -14,6 +14,7 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -33,6 +34,9 @@ android {
         exclude 'META-INF/NOTICE.txt'
     }
 
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -41,22 +45,20 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-core:2.5.4'
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.5.4'
 
-    // TODO: replace google with jackson
     compile 'com.google.code.gson:gson:2.2.4'
 
     compile 'com.squareup.retrofit2:retrofit:2.0.0-beta3'
     compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta3'
-
-    testCompile 'junit:junit:4.12'
 
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.facebook.fresco:fresco:0.8.0+'
     compile 'com.squareup.okhttp:okhttp:2.7.2'
     compile 'com.squareup.okio:okio:1.6.0'
 
-//    dependencies {
-//        compile files('libs/dropbox-core-sdk-0-SNAPSHOT.jar')
-//        compile files('libs/json_simple-1.1.jar')
-//    }
     compile 'com.facebook.stetho:stetho-okhttp:1.2.0'
+
+    testCompile 'junit:junit:4.12'
+    androidTestCompile 'com.android.support.test:runner:0.2'
+    androidTestCompile 'com.android.support.test:rules:0.2'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.1'
 }

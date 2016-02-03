@@ -22,7 +22,8 @@ import java.util.Locale;
  * Dropbox provider implementation.
  */
 public class DbxProvider implements Provider {
-    private static final String REPO_URL = "https://content.dropboxapi.com/2/files/";
+
+    private static final String DOMAIN = "dropbox";
 
     private final DbxClientV2 mDbxClient;
 
@@ -123,11 +124,19 @@ public class DbxProvider implements Provider {
 
     @Override
     public Uri getThumbnailUri(String path, String size, String format) throws ProviderException {
+        return getImageUri(path, format, size);
+    }
+
+    @Override
+    public Uri getUri(String path, String rev) throws ProviderException {
+        return getImageUri(path, null, null);
+    }
+
+    private static Uri getImageUri(String path, String format, String size) {
         Uri.Builder ub = new Uri.Builder()
                 .scheme("http")
-                .authority(REPO_URL + "/get_thumbnail")
-                .appendPath(path)
-                .appendQueryParameter("auth", mDbxClient.getAccessToken());
+                .authority(DOMAIN)
+                .appendPath(path);
         if (size != null) {
             ub.appendQueryParameter("size", size);
         }
@@ -138,16 +147,8 @@ public class DbxProvider implements Provider {
     }
 
     @Override
-    public Uri getUri(String path, String rev) throws ProviderException {
-        Uri.Builder ub = new Uri.Builder()
-                .scheme("http")
-                .authority(REPO_URL + "/download")
-                .appendPath(path)
-                .appendQueryParameter("auth", mDbxClient.getAccessToken());
-        if (rev != null) {
-            ub.appendQueryParameter("rev", rev);
-        }
-        return ub.build();
+    public String getToken() {
+        return mDbxClient.getAccessToken();
     }
 
     public DbxFiles getFilesClient() {
@@ -302,12 +303,12 @@ public class DbxProvider implements Provider {
 
         @Override
         public Uri imageUri() {
-            return PicassoRequestHandler.buildPicassoUri(this);
+            return getImageUri(pathLower(), null, null);
         }
 
         @Override
         public Uri thumbnailUri(String format, String size) {
-            return PicassoRequestHandler.buildPicassoThumbnailUri(this, format, size);
+            return getImageUri(pathLower(), format, size);
         }
     }
 

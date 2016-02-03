@@ -5,12 +5,16 @@
 
 package com.seagate.alto.provider.lyve.response;
 
-import com.seagate.alto.provider.lyve.annotation.Generated;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-@Generated("org.jsonschema2pojo")
 public class Location {
 
+    @SerializedName("latitude")
+    @Expose
     public Integer latitude;
+    @SerializedName("longitude")
+    @Expose
     public Integer longitude;
 
 }

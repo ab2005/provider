@@ -4,36 +4,29 @@
 
 package com.seagate.alto.provider.lyve;
 
-import com.seagate.alto.provider.gdrive.responce.AccessToken;
-import com.seagate.alto.provider.gdrive.responce.UserCode;
+import com.seagate.alto.provider.lyve.request.ListFolderRequest;
+import com.seagate.alto.provider.lyve.request.LoginRequest;
+import com.seagate.alto.provider.lyve.request.SearchRequest;
+import com.seagate.alto.provider.lyve.response.ListFolderResponse;
+import com.seagate.alto.provider.lyve.response.SearchResponse;
+import com.seagate.alto.provider.lyve.response.Token;
 
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
+import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.POST;
 
 public interface LyveCloudClient {
-    String BASE_URL = "https://accounts.google.com";
-    String ACCESS_GRANT_TYPE = "http://oauth.net/grant_type/device/1.0";
-    String REFRESH_GRANT_TYPE = "refresh_token";
+    @POST("/v1/auth/login")
+    Call<Token> login(@Body LoginRequest req);
 
-    @POST("/o/oauth2/device/code")
-    @FormUrlEncoded
-    UserCode getUserCode(@Field("client_id") String clientId,
-                         @Field("scope") String scope);
+    @POST("/v1/files/list_folder")
+    Call<ListFolderResponse> listFolder(@Body ListFolderRequest req);
 
-    @POST("/o/oauth2/token")
-    @FormUrlEncoded
-    AccessToken getAccessToken(@Field("client_id") String clientId,
-                               @Field("client_secret") String clientSecret,
-                               @Field("code") String code,
-                               @Field("grant_type") String grantType);
+    @POST("/v1/files/search")
+    Call<SearchResponse> search(@Body SearchRequest req);
 
-    @POST("/o/oauth2/token")
-    @FormUrlEncoded
-    AccessToken refreshAccessToken(@Field("client_id") String clientId,
-                                   @Field("client_secret") String clientSecret,
-                                   @Field("refresh_token") String refreshToken,
-                                   @Field("grant_type") String grantType);
+//    @POST("/v1/files/download")
+//    Call<SearchResponse> download(@Body DownloadRequest req);
 
     // TODO:
     // create account
@@ -69,6 +62,45 @@ curl -v -c cook -X POST --header 'Content-Type: application/json' --header 'Acce
     "display_name": "d"
   }
 }' 'https://api.dogfood.blackpearlsystems.net/v1/auth/login'  | pjson
+
+
+curl -X POST \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer MywxLE1JV0NkVHNoOG52QzdzaEl2R3dMSGc9PSx5UkRYS3JiQS9zUUR0em44ZzF1bDZXeC9DREQ2VTNnTlhsd2NwVkhZRk1QN0lGdHBIQ3NraktHdWFWOUVsUXVDMVUyV3plVTM5QWxJZms2ZHZLVGhTVkhnTllzSXovTlB4bFdQcU1XWFBzN1RFSU9DazU5MDYxNlluc0dHd3FzTmhxTTNlSFhNU0FIQlI1REx6VWd6QURnMG5WSHdlZ3M4YkFFOVprY2sxYmFSVUMvUzMzTitrWnQ3TFgvTHoyYmV2V3ZQbHdxQk5neEZKTy9Zb0NnekNUS1phVkQ4a0VIOEhvL0IzM0crWTU5bU54dXk5eTh2d3VBc2tEN1hkdHQ0djdvUzNIUS9KSWJHYUlnT015c2N5TXRtWUowbG50N0syTnpCQVdTdWJOcz0=' \
+--header 'Accept: application/json' -d '{
+  "path": "/d6f14c1e-ce88-4ebf-aa2f-f50fc7250dc4/Demo1",
+  "limit": 1000,
+  "include_deleted": true,
+  "include_media_info": true,
+  "include_child_count": true
+}' 'https://api.dogfood.blackpearlsystems.net/v1/files/list_folder' | pjson
+
+curl -X POST \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer MywxLE1JV0NkVHNoOG52QzdzaEl2R3dMSGc9PSx5UkRYS3JiQS9zUUR0em44ZzF1bDZXeC9DREQ2VTNnTlhsd2NwVkhZRk1QN0lGdHBIQ3NraktHdWFWOUVsUXVDMVUyV3plVTM5QWxJZms2ZHZLVGhTVkhnTllzSXovTlB4bFdQcU1XWFBzN1RFSU9DazU5MDYxNlluc0dHd3FzTmhxTTNlSFhNU0FIQlI1REx6VWd6QURnMG5WSHdlZ3M4YkFFOVprY2sxYmFSVUMvUzMzTitrWnQ3TFgvTHoyYmV2V3ZQbHdxQk5neEZKTy9Zb0NnekNUS1phVkQ4a0VIOEhvL0IzM0crWTU5bU54dXk5eTh2d3VBc2tEN1hkdHQ0djdvUzNIUS9KSWJHYUlnT015c2N5TXRtWUowbG50N0syTnpCQVdTdWJOcz0=' \
+--header 'Accept: application/json' -d '{
+  "path": "/d6f14c1e-ce88-4ebf-aa2f-f50fc7250dc4/Demo1/test",
+  "limit": 1000,
+  "include_deleted": true,
+  "include_media_info": true,
+  "include_child_count": true
+}' 'https://api.dogfood.blackpearlsystems.net/v1/files/list_folder' | pjson
+
+
+curl -X POST \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer MywxLE1JV0NkVHNoOG52QzdzaEl2R3dMSGc9PSx5UkRYS3JiQS9zUUR0em44ZzF1bDZXeC9DREQ2VTNnTlhsd2NwVkhZRk1QN0lGdHBIQ3NraktHdWFWOUVsUXVDMVUyV3plVTM5QWxJZms2ZHZLVGhTVkhnTllzSXovTlB4bFdQcU1XWFBzN1RFSU9DazU5MDYxNlluc0dHd3FzTmhxTTNlSFhNU0FIQlI1REx6VWd6QURnMG5WSHdlZ3M4YkFFOVprY2sxYmFSVUMvUzMzTitrWnQ3TFgvTHoyYmV2V3ZQbHdxQk5neEZKTy9Zb0NnekNUS1phVkQ4a0VIOEhvL0IzM0crWTU5bU54dXk5eTh2d3VBc2tEN1hkdHQ0djdvUzNIUS9KSWJHYUlnT015c2N5TXRtWUowbG50N0syTnpCQVdTdWJOcz0=' \
+--header 'Accept: application/json' -d '{
+  "path": "/d6f14c1e-ce88-4ebf-aa2f-f50fc7250dc4/Demo1/test/",
+  "query": "jpg"
+}' 'https://api.dogfood.blackpearlsystems.net/v1/files/search' | pjson
+
+curl -X POST \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer MywxLE1JV0NkVHNoOG52QzdzaEl2R3dMSGc9PSx5UkRYS3JiQS9zUUR0em44ZzF1bDZXeC9DREQ2VTNnTlhsd2NwVkhZRk1QN0lGdHBIQ3NraktHdWFWOUVsUXVDMVUyV3plVTM5QWxJZms2ZHZLVGhTVkhnTllzSXovTlB4bFdQcU1XWFBzN1RFSU9DazU5MDYxNlluc0dHd3FzTmhxTTNlSFhNU0FIQlI1REx6VWd6QURnMG5WSHdlZ3M4YkFFOVprY2sxYmFSVUMvUzMzTitrWnQ3TFgvTHoyYmV2V3ZQbHdxQk5neEZKTy9Zb0NnekNUS1phVkQ4a0VIOEhvL0IzM0crWTU5bU54dXk5eTh2d3VBc2tEN1hkdHQ0djdvUzNIUS9KSWJHYUlnT015c2N5TXRtWUowbG50N0syTnpCQVdTdWJOcz0=' \
+-d '{
+        "path": "/d6f14c1e-ce88-4ebf-aa2f-f50fc7250dc4/Demo1/test/IMG_8591.JPG"
+}' 'https://api.dogfood.blackpearlsystems.net/v1/files/download'
 
      */
 }

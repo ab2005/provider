@@ -24,7 +24,6 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.seagate.alto.provider.Provider;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,7 +35,7 @@ public class ProviderFilesAdapter extends RecyclerView.Adapter<ProviderFilesAdap
     private final Picasso mPicasso;
     private final Callback mCallback;
 
-    public void setFiles(ArrayList<Provider.Metadata> files) {
+    public void setFiles(List<Provider.Metadata> files) {
         mFiles = files;
         notifyDataSetChanged();
     }

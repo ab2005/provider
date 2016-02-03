@@ -9,9 +9,6 @@ import android.net.Uri;
 import android.os.Looper;
 import android.os.SystemClock;
 
-import com.dropbox.core.DbxDownloader;
-import com.dropbox.core.DbxException;
-import com.dropbox.core.v2.DbxFiles;
 import com.facebook.common.logging.FLog;
 import com.facebook.imagepipeline.image.EncodedImage;
 import com.facebook.imagepipeline.producers.BaseNetworkFetcher;
@@ -136,7 +133,7 @@ public class OkHttpNetworkFetcher extends BaseNetworkFetcher<OkHttpNetworkFetche
                             if (contentLength < 0) {
                                 contentLength = 0;
                             }
-                            callback.onResponse(body.byteStream(), (int) contentLength);
+                            callback.onResponse(body.byteStream(), -1);
                         } catch (Exception e) {
                             handleException(call, e, callback);
                         } finally {
@@ -155,101 +152,10 @@ public class OkHttpNetworkFetcher extends BaseNetworkFetcher<OkHttpNetworkFetche
                 });
     }
 
-    private static class DbxFilesCall implements Call {
-        private final OkHttpNetworkFetchState fetchState;
-        private final Callback callback;
-        private final DbxProvider provider;
-        private DbxDownloader<DbxFiles.FileMetadata> downloader = null;
-
-        DbxFilesCall(final OkHttpNetworkFetchState fetchState, final Callback callback, DbxProvider provider) {
-            this.fetchState = fetchState;
-            this.callback = callback;
-            this.provider = provider;
-        }
-
-        @Override
-        public void run() {
-            try {
-                downloader = downloader();
-                fetchState.responseTime = SystemClock.elapsedRealtime();
-                callback.onResponse(downloader.body, (int) downloader.result.size);
-            } catch (DbxException | IOException e) {
-                if (downloader != null) {
-                    try {
-                        downloader.close();
-                    } catch (IllegalStateException ex) {
-                        // ignore
-                    }
-                    downloader = null;
-                    callback.onFailure(e);
-                }
-            }
-        }
-
-        @Override
-        public void cancel() {
-            if (downloader != null) {
-                try {
-                    downloader.close();
-                } catch (IllegalStateException e) {
-                    // ignore
-                }
-                downloader = null;
-                callback.onCancellation();
-            }
-        }
-
-        private DbxDownloader<DbxFiles.FileMetadata> downloader() throws DbxException {
-            Uri uri = fetchState.getUri();
-            if (isFullSize()) {
-                return provider.getFilesClient()
-                        .downloadBuilder(uri.getPath())
-                        .rev(uri.getQueryParameter("rev"))
-                        .start();
-            } else {
-                return provider.getFilesClient()
-                        .getThumbnailBuilder(uri.getPath())
-                        .format(thumbnailFormat())
-                        .size(thumbnailSize())
-                        .start();
-            }
-        }
-
-        private boolean isFullSize() {
-            Uri uri = fetchState.getUri();
-            return (uri.getQueryParameter("format") == null) && (uri.getQueryParameter("size") == null);
-        }
-
-        private DbxFiles.ThumbnailFormat thumbnailFormat() {
-            String format = fetchState.getUri().getQueryParameter("format");
-            if (format == null) {
-                format = "jpeg";
-            }
-            switch(format) {
-                case "png": return DbxFiles.ThumbnailFormat.png;
-                default:case "jpeg": return DbxFiles.ThumbnailFormat.jpeg;
-            }
-        }
-
-        private DbxFiles.ThumbnailSize thumbnailSize() {
-            String size = fetchState.getUri().getQueryParameter("size");
-            if (size == null) {
-                size = "w128h128";
-            }
-            switch(size) {
-                case "w32h32": return DbxFiles.ThumbnailSize.w32h32;
-                case "w64h64": return DbxFiles.ThumbnailSize.w64h64;
-                default:case "w128h128": return DbxFiles.ThumbnailSize.w128h128;
-                case "w640h480": return DbxFiles.ThumbnailSize.w640h480;
-                case "w1024h768": return DbxFiles.ThumbnailSize.w1024h768;
-            }
-        }
-    }
-
     private Call buildCall(final OkHttpNetworkFetchState fetchState, final Callback callback) {
         final String domain = fetchState.getUri().getAuthority();
         switch(domain) {
-            case "seagate":
+            case "seagate": return new LyveCloudFilesCall(fetchState, callback, mProvider, mOkHttpClient);
             case "dropbox": return new DbxFilesCall(fetchState, callback, (DbxProvider) mProvider);
             default: return null;
         }

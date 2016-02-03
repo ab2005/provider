@@ -1,18 +1,26 @@
-/*
- * Copyright (c) 2015. Seagate Technology PLC. All rights reserved.
- */
-
 package com.seagate.alto.provider.lyve.request;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import com.seagate.alto.provider.lyve.annotation.Generated;
 
 @Generated("org.jsonschema2pojo")
 public class ListFolderRequest {
 
+    @SerializedName("path")
+    @Expose
     public String path;
+    @SerializedName("limit")
+    @Expose
     public Integer limit;
+    @SerializedName("include_deleted")
+    @Expose
     public Boolean includeDeleted;
+    @SerializedName("include_media_info")
+    @Expose
     public Boolean includeMediaInfo;
+    @SerializedName("include_child_count")
+    @Expose
     public Boolean includeChildCount;
 
     public ListFolderRequest withPath(String path) {
