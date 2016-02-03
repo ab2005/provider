@@ -108,7 +108,7 @@ public class ImageSwitchView extends ImageView {
 
     @Override
     public void onAttachedToWindow() {
-        Log.d(TAG + " Feb1", "onAttachedToWindow()");
+        Log.d(TAG, "onAttachedToWindow()");
         super.onAttachedToWindow();
         attachDraweeHolders();
 
@@ -117,7 +117,7 @@ public class ImageSwitchView extends ImageView {
 
     @Override
     public void onDetachedFromWindow() {
-        Log.d(TAG + " Feb1", "onDetachedFromWindow()");
+        Log.d(TAG, "onDetachedFromWindow()");
         super.onDetachedFromWindow();
         detachDraweeHolders();
 

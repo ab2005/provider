@@ -195,7 +195,6 @@ public class DigestCellView extends RelativeLayout {
                 isv.resumeSwitching();
             }
         }
-
     }
 
     public void pauseView() {

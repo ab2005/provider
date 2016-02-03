@@ -104,10 +104,5 @@ public class DigestRecyclerView extends RecyclerView {
             return 60;
         }
 
-
-        public void onResume() {
-
-        }
-
     }
 }
