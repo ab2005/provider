@@ -20,6 +20,7 @@ import com.facebook.drawee.view.DraweeHolder;
 import com.facebook.drawee.view.MultiDraweeHolder;
 import com.seagate.alto.PlaceholderContent;
 import com.seagate.alto.R;
+import com.seagate.alto.digest.DigestCellView;
 import com.seagate.alto.utils.LayoutUtils;
 import com.seagate.alto.utils.LogUtils;
 import com.seagate.alto.utils.ScreenUtils;

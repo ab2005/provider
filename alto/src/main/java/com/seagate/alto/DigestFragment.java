@@ -11,7 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.seagate.alto.ui.DigestRecyclerView;
+import com.seagate.alto.digest.DigestRecyclerView;
 import com.seagate.alto.utils.LogUtils;
 import com.seagate.alto.utils.ScreenUtils;
 

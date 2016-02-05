@@ -1,4 +1,4 @@
-package com.seagate.alto.ui;
+package com.seagate.alto.digest;
 
 import android.content.Context;
 import android.graphics.Canvas;

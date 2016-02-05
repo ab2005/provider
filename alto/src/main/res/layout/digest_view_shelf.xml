@@ -7,7 +7,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical">
-    <com.seagate.alto.ui.DigestRecyclerView
+    <com.seagate.alto.digest.DigestRecyclerView
         android:id="@+id/digest_shelf"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -18,5 +18,5 @@
         android:orientation="vertical"
         android:overScrollMode="always"
         android:scrollbars="vertical" >
-    </com.seagate.alto.ui.DigestRecyclerView>
+    </com.seagate.alto.digest.DigestRecyclerView>
 </RelativeLayout>
