@@ -2,13 +2,9 @@
 
 package com.seagate.alto;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
-import android.provider.MediaStore;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,24 +17,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.facebook.common.executors.CallerThreadExecutor;
-import com.facebook.common.references.CloseableReference;
-import com.facebook.datasource.DataSource;
-import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.facebook.imagepipeline.core.ImagePipeline;
-import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
-import com.facebook.imagepipeline.image.CloseableImage;
-import com.facebook.imagepipeline.request.ImageRequest;
-import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.seagate.alto.events.BusMaster;
 import com.seagate.alto.events.ItemSelectedEvent;
 import com.seagate.alto.utils.LogUtils;
+import com.seagate.alto.utils.SharingUtils;
 
 import java.util.ArrayList;
-
-import javax.annotation.Nullable;
 
 /**
  * Provides UI for the view with List.
@@ -70,7 +56,6 @@ public class ListRecyclerView extends RecyclerView {
         Log.d(TAG, "onFinishInflate");
 
         mAdapter = new ViewHolder.ContentAdapter();
-        mAdapter.setActivity((Activity) getContext());
         setAdapter(mAdapter);
         setHasFixedSize(true);
         setLayoutManager(new LinearLayoutManager(getContext()));
@@ -90,7 +75,7 @@ public class ListRecyclerView extends RecyclerView {
         TextView title;
         int position;
 
-        public ViewHolder(LayoutInflater inflater, final ViewGroup parent, final Activity activity) {
+        public ViewHolder(LayoutInflater inflater, final ViewGroup parent) {
             super(inflater.inflate(R.layout.item_list, parent, false));
 
             drawee = (SimpleDraweeView) itemView.findViewById(R.id.list_avatar);
@@ -122,58 +107,7 @@ public class ListRecyclerView extends RecyclerView {
                     menu.add("share").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
-
-//                            new Thread(new Runnable() {
-//                                @Override
-//                                public void run() {
-
-                                    ImagePipeline imagePipeline = Fresco.getImagePipeline();
-                                    ImageRequest imageRequest = ImageRequestBuilder
-                                            .newBuilderWithSource(PlaceholderContent.getThumbnailUri(position))
-                                            .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
-                                            .build();
-                                    final DataSource<CloseableReference<CloseableImage>> dataSource =
-                                            imagePipeline.fetchDecodedImage(imageRequest, activity);
-//                            try {
-//                                Thread.sleep(200);
-//                            } catch (InterruptedException e) {
-//                                e.printStackTrace();
-//                            }
-//                            http://stackoverflow.com/questions/32949914/try-to-fetch-bitmap-from-uri-using-fresco
-//                            try {
-                                Log.d(TAG, "dataSource ready? " + dataSource);
-                                dataSource.subscribe(new BaseBitmapDataSubscriber() {
-                                    @Override
-                                    public void onNewResultImpl(@Nullable Bitmap bitmap) {
-                                        if (bitmap == null) {
-                                            Log.d(TAG, "Bitmap data source returned success, but bitmap null.");
-                                            return;
-                                        }
-
-                                        Log.d(TAG, "sharing bitmap: " + bitmap.getWidth() + "/" + bitmap.getHeight() + ", " + bitmap);
-
-                                        String path = MediaStore.Images.Media.insertImage(activity.getContentResolver(),
-                                                bitmap, "Image Description", null);
-                                        Uri bmpUri = Uri.parse(path);
-                                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                                        shareIntent.putExtra(Intent.EXTRA_STREAM, bmpUri);
-                                        shareIntent.setType("image/*");
-
-                                        activity.startActivity(Intent.createChooser(shareIntent, "Share Image"));
-
-                                        dataSource.close();
-
-                                    }
-
-                                    @Override
-                                    public void onFailureImpl(DataSource dataSource) {
-                                        // No cleanup required here
-                                        if (dataSource != null) {
-                                            dataSource.close();
-                                        }
-                                    }
-                                }, CallerThreadExecutor.getInstance());
-
+                            SharingUtils.shareImageFromRecyclerView(position, itemView.getContext());
                             return true;
                         }
                     });
@@ -182,25 +116,14 @@ public class ListRecyclerView extends RecyclerView {
 
         }
 
-
-
         /**
          * Adapter to display recycler view.
          */
         public static class ContentAdapter extends RecyclerView.Adapter<ViewHolder> {
 
-            public void setActivity(Activity mActivity) {
-                this.mActivity = mActivity;
-            }
-
-            private Activity mActivity;
-
-            public ContentAdapter() {
-            }
-
             @Override
             public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                return new ViewHolder(LayoutInflater.from(parent.getContext()), parent, mActivity);
+                return new ViewHolder(LayoutInflater.from(parent.getContext()), parent);
             }
 
             @Override
@@ -224,8 +147,6 @@ public class ListRecyclerView extends RecyclerView {
             }
         }
 
-
     }
-
 
 }

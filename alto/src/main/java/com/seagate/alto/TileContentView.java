@@ -2,7 +2,6 @@
 
 package com.seagate.alto;
 
-import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
@@ -12,7 +11,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -21,6 +22,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.seagate.alto.events.BusMaster;
 import com.seagate.alto.events.ItemSelectedEvent;
 import com.seagate.alto.utils.LogUtils;
+import com.seagate.alto.utils.SharingUtils;
 
 import java.util.ArrayList;
 
@@ -50,7 +52,6 @@ public class TileContentView extends RecyclerView {
         super.onFinishInflate();
 
         mAdapter = new ContentAdapter();
-        mAdapter.setActivity((Activity) getContext());
         setAdapter(mAdapter);
         setHasFixedSize(true);
         setLayoutManager(new LinearLayoutManager(getContext()));
@@ -68,7 +69,7 @@ public class TileContentView extends RecyclerView {
         int position;
         TextView title;
 
-        public ViewHolder(LayoutInflater inflater, final ViewGroup parent, final Activity activity) {
+        public ViewHolder(LayoutInflater inflater, final ViewGroup parent) {
 
             super(inflater.inflate(R.layout.item_tile, parent, false));
 
@@ -88,6 +89,19 @@ public class TileContentView extends RecyclerView {
 //                }
                 }
             });
+
+            itemView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
+                @Override
+                public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+                    menu.add("share").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            SharingUtils.shareImageFromRecyclerView(position, itemView.getContext());
+                            return true;
+                        }
+                    });
+                }
+            });
         }
     }
 
@@ -96,19 +110,13 @@ public class TileContentView extends RecyclerView {
      */
     public static class ContentAdapter extends RecyclerView.Adapter<ViewHolder> {
 
-        private Activity mActivity;
-
         public ContentAdapter() {
             // no-op
         }
 
-        public void setActivity(Activity mActivity) {
-            this.mActivity = mActivity;
-        }
-
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new ViewHolder(LayoutInflater.from(parent.getContext()), parent, mActivity);
+            return new ViewHolder(LayoutInflater.from(parent.getContext()), parent);
         }
 
         @Override
