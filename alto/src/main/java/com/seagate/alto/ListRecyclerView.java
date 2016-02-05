@@ -86,20 +86,19 @@ public class ListRecyclerView extends RecyclerView {
             drawee.getHierarchy().setRoundingParams(roundingParams);
 
             itemView.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
+                @Override
+                public void onClick(View v) {
 
-                                                ArrayList<Pair<View, String>> pairs = new ArrayList<Pair<View, String>>();
-                                                Pair<View, String> imagePair = Pair.create((View) drawee, "tThumbnail");
-                                                pairs.add(imagePair);
-                                                Pair<View, String> titlePair = Pair.create((View) title, "tTitle");
-                                                pairs.add(titlePair);
+                    ArrayList<Pair<View, String>> pairs = new ArrayList<Pair<View, String>>();
+                    Pair<View, String> imagePair = Pair.create((View) drawee, "tThumbnail");
+                    pairs.add(imagePair);
+                    Pair<View, String> titlePair = Pair.create((View) title, "tTitle");
+                    pairs.add(titlePair);
 
-                                                BusMaster.getBus().post(new ItemSelectedEvent(position, pairs));
+                    BusMaster.getBus().post(new ItemSelectedEvent(position, pairs));
 
-                                            }
-                                        }
-            );
+                }
+            });
 
             itemView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
                 @Override
