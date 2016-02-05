@@ -132,8 +132,7 @@ public class SeagateReporter implements IMetricsReporter{
             while (true) {
 
                 if (!queue.isEmpty()) {
-                    JSONObject report = makeReport();
-                    sendReport(report);
+                    sendReport();
                 }
 
                 // wait a bit then blast again
@@ -185,34 +184,33 @@ public class SeagateReporter implements IMetricsReporter{
             return report;
         }
 
-        private void sendReport(JSONObject report) {
+        private void sendReport() {
 
             final String DEVENDPOINT = "https://datacollection.dev.blackpearlsystems.net/datacollection/rest/v1/noauth/structured/";
 //            final String ENDPOINT = "https://datacollection.dogfood.blackpearlsystems.net/datacollection/rest/v1/noauth/structured/";
 
+            BufferedWriter writer = null;
+            OutputStream os = null;
+            HttpsURLConnection conn = null;
+
             try {
-                Log.d(TAG, report.toString(4));
 
                 // post json to the endpoint
                 URL url = new URL(DEVENDPOINT);
-                HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-//                conn.setReadTimeout(10000);
-//                conn.setConnectTimeout(15000);
+                conn = (HttpsURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setDoOutput(true);
 
-                OutputStream os = conn.getOutputStream();
-                BufferedWriter writer = new BufferedWriter(
-                        new OutputStreamWriter(os, "UTF-8"));
-//                writer.write(getQuery(params));
+                os = conn.getOutputStream();
+                writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+
+                JSONObject report = makeReport();
+                Log.d(TAG, report.toString(4));
                 writer.write(report.toString());
                 writer.flush();
-                writer.close();
 
                 int responseCode = conn.getResponseCode();
                 Log.d(TAG, "response: " + responseCode);
-
-                os.close();
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -225,8 +223,24 @@ public class SeagateReporter implements IMetricsReporter{
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            finally {
+                try {
+                    writer.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                try {
+                    os.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                try {
+                    conn.disconnect();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-
+            }
         }
     }
 
