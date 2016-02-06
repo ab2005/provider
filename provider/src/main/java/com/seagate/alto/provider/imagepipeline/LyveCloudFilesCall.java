@@ -9,8 +9,10 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import com.facebook.imagepipeline.producers.NetworkFetcher;
+import com.seagate.alto.provider.LyveCloudProvider;
 import com.seagate.alto.provider.Provider;
 import com.squareup.okhttp.CacheControl;
+import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -39,11 +41,14 @@ public class LyveCloudFilesCall implements OkHttpNetworkFetcher.Call {
 
         Uri uri = fetchState.getUri();
         String path = uri.getPath();
+        path = path.substring(1, path.length());
         String size = uri.getQueryParameter("size");
         String format = uri.getQueryParameter("format");
         String cmd = "";
         String args = "";
-        if (size != null) {
+        // FIXME: thumbnail API does not work!!
+//        if (size != null) {
+        if (false) {
             cmd = "/v1/files/get_thumbnail";
             if (format != null) {
                 args = String.format("{\n" +
@@ -62,12 +67,12 @@ public class LyveCloudFilesCall implements OkHttpNetworkFetcher.Call {
             args = String.format("{\"path\":\"%s\"}", path);
         }
 
-        // TODO: create a valid request
+
         Request request = new Request.Builder()
                 .cacheControl(new CacheControl.Builder().noStore().build())
-                .url(uri.toString())
+                .url(LyveCloudProvider.API_BASE_URL + cmd)
                 .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + provider.getToken())
+                .header("Authorization", "Bearer " + provider.getAccessToken())
                 .header("Accept", "*/*")
                 .method("POST", RequestBody.create(MediaType.parse(""), args))
                 .build();
@@ -85,8 +90,13 @@ public class LyveCloudFilesCall implements OkHttpNetworkFetcher.Call {
                         final ResponseBody body = response.body();
                         try {
                             long contentLength = body.contentLength();
+
+                            HttpUrl uri = response.request().httpUrl();
+                            Log.d(TAG, uri + " - content length = " + contentLength);
+                            Log.d(TAG, uri + " - time(ms) = " + (fetchState.responseTime - fetchState.submitTime));
+
                             if (contentLength < 0) {
-                                contentLength = 0;
+                                contentLength = -1;
                             }
                             callback.onResponse(body.byteStream(), (int) contentLength);
                         } catch (Exception e) {
@@ -111,7 +121,7 @@ public class LyveCloudFilesCall implements OkHttpNetworkFetcher.Call {
     @Override
     public void cancel() {
         httpCall.cancel();
-        handleException(httpCall, null, callback);
+//        handleException(httpCall, null, callback);
     }
 
     /*
@@ -122,6 +132,7 @@ public class LyveCloudFilesCall implements OkHttpNetworkFetcher.Call {
      * and onCancellation is called. Otherwise onFailure is called.
      */
     private void handleException(final com.squareup.okhttp.Call call, final Exception e, final NetworkFetcher.Callback callback) {
+        Log.e(TAG, "handleException", e);
         if (call.isCanceled()) {
             callback.onCancellation();
         } else {

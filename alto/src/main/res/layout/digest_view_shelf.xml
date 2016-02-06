@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Copyright (c) 2015. Seagate Technology PLC. All rights reserved. -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/life_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+    <com.seagate.alto.ui.DigestRecyclerView
+        android:id="@+id/digest_shelf"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@null"
+        android:contentDescription="Vertically scrolling view of &apos;albums&apos; showing the date as well as photos and videos."
+        android:fastScrollEnabled="true"
+        android:listSelector="#00000000"
+        android:orientation="vertical"
+        android:overScrollMode="always"
+        android:scrollbars="vertical" >
+    </com.seagate.alto.ui.DigestRecyclerView>
+</RelativeLayout>

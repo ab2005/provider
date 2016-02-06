@@ -102,7 +102,7 @@ public class StackFragment extends Fragment implements IToolbarHolder, IBackPres
         // otherwise the fragment stack will be restored to previous state magically
 
         if (savedInstanceState == null) {
-            setFragment(new PagerFragment());
+            setFragment(new DigestFragment());
             navigationView.setCheckedItem(R.id.digest);
         } else {
             // the fragment stack is transferred over during rotation
@@ -248,16 +248,16 @@ public class StackFragment extends Fragment implements IToolbarHolder, IBackPres
         int id = item.getItemId();
 
         if (id == R.id.digest) {
-            setFragment(new PagerFragment());
+            setFragment(new DigestFragment());
         } else if (id == R.id.tags) {
-            setFragment(new ListDetailFragment());
+            setFragment(new PagerFragment());
         } else if (id == R.id.just_added) {
             setFragment(new TileDetailFragment());
         } else if (id == R.id.favorites) {
             setFragment(new CardDetailFragment());
         } else if (id == R.id.photos) {
             setFragment(new TileDetailFragment());
-        } else {
+        } else {        // id == videos
             setFragment(new ListDetailFragment());
         }
 

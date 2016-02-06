@@ -8,6 +8,7 @@ package com.seagate.alto.provider.imagepipeline;
 import android.net.Uri;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.util.Log;
 
 import com.facebook.common.logging.FLog;
 import com.facebook.imagepipeline.image.EncodedImage;
@@ -17,7 +18,7 @@ import com.facebook.imagepipeline.producers.Consumer;
 import com.facebook.imagepipeline.producers.FetchState;
 import com.facebook.imagepipeline.producers.ProducerContext;
 import com.seagate.alto.provider.DbxProvider;
-import com.seagate.alto.provider.Provider;
+import com.seagate.alto.provider.Providers;
 import com.squareup.okhttp.CacheControl;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -33,9 +34,6 @@ import java.util.concurrent.Executor;
  * Network fetcher that uses OkHttp as a backend for {@Provider} calls.
  */
 public class OkHttpNetworkFetcher extends BaseNetworkFetcher<OkHttpNetworkFetcher.OkHttpNetworkFetchState> {
-
-    private final Provider mProvider;
-
     public static class OkHttpNetworkFetchState extends FetchState {
         public long submitTime;
         public long responseTime;
@@ -46,7 +44,7 @@ public class OkHttpNetworkFetcher extends BaseNetworkFetcher<OkHttpNetworkFetche
         }
     }
 
-    private static final String TAG = "OkHttpNetworkFetchProducer";
+    private static final String TAG = "OkHttpNetworkFetcher";
     private static final String QUEUE_TIME = "queue_time";
     private static final String FETCH_TIME = "fetch_time";
     private static final String TOTAL_TIME = "total_time";
@@ -58,12 +56,10 @@ public class OkHttpNetworkFetcher extends BaseNetworkFetcher<OkHttpNetworkFetche
 
     /**
      * @param okHttpClient client to use
-     * @param provider provider instance
      */
-    public OkHttpNetworkFetcher(OkHttpClient okHttpClient, Provider provider) {
+    public OkHttpNetworkFetcher(OkHttpClient okHttpClient) {
         mOkHttpClient = okHttpClient;
         mExecutor = okHttpClient.getDispatcher().getExecutorService();
-        mProvider = provider;
     }
 
     @Override
@@ -133,7 +129,9 @@ public class OkHttpNetworkFetcher extends BaseNetworkFetcher<OkHttpNetworkFetche
                             if (contentLength < 0) {
                                 contentLength = 0;
                             }
-                            callback.onResponse(body.byteStream(), -1);
+                            Log.d(TAG, uri + " - content length = " + contentLength);
+                            Log.d(TAG, uri + " - time(ms) = " + (fetchState.responseTime - fetchState.submitTime));
+                            callback.onResponse(body.byteStream(), (int)contentLength);
                         } catch (Exception e) {
                             handleException(call, e, callback);
                         } finally {
@@ -155,8 +153,8 @@ public class OkHttpNetworkFetcher extends BaseNetworkFetcher<OkHttpNetworkFetche
     private Call buildCall(final OkHttpNetworkFetchState fetchState, final Callback callback) {
         final String domain = fetchState.getUri().getAuthority();
         switch(domain) {
-            case "seagate": return new LyveCloudFilesCall(fetchState, callback, mProvider, mOkHttpClient);
-            case "dropbox": return new DbxFilesCall(fetchState, callback, (DbxProvider) mProvider);
+            case "seagate": return new LyveCloudFilesCall(fetchState, callback, Providers.SEAGATE.provider, mOkHttpClient);
+            case "dropbox": return new DbxFilesCall(fetchState, callback, (DbxProvider) Providers.DROPBOX.provider);
             default: return null;
         }
     }
@@ -169,7 +167,6 @@ public class OkHttpNetworkFetcher extends BaseNetworkFetcher<OkHttpNetworkFetche
         final Call call = buildCall(fetchState, callback);
 
         if (call != null) {
-            mExecutor.execute(call);
             fetchState.getContext().addCallbacks(new BaseProducerContextCallbacks() {
                 @Override
                 public void onCancellationRequested() {
@@ -185,6 +182,11 @@ public class OkHttpNetworkFetcher extends BaseNetworkFetcher<OkHttpNetworkFetche
                     }
                 }
             });
+            if (Looper.myLooper() != Looper.getMainLooper()) {
+                call.run();
+            } else {
+                mExecutor.execute(call);
+            }
         } else {
             fetchUnknownProvider(fetchState, callback);
         }
@@ -192,7 +194,9 @@ public class OkHttpNetworkFetcher extends BaseNetworkFetcher<OkHttpNetworkFetche
 
     @Override
     public void onFetchCompletion(OkHttpNetworkFetchState fetchState, int byteSize) {
+        Log.d(TAG, "onFetchCompletion : " + byteSize + " bytes from " + fetchState.getUri());
         fetchState.fetchCompleteTime = SystemClock.elapsedRealtime();
+        Log.d(TAG, "onFetchCompletion : " + TOTAL_TIME + " = " + Long.toString(fetchState.fetchCompleteTime - fetchState.submitTime));
     }
 
     @Override

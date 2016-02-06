@@ -5,6 +5,7 @@ package com.seagate.alto;
 // display a full screen photo in a view pager
 
 import android.graphics.drawable.Animatable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -17,9 +18,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.backends.pipeline.PipelineDraweeControllerBuilder;
 import com.facebook.drawee.controller.BaseControllerListener;
+import com.facebook.drawee.drawable.ProgressBarDrawable;
+import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.imagepipeline.image.ImageInfo;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.seagate.alto.utils.LogUtils;
 
 import me.relex.photodraweeview.PhotoDraweeView;
@@ -118,20 +122,44 @@ public class PhotoFragment extends Fragment {
             }
 
             final PhotoDraweeView photoDraweeView = (PhotoDraweeView) v.findViewById(R.id.image);
-            PipelineDraweeControllerBuilder controller = Fresco.newDraweeControllerBuilder();
-            controller.setUri(PlaceholderContent.getUri(index));
-            controller.setOldController(photoDraweeView.getController());
-            controller.setControllerListener(new BaseControllerListener<ImageInfo>() {
-                @Override
-                public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
-                    super.onFinalImageSet(id, imageInfo, animatable);
-                    if (imageInfo == null) {
-                        return;
-                    }
-                    photoDraweeView.update(imageInfo.getWidth(), imageInfo.getHeight());
-                }
-            });
-            photoDraweeView.setController(controller.build());
+            photoDraweeView.getHierarchy().setFadeDuration(500);
+            photoDraweeView.getHierarchy().setProgressBarImage(new ProgressBarDrawable());
+
+            Uri uri = PlaceholderContent.getUri(index);
+            Uri thumbUri = PlaceholderContent.getThumbnailUri(index, 640);
+            ImageRequest imageRequest = ImageRequestBuilder.newBuilderWithSource(uri)
+                    .setProgressiveRenderingEnabled(true)
+                    .setLocalThumbnailPreviewsEnabled(true)
+                    .build();
+
+            DraweeController controller = Fresco.newDraweeControllerBuilder()
+                    .setLowResImageRequest(ImageRequest.fromUri(thumbUri))
+                    .setImageRequest(imageRequest)
+                    .setOldController(photoDraweeView.getController())
+                    .setAutoPlayAnimations(true)
+                    .setControllerListener(new BaseControllerListener<ImageInfo>() {
+                        @Override
+                        public void onIntermediateImageSet(String id, ImageInfo imageInfo) {
+                            if (imageInfo == null) {
+                                return;
+                            }
+                            photoDraweeView.update(imageInfo.getWidth(), imageInfo.getHeight());
+                            photoDraweeView.invalidate();
+
+                        }
+                        @Override
+                        public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
+                            super.onFinalImageSet(id, imageInfo, animatable);
+                            if (imageInfo == null) {
+                                return;
+                            }
+                            photoDraweeView.update(imageInfo.getWidth(), imageInfo.getHeight());
+                            photoDraweeView.invalidate();
+                        }
+                    })
+                    .build();
+
+            photoDraweeView.setController(controller);
 
             return v;
         }

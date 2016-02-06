@@ -15,7 +15,6 @@ import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.imagepipeline.listener.RequestListener;
 import com.facebook.imagepipeline.listener.RequestLoggingListener;
 import com.facebook.stetho.okhttp.StethoInterceptor;
-import com.seagate.alto.provider.Provider;
 import com.squareup.okhttp.OkHttpClient;
 
 import java.util.HashSet;
@@ -48,12 +47,12 @@ public class ImagePipelineConfigFactory {
     /**
      * Creates config using OkHttp as network backend.
      */
-    public static ImagePipelineConfig getOkHttpImagePipelineConfig(Context context, Provider provider) {
+    public static ImagePipelineConfig getOkHttpImagePipelineConfig(Context context) {
         if (sOkHttpImagePipelineConfig == null) {
             OkHttpClient okHttpClient = new OkHttpClient();
             okHttpClient.networkInterceptors().add(new StethoInterceptor());
             ImagePipelineConfig.Builder configBuilder =
-                    OkHttpImagePipelineConfigFactory.newBuilder(context, okHttpClient, provider);
+                    OkHttpImagePipelineConfigFactory.newBuilder(context, okHttpClient);
             configureCaches(configBuilder, context);
             configureLoggingListeners(configBuilder);
             sOkHttpImagePipelineConfig = configBuilder.build();
@@ -73,6 +72,7 @@ public class ImagePipelineConfigFactory {
                 ConfigConstants.MAX_MEMORY_CACHE_SIZE, // Max total size of elements in eviction queue
                 Integer.MAX_VALUE,                     // Max length of eviction queue
                 Integer.MAX_VALUE);                    // Max cache entry size
+
         configBuilder
                 .setBitmapMemoryCacheParamsSupplier(
                         new Supplier<MemoryCacheParams>() {

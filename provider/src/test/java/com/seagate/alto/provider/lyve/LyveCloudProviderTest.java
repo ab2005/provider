@@ -6,6 +6,7 @@ package com.seagate.alto.provider.lyve;
 
 import com.seagate.alto.provider.LyveCloudProvider;
 import com.seagate.alto.provider.Provider;
+import com.seagate.alto.provider.Providers;
 
 import junit.framework.Assert;
 
@@ -25,7 +26,8 @@ public class LyveCloudProviderTest {
         String token = LyveCloudProvider.login(TEST_EMAIL, TEST_PWD);
         Assert.assertNotNull(token);
 
-        mProvider = new LyveCloudProvider(token);
+        mProvider = Providers.SEAGATE.provider;
+        mProvider.setAccessToken(token);
     }
 
     @After
@@ -33,12 +35,12 @@ public class LyveCloudProviderTest {
 
     }
 
-    @Test(timeout = 5000)
+    @Test(timeout = 15000)
     public void testListRootFolder() throws Exception {
         listFolder("");
     }
 
-    @Test(timeout = 5000)
+    @Test(timeout = 15000)
     public void testListDemo1() throws Exception {
         listFolder("/d6f14c1e-ce88-4ebf-aa2f-f50fc7250dc4/Demo1/test");
     }

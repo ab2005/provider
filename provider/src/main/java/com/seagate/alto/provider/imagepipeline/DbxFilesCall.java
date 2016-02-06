@@ -6,6 +6,7 @@ package com.seagate.alto.provider.imagepipeline;
 
 import android.net.Uri;
 import android.os.SystemClock;
+import android.util.Log;
 
 import com.dropbox.core.DbxDownloader;
 import com.dropbox.core.DbxException;
@@ -15,10 +16,8 @@ import com.seagate.alto.provider.DbxProvider;
 
 import java.io.IOException;
 
-/**
- * Created by abarilov on 2/2/16.
- */
 class DbxFilesCall implements OkHttpNetworkFetcher.Call {
+    private static final String TAG = "DbxFilesCall";
     private final OkHttpNetworkFetcher.OkHttpNetworkFetchState fetchState;
     private final NetworkFetcher.Callback callback;
     private final DbxProvider provider;
@@ -37,6 +36,7 @@ class DbxFilesCall implements OkHttpNetworkFetcher.Call {
             fetchState.responseTime = SystemClock.elapsedRealtime();
             callback.onResponse(downloader.body, -1);
         } catch (DbxException | IOException e) {
+            Log.d(TAG, " FAILED REQUEST: " + fetchState.getUri());
             if (downloader != null) {
                 try {
                     downloader.close();
@@ -54,8 +54,9 @@ class DbxFilesCall implements OkHttpNetworkFetcher.Call {
         if (downloader != null) {
             try {
                 downloader.close();
-            } catch (IllegalStateException e) {
+            } catch (IllegalStateException | NullPointerException e) {
                 // ignore
+                Log.e(TAG, e.getMessage());
             }
             downloader = null;
             callback.onCancellation();
@@ -67,7 +68,6 @@ class DbxFilesCall implements OkHttpNetworkFetcher.Call {
         if (isFullSize()) {
             return provider.getFilesClient()
                     .downloadBuilder(uri.getPath())
-                    .rev(uri.getQueryParameter("rev"))
                     .start();
         } else {
             return provider.getFilesClient()

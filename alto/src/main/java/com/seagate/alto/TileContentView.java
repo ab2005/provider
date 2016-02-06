@@ -11,13 +11,16 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.seagate.alto.events.BusMaster;
 import com.seagate.alto.events.ItemSelectedEvent;
 import com.seagate.alto.utils.LogUtils;
@@ -78,17 +81,13 @@ public class TileContentView extends RecyclerView {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
 //                if (parent.getContext() instanceof MainActivity) {
-
                     ArrayList<Pair<View, String>> pairs = new ArrayList<Pair<View, String>>();
                     Pair<View, String> imagePair = Pair.create((View) drawee, "tThumbnail");
                     pairs.add(imagePair);
                     Pair<View, String> titlePair = Pair.create((View) title, "tTitle");
                     pairs.add(titlePair);
-
                     BusMaster.getBus().post(new ItemSelectedEvent(position, pairs));
-
 //                }
                 }
             });
@@ -118,10 +117,20 @@ public class TileContentView extends RecyclerView {
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
 
-            Uri uri = PlaceholderContent.getUri(position);
-            holder.drawee.setImageURI(uri);
+            Uri uri = PlaceholderContent.getThumbnailUri(position, 640);
+            Uri thumbUri = PlaceholderContent.getThumbnailUri(position, 32);
+            ImageRequest imageRequest = ImageRequestBuilder.newBuilderWithSource(uri)
+//                    .setProgressiveRenderingEnabled(true)
+//                    .setLocalThumbnailPreviewsEnabled(true)
+                    .build();
+            DraweeController controller = Fresco.newDraweeControllerBuilder()
+//                    .setLowResImageRequest(ImageRequest.fromUri(thumbUri))
+                    .setImageRequest(imageRequest)
+                    .setOldController(holder.drawee.getController())
+//                    .setAutoPlayAnimations(true)
+                    .build();
 
-            Log.d("seagate-tile", "uri=" + uri);
+            holder.drawee.setController(controller);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 holder.drawee.setTransitionName("TileThumb"+position);

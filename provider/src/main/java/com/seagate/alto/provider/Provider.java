@@ -13,6 +13,12 @@ import android.util.Size;
  * A cloud provider API
  */
 public interface Provider {
+
+    /**
+     * Set a security token used by the network protocol handler when accessing provider API.
+     */
+    void setAccessToken(String token);
+
     /**
      * Creates a folder at a given path.
      */
@@ -65,8 +71,13 @@ public interface Provider {
 
     /**
      * Get authentication token.
-     * */
-    String getToken();
+     */
+    String getAccessToken();
+
+    /**
+     * Get provider's domain.
+     */
+    String getDomain();
 
     /**
      * The base exception thrown by Provider API calls.

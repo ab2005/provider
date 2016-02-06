@@ -5,6 +5,7 @@
 package com.seagate.alto.provider;
 
 import android.net.Uri;
+import android.util.Size;
 
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxHost;
@@ -22,26 +23,15 @@ import java.util.Locale;
  * Dropbox provider implementation.
  */
 public class DbxProvider implements Provider {
+    private static String DOMAIN = "dropbox";
 
-    private static final String DOMAIN = "dropbox";
+    private DbxClientV2 mDbxClient;
 
-    private final DbxClientV2 mDbxClient;
-
-    /**
-     * Constructs a Dropbox provider.
-     *
-     * @param accessToken
-     *      authenticator token retrieved from the login or previous session
-     * @param clientIdentifier
-     *      An identifier for the API client, typically of the form "Name/Version".
-     *      This is used to set the HTTP {@code User-Agent} header when making API requests.
-     *      The exact format of the {@code User-Agent} header is described in
-     *      <a href="http://tools.ietf.org/html/rfc2616#section-3.8">section 3.8 of the HTTP specification</a>.
-     */
-    public DbxProvider(String accessToken, String clientIdentifier) {
+    @Override
+    public void setAccessToken(String token) {
         String userLocale = Locale.getDefault().toString();
-        DbxRequestConfig requestConfig = new DbxRequestConfig(clientIdentifier, userLocale, OkHttpRequestor.Instance);
-        mDbxClient = new DbxClientV2(requestConfig, accessToken, DbxHost.Default);
+        DbxRequestConfig requestConfig = new DbxRequestConfig("alto/v0.0.1", userLocale, OkHttpRequestor.Instance);
+        mDbxClient = new DbxClientV2(requestConfig, token, DbxHost.Default);
     }
 
     @Override
@@ -81,7 +71,8 @@ public class DbxProvider implements Provider {
     public SearchResult search(String path, String query) throws ProviderException {
         final DbxFiles.SearchResult sr;
         try {
-            sr = mDbxClient.files.search(path, query);
+            sr = mDbxClient.files.searchBuilder(path, query).maxResults(1000).mode(DbxFiles.SearchMode.filename).start();
+            //sr = mDbxClient.files.search(path, query);
         } catch (DbxException e) {
             throw new ProviderException("Failed to search at " + path + " with query " + query, e);
         }
@@ -133,6 +124,10 @@ public class DbxProvider implements Provider {
     }
 
     private static Uri getImageUri(String path, String format, String size) {
+        if (path != null && path.startsWith("/")) {
+            path = path.substring(1, path.length());
+        }
+
         Uri.Builder ub = new Uri.Builder()
                 .scheme("http")
                 .authority(DOMAIN)
@@ -147,8 +142,13 @@ public class DbxProvider implements Provider {
     }
 
     @Override
-    public String getToken() {
+    public String getAccessToken() {
         return mDbxClient.getAccessToken();
+    }
+
+    @Override
+    public String getDomain() {
+        return DOMAIN;
     }
 
     public DbxFiles getFilesClient() {
@@ -253,7 +253,7 @@ public class DbxProvider implements Provider {
         private long size;
         private MediaInfo mediaInfo;
 
-        public FileMetadataImpl(DbxFiles.FileMetadata item) {
+        public FileMetadataImpl(final DbxFiles.FileMetadata item) {
             super(item);
             this.id = item.id;
             this.clientModified = item.clientModified;
@@ -263,7 +263,30 @@ public class DbxProvider implements Provider {
 
             this.mediaInfo = new MediaInfo() {
                 public Tag tag() {return mediaInfo.tag();}
-                public MediaMetadata metadata() {return mediaInfo.metadata();}
+                public MediaMetadata metadata() {
+                    return new MediaMetadata() {
+                        @Override
+                        public Size dimensions() {
+                            return null;
+                        }
+
+                        @Override
+                        public double latitude() {
+                            return item.mediaInfo.getMetadata().location.latitude;
+                        }
+
+                        @Override
+                        public double longitude() {
+                            return item.mediaInfo.getMetadata().location.longitude;
+                        }
+
+                        @Override
+                        public Date timeTaken() {
+                            DbxFiles.MediaInfo mi = item.mediaInfo;
+                            return item.clientModified;
+                        }
+                    };
+                }
             };
         }
 
