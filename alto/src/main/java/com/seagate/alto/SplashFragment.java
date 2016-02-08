@@ -136,6 +136,7 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
         String path = dropbox ? "/camera uploads" :  "/d6f14c1e-ce88-4ebf-aa2f-f50fc7250dc4/Demo1/test";
         Provider provider = dropbox ? Providers.DROPBOX.provider : Providers.SEAGATE.provider;
         if (dropbox) provider.setAccessToken(token);
+        //provider = Providers.LOCAL.provider;
         new ListFolderAsyncTask(provider, new ListFolderAsyncTask.Callback() {
             @Override
             public void onDataLoaded(Provider.ListFolderResult result) {
@@ -146,7 +147,7 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void onError(Exception e) {
-                Log.d(TAG, "Error listins=g images on Dropbo's '/camera uploads'" + e);
+                Log.d(TAG, "Error : " + e);
             }
         }).execute(path);
 

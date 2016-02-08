@@ -21,7 +21,7 @@ public class AltoApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        sMe = this;
+//        sMe = this;
         startMetrics();
         ScreenUtils.init(this);
         Providers.initWithDefaults(this);

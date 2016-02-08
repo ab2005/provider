@@ -5,7 +5,6 @@
 package com.seagate.alto.provider;
 
 import android.app.Application;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -20,33 +19,39 @@ import com.seagate.alto.provider.imagepipeline.ImagePipelineConfigFactory;
  */
 public enum Providers {
     DROPBOX(new DbxProvider()),
-    SEAGATE(new LyveCloudProvider());
+    SEAGATE(new LyveCloudProvider()),
+    LOCAL(new MediaProvider());
 
+    private static Application sApplication;
     public final Provider provider;
-
     Providers(Provider provider) {
         this.provider = provider;
     }
 
     // TODO: add option to provide config
 
+    public static Application getContext() {
+        return sApplication;
+    }
+
     /**
      *
      * A single initialization step which occurs once in your Application class {@link Application#onCreate()}.
      * @param context
      */
-    public static void initWithDefaults(@NonNull Context context) {
+    public static void initWithDefaults(@NonNull Application context) {
+        sApplication = context;
         ImagePipelineConfig config = ImagePipelineConfigFactory.getOkHttpImagePipelineConfig(context);
         Fresco.initialize(context, config);
         Stetho.initializeWithDefaults(context);
+        applyStoredTokens();
     }
 
     /**
      * Load access tokens stored in the context and set providers.
-     * @param context
      */
-    public static void setStoredTokens(Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+    public static void applyStoredTokens() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(sApplication);
         for (Providers p : Providers.values()) {
             String key = "Providers.access.token." + p.provider.getDomain();
             String token = prefs.getString(key, null);
@@ -57,11 +62,22 @@ public enum Providers {
     }
 
     /**
-     * Save access tokens from providers.
-     * @param context
+     * Save access tokens from provider.
      */
-    public static void storeTokens(Context context) {
-        SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(context).edit();
+    public static void storeTokens(Provider provider) {
+        SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(sApplication).edit();
+        edit.commit();
+        String key = "Providers.access.token." + provider.getDomain();
+        String token = provider.getAccessToken();
+        edit.putString(key, token);
+        edit.commit();
+    }
+
+    /**
+     * Save access tokens from providers.
+     */
+    public static void storeTokens() {
+        SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(sApplication).edit();
         edit.commit();
         for (Providers p : Providers.values()) {
             String key = "Providers.access.token." + p.provider.getDomain();

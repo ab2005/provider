@@ -5,8 +5,7 @@
 
 package com.seagate.alto.provider.lyve.response;
 
-import android.util.Size;
-
+import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.seagate.alto.provider.Provider;
@@ -32,8 +31,8 @@ public class MediaMetadata implements Provider.MediaMetadata {
     public Integer duration;
 
     @Override
-    public Size dimensions() {
-        return new Size(dimensions.width, dimensions.height);
+    public Provider.Size dimensions() {
+        return new Provider.Size(dimensions.width, dimensions.height);
     }
 
     @Override
@@ -49,5 +48,10 @@ public class MediaMetadata implements Provider.MediaMetadata {
     @Override
     public Date timeTaken() {
         return new Date(timeTaken);
+    }
+
+    @Override
+    public String toString() {
+        return new Gson().toJson(this);
     }
 }

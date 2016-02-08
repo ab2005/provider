@@ -5,6 +5,7 @@
 
 package com.seagate.alto.provider.lyve.response;
 
+import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.seagate.alto.provider.Provider;
@@ -46,5 +47,10 @@ public class ListFolderResponse implements Provider.ListFolderResult {
     @Override
     public boolean hasMore() {
         return hasMore;
+    }
+
+    @Override
+    public String toString() {
+        return new Gson().toJson(this);
     }
 }

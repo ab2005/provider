@@ -39,7 +39,7 @@ public class ListFolderAsyncTask extends AsyncTask<String, Void, Provider.ListFo
     @Override
     protected Provider.ListFolderResult doInBackground(String... params) {
         try {
-            if (mProvider.getAccessToken() == null) {
+            if (mProvider != Providers.LOCAL.provider && mProvider.getAccessToken() == null) {
                 if (mProvider instanceof LyveCloudProvider) {
                     try {
                         String token = LyveCloudProvider.login("demo.zzz@seagate.com", "demozzz");

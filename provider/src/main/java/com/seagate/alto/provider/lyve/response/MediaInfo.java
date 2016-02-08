@@ -7,11 +7,12 @@ package com.seagate.alto.provider.lyve.response;
 
 import android.support.annotation.Nullable;
 
+import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.seagate.alto.provider.Provider;
 
-public class MediaInfo implements Provider.MediaInfo{
+public class MediaInfo implements Provider.MediaInfo {
 
     @SerializedName(".tag")
     @Expose
@@ -32,5 +33,10 @@ public class MediaInfo implements Provider.MediaInfo{
     @Override
     public Provider.MediaMetadata metadata() {
         return metadata;
+    }
+
+    @Override
+    public String toString() {
+        return new Gson().toJson(this);
     }
 }

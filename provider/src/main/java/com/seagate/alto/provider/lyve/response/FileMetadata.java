@@ -86,7 +86,7 @@ public class FileMetadata implements Provider.FileMetadata {
 
     @Override
     public Provider.MediaInfo mediaInfo() {
-        return mediaInfo();
+        return mediaInfo;
     }
 
     @Override

@@ -16,7 +16,6 @@ import com.seagate.alto.provider.lyve.response.ListFolderResponse;
 import com.seagate.alto.provider.lyve.response.Match;
 import com.seagate.alto.provider.lyve.response.SearchResponse;
 import com.seagate.alto.provider.lyve.response.Token;
-import com.squareup.okhttp.ResponseBody;
 
 import junit.framework.Assert;
 
@@ -30,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -165,7 +165,7 @@ public class ServiceGeneratorTest {
         List<Provider.Metadata> fileItems = sr.matches();
         for (Provider.Metadata item : fileItems) {
             Assert.assertTrue(item instanceof Provider.FileMetadata);
-            Provider.FileMetadata md = (Provider.FileMetadata)item;
+            Provider.FileMetadata md = (Provider.FileMetadata) item;
             System.out.println(md.thumbnailUri("jpg", "w32h32"));
             System.out.println(md.imageUri());
         }
@@ -177,7 +177,7 @@ public class ServiceGeneratorTest {
         provider.setAccessToken(mToken.token);
     }
 
-    @Test(timeout = 15000)
+    @Test()
     public void testLoadFilesFromFolderDemo1_test() throws Exception {
         ListFolderRequest req = new ListFolderRequest()
                 .withPath("/d6f14c1e-ce88-4ebf-aa2f-f50fc7250dc4/Demo1/test")
@@ -194,10 +194,6 @@ public class ServiceGeneratorTest {
         Assert.assertNotNull(lfr);
 
         List<FileMetadata> items = lfr.entries;
-//        for (FileMetadata item : items) {
-//            Assert.assertTrue(item instanceof Provider.FileMetadata);
-//            System.out.println(item);
-//        }
 
         List<Provider.Metadata> fileItems = lfr.entries();
         for (final Provider.Metadata item : items) {
@@ -205,24 +201,21 @@ public class ServiceGeneratorTest {
             System.out.println(path);
             Callback<ResponseBody> cb = new Callback<ResponseBody>() {
                 @Override
-                public void onResponse(Response<ResponseBody> response) {
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    System.out.println(response);
                     InputStream in = null;
                     ByteArrayOutputStream out = null;
-                    long len = 0;
                     long t = System.currentTimeMillis();
                     try {
                         in = new BufferedInputStream(response.body().byteStream());
                         out = new ByteArrayOutputStream();
                         byte[] buff = new byte[1024];
-                        for (; ; ) {
-                            int count = in.read(buff, 0, buff.length);
-                            if (count == -1)
-                                break;
-                            len += count;
+                        int count = 0;
+                        while((count = in.read(buff, 0, buff.length)) != -1) {
                             out.write(buff, 0, count);
                         }
                         out.flush();
-                        System.out.println(" " + out.size() + "," + len + ", " + (System.currentTimeMillis() - t) + "ms");
+                        System.out.println(out.size() + " bytes, " + (System.currentTimeMillis() - t) + "ms");
                     } catch (IOException e) {
                         e.printStackTrace();
                     } finally {
@@ -235,18 +228,38 @@ public class ServiceGeneratorTest {
                         }
                     }
                 }
-
                 @Override
-                public void onFailure(Throwable t) {
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
                     t.printStackTrace();
                 }
             };
 
-
-//            mLyveCloudJsonClient.download(new DownloadRequest(path)).enqueue(cb);
             Call<ResponseBody> call = mLyveCloudClient.download(new DownloadRequest(path));
-            Response<ResponseBody> rb = call.execute();
-            cb.onResponse(rb);
+//            call.enqueue(cb);
+            long t = System.currentTimeMillis();
+            Response<ResponseBody> r = call.execute();
+            System.out.println("POST Executed in " + (System.currentTimeMillis() - t) + "ms");
+            if (r.isSuccess()) {
+                cb.onResponse(call, r);
+            } else {
+                cb.onFailure(call, new Exception("code = " + r.code()));
+            }
+
+            Call<ResponseBody> call1 = mLyveCloudClient.checkout(path);
+            long t1 = System.currentTimeMillis();
+            Response<ResponseBody> r1 = call1.execute();
+            System.out.println("GET Executed in " + (System.currentTimeMillis() - t) + "ms");
+            if (r1.isSuccess()) {
+                cb.onResponse(call, r1);
+            } else {
+                System.out.println("message " + r.message());
+                System.out.println("body " + r.body());
+                System.out.println("err body " + r.errorBody());
+                System.out.println("raw  " + r.raw());
+                System.out.println("raw  message" + r.raw().message());
+                System.out.println("type " + r.raw().body().contentType());
+                System.out.println("length " + r.raw().body().contentLength());
+            }
         }
     }
 

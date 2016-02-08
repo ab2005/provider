@@ -179,7 +179,6 @@ public class DigestCellView extends RelativeLayout {
             for (int i = 0; i < mImagePanelCount; i++) {
                 // have to build a new DraweeController if you want to set new URI.
                 DraweeController controller = Fresco.newDraweeControllerBuilder()
-                        .setOldController(mImageSwitchViews[i].getCurrentDrawee().getController())
                         .setUri(PlaceholderContent.getThumbnailUri(((i + 1) * (position + 1))))
                         .build();
                 mImageSwitchViews[i].loadContent(controller);

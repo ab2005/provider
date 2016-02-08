@@ -81,9 +81,6 @@ public class ImageSwitchView extends ImageView {
         mMultiDraweeHolder.get(mCurrentIndex).setController(controller);
     }
 
-    public DraweeHolder<GenericDraweeHierarchy> getCurrentDrawee() {
-        return mMultiDraweeHolder.get(mCurrentIndex);
-    }
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         // gonna be called when rotating the screen. Recalculate the layouts/bounds/sizes here.

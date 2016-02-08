@@ -5,7 +5,6 @@
 package com.seagate.alto.provider;
 
 import android.net.Uri;
-import android.util.Size;
 
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxHost;
@@ -32,6 +31,7 @@ public class DbxProvider implements Provider {
         String userLocale = Locale.getDefault().toString();
         DbxRequestConfig requestConfig = new DbxRequestConfig("alto/v0.0.1", userLocale, OkHttpRequestor.Instance);
         mDbxClient = new DbxClientV2(requestConfig, token, DbxHost.Default);
+
     }
 
     @Override
@@ -262,12 +262,18 @@ public class DbxProvider implements Provider {
             this.size = item.size;
 
             this.mediaInfo = new MediaInfo() {
-                public Tag tag() {return mediaInfo.tag();}
+                public Tag tag() {
+                    DbxFiles.MediaInfo.Tag t = item.mediaInfo.tag;
+                    if (t == DbxFiles.MediaInfo.Tag.metadata) return Tag.metadata;
+                    if (t == DbxFiles.MediaInfo.Tag.pending) return Tag.pending;
+                    return null;
+                }
                 public MediaMetadata metadata() {
                     return new MediaMetadata() {
                         @Override
                         public Size dimensions() {
-                            return null;
+                            DbxFiles.Dimensions d = item.mediaInfo.getMetadata().dimensions;
+                            return new Size((int)d.width, (int)d.height);
                         }
 
                         @Override
@@ -282,8 +288,7 @@ public class DbxProvider implements Provider {
 
                         @Override
                         public Date timeTaken() {
-                            DbxFiles.MediaInfo mi = item.mediaInfo;
-                            return item.clientModified;
+                            return item.mediaInfo.getMetadata().timeTaken;
                         }
                     };
                 }

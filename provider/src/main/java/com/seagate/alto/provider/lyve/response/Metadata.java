@@ -7,8 +7,10 @@ package com.seagate.alto.provider.lyve.response;
 
 import android.net.Uri;
 
+import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.seagate.alto.provider.LyveCloudProvider;
 import com.seagate.alto.provider.Provider;
 
 import java.util.Date;
@@ -65,14 +67,12 @@ public class Metadata implements Provider.FileMetadata {
 
     @Override
     public Date clientModified() {
-        // FIXME: date format
-        return new Date(clientModified);
+        return LyveCloudProvider.dateFromString(clientModified);
     }
 
     @Override
     public Date serverModified() {
-        // FIXME: date format
-        return new Date(serverModified);
+        return LyveCloudProvider.dateFromString(serverModified);
     }
 
     @Override
@@ -87,16 +87,41 @@ public class Metadata implements Provider.FileMetadata {
 
     @Override
     public Provider.MediaInfo mediaInfo() {
-        return null;
+        return new Provider.MediaInfo() {
+            public Provider.MediaInfo.Tag tag() {
+                return Provider.MediaInfo.Tag.metadata;
+            }
+            public Provider.MediaMetadata metadata() {
+                return new Provider.MediaMetadata() {
+                    public Provider.Size dimensions() {
+                        return new Provider.Size(0, 0);
+                    }
+                    public double latitude() {
+                        return 0;
+                    }
+                    public double longitude() {
+                        return 0;
+                    }
+                    public Date timeTaken() {
+                        return new Date();
+                    }
+                };
+            }
+        };
     }
 
     @Override
     public Uri imageUri() {
-        return null;
+        return LyveCloudProvider.getImageUri(pathLower, null, null);
     }
 
     @Override
     public Uri thumbnailUri(String type, String size) {
-        return null;
+        return LyveCloudProvider.getImageUri(pathLower, type, size);
+    }
+
+    @Override
+    public String toString() {
+        return new Gson().toJson(this);
     }
 }

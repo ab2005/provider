@@ -5,6 +5,7 @@
 
 package com.seagate.alto.provider.lyve.response;
 
+import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -16,5 +17,10 @@ public class Location {
     @SerializedName("longitude")
     @Expose
     public Integer longitude;
+
+    @Override
+    public String toString() {
+        return new Gson().toJson(this);
+    }
 
 }

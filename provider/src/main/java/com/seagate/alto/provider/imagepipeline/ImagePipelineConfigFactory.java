@@ -54,6 +54,7 @@ public class ImagePipelineConfigFactory {
             ImagePipelineConfig.Builder configBuilder =
                     OkHttpImagePipelineConfigFactory.newBuilder(context, okHttpClient);
             configureCaches(configBuilder, context);
+            configureOptions(configBuilder);
             configureLoggingListeners(configBuilder);
             sOkHttpImagePipelineConfig = configBuilder.build();
         }
