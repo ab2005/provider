@@ -122,12 +122,11 @@ public class PhotoFragment extends Fragment {
             }
 
             final PhotoDraweeView photoDraweeView = (PhotoDraweeView) v.findViewById(R.id.image);
-
-            photoDraweeView.getHierarchy().setFadeDuration(500);//.setProgressBarImage(new ProgressBarDrawable());
+            photoDraweeView.getHierarchy().setFadeDuration(500);
             photoDraweeView.getHierarchy().setProgressBarImage(new ProgressBarDrawable());
 
             Uri uri = PlaceholderContent.getUri(index);
-            Uri thumbUri = PlaceholderContent.getThumbnailUri(index);
+            Uri thumbUri = PlaceholderContent.getThumbnailUri(index, 640);
             ImageRequest imageRequest = ImageRequestBuilder.newBuilderWithSource(uri)
                     .setProgressiveRenderingEnabled(true)
                     .setLocalThumbnailPreviewsEnabled(true)
@@ -145,6 +144,8 @@ public class PhotoFragment extends Fragment {
                                 return;
                             }
                             photoDraweeView.update(imageInfo.getWidth(), imageInfo.getHeight());
+                            photoDraweeView.invalidate();
+
                         }
                         @Override
                         public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
@@ -153,6 +154,7 @@ public class PhotoFragment extends Fragment {
                                 return;
                             }
                             photoDraweeView.update(imageInfo.getWidth(), imageInfo.getHeight());
+                            photoDraweeView.invalidate();
                         }
                     })
                     .build();

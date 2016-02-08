@@ -5,7 +5,6 @@
 package com.seagate.alto.provider;
 
 import android.net.Uri;
-import android.util.Size;
 
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxHost;
@@ -23,25 +22,16 @@ import java.util.Locale;
  * Dropbox provider implementation.
  */
 public class DbxProvider implements Provider {
-    private static final String REPO_URL = "https://content.dropboxapi.com/2/files/";
+    private static String DOMAIN = "dropbox";
 
-    private final DbxClientV2 mDbxClient;
+    private DbxClientV2 mDbxClient;
 
-    /**
-     * Constructs a Dropbox provider.
-     *
-     * @param accessToken
-     *      authenticator token retrieved from the login or previous session
-     * @param clientIdentifier
-     *      An identifier for the API client, typically of the form "Name/Version".
-     *      This is used to set the HTTP {@code User-Agent} header when making API requests.
-     *      The exact format of the {@code User-Agent} header is described in
-     *      <a href="http://tools.ietf.org/html/rfc2616#section-3.8">section 3.8 of the HTTP specification</a>.
-     */
-    public DbxProvider(String accessToken, String clientIdentifier) {
+    @Override
+    public void setAccessToken(String token) {
         String userLocale = Locale.getDefault().toString();
-        DbxRequestConfig requestConfig = new DbxRequestConfig(clientIdentifier, userLocale, OkHttpRequestor.Instance);
-        mDbxClient = new DbxClientV2(requestConfig, accessToken, DbxHost.Default);
+        DbxRequestConfig requestConfig = new DbxRequestConfig("alto/v0.0.1", userLocale, OkHttpRequestor.Instance);
+        mDbxClient = new DbxClientV2(requestConfig, token, DbxHost.Default);
+
     }
 
     @Override
@@ -125,11 +115,23 @@ public class DbxProvider implements Provider {
 
     @Override
     public Uri getThumbnailUri(String path, String size, String format) throws ProviderException {
+        return getImageUri(path, format, size);
+    }
+
+    @Override
+    public Uri getUri(String path, String rev) throws ProviderException {
+        return getImageUri(path, null, null);
+    }
+
+    private static Uri getImageUri(String path, String format, String size) {
+        if (path != null && path.startsWith("/")) {
+            path = path.substring(1, path.length());
+        }
+
         Uri.Builder ub = new Uri.Builder()
                 .scheme("http")
-                .authority(REPO_URL + "/get_thumbnail")
-                .appendPath(path)
-                .appendQueryParameter("auth", mDbxClient.getAccessToken());
+                .authority(DOMAIN)
+                .appendPath(path);
         if (size != null) {
             ub.appendQueryParameter("size", size);
         }
@@ -140,16 +142,13 @@ public class DbxProvider implements Provider {
     }
 
     @Override
-    public Uri getUri(String path, String rev) throws ProviderException {
-        Uri.Builder ub = new Uri.Builder()
-                .scheme("http")
-                .authority(REPO_URL + "/download")
-                .appendPath(path)
-                .appendQueryParameter("auth", mDbxClient.getAccessToken());
-        if (rev != null) {
-            ub.appendQueryParameter("rev", rev);
-        }
-        return ub.build();
+    public String getAccessToken() {
+        return mDbxClient.getAccessToken();
+    }
+
+    @Override
+    public String getDomain() {
+        return DOMAIN;
     }
 
     public DbxFiles getFilesClient() {
@@ -263,12 +262,18 @@ public class DbxProvider implements Provider {
             this.size = item.size;
 
             this.mediaInfo = new MediaInfo() {
-                public Tag tag() {return mediaInfo.tag();}
+                public Tag tag() {
+                    DbxFiles.MediaInfo.Tag t = item.mediaInfo.tag;
+                    if (t == DbxFiles.MediaInfo.Tag.metadata) return Tag.metadata;
+                    if (t == DbxFiles.MediaInfo.Tag.pending) return Tag.pending;
+                    return null;
+                }
                 public MediaMetadata metadata() {
                     return new MediaMetadata() {
                         @Override
                         public Size dimensions() {
-                            return null;
+                            DbxFiles.Dimensions d = item.mediaInfo.getMetadata().dimensions;
+                            return new Size((int)d.width, (int)d.height);
                         }
 
                         @Override
@@ -283,8 +288,7 @@ public class DbxProvider implements Provider {
 
                         @Override
                         public Date timeTaken() {
-                            DbxFiles.MediaInfo mi = item.mediaInfo;
-                            return item.clientModified;
+                            return item.mediaInfo.getMetadata().timeTaken;
                         }
                     };
                 }
@@ -327,12 +331,12 @@ public class DbxProvider implements Provider {
 
         @Override
         public Uri imageUri() {
-            return PicassoRequestHandler.buildPicassoUri(this);
+            return getImageUri(pathLower(), null, null);
         }
 
         @Override
         public Uri thumbnailUri(String format, String size) {
-            return PicassoRequestHandler.buildPicassoThumbnailUri(this, format, size);
+            return getImageUri(pathLower(), format, size);
         }
     }
 

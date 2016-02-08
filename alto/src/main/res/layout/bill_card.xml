@@ -23,12 +23,19 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/card_image_height"
             android:transitionName="tThumbnail"
-            fresco:fadeDuration="300"
-            fresco:roundAsCircle="true"
+            fresco:fadeDuration="0"
             fresco:actualImageScaleType="focusCrop"
+
+            fresco:placeholderImage="@color/medium_grey"
+            fresco:placeholderImageScaleType="fitCenter"
+            fresco:failureImage="@color/colorAccent"
+            fresco:failureImageScaleType="centerInside"
+            fresco:retryImage="@color/wait_color"
+            fresco:retryImageScaleType="centerCrop"
+            fresco:progressBarImage="@color/colorAccent"
             fresco:progressBarImageScaleType="centerInside"
             fresco:progressBarAutoRotateInterval="1000"
-            fresco:backgroundImage="#ff0000ff"
+
             />
 
         <TextView
