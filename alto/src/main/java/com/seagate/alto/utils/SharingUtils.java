@@ -51,7 +51,7 @@ public class SharingUtils {
                     File cachePath = new File(activity.getCacheDir(), "images");
                     cachePath.mkdirs(); // don't forget to make the directory
                     FileOutputStream stream = new FileOutputStream(cachePath + "/image.jpg"); // overwrites this image every time
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                     stream.close();
 
                 } catch (FileNotFoundException e) {
