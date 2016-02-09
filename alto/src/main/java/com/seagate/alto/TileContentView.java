@@ -2,6 +2,7 @@
 
 package com.seagate.alto;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
@@ -96,7 +97,7 @@ public class TileContentView extends RecyclerView {
                     menu.add("share").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
-                            SharingUtils.shareImageFromRecyclerView(position, itemView.getContext());
+                            SharingUtils.shareImageFromRecyclerView(position, (Activity) itemView.getContext());
                             return true;
                         }
                     });

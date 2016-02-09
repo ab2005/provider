@@ -1,10 +1,10 @@
 package com.seagate.alto.utils;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 
 import com.facebook.common.executors.CallerThreadExecutor;
@@ -18,39 +18,62 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.seagate.alto.PlaceholderContent;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import javax.annotation.Nullable;
 
 public class SharingUtils {
     private final static String TAG = LogUtils.makeTag(SharingUtils.class);
 
-    public static void shareImageFromRecyclerView(int position, final Context context) {
+    public static void shareImageFromRecyclerView(int position, final Activity activity) {
         ImagePipeline imagePipeline = Fresco.getImagePipeline();
         ImageRequest imageRequest = ImageRequestBuilder
                 .newBuilderWithSource(PlaceholderContent.getThumbnailUri(position))
                 .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
                 .build();
         final DataSource<CloseableReference<CloseableImage>> dataSource =
-                imagePipeline.fetchDecodedImage(imageRequest, context);
+                imagePipeline.fetchDecodedImage(imageRequest, activity);
 
         dataSource.subscribe(new BaseBitmapDataSubscriber() {
             @Override
             public void onNewResultImpl(@Nullable Bitmap bitmap) {
                 if (bitmap == null) {
-                    Log.d(TAG, "Bitmap data source returned success, but bitmap null.");
+                    Log.d(TAG, "Bitmap data source returned success, but bitmap is null.");
                     return;
                 }
 
-                Log.d(TAG, "sharing bitmap: " + bitmap.getWidth() + "/" + bitmap.getHeight() + ", " + bitmap);
+                // save bitmap to cache directory
+                try {
 
-                String path = MediaStore.Images.Media.insertImage(context.getContentResolver(),
-                        bitmap, "Image Description", null);
-                Uri bmpUri = Uri.parse(path);
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.putExtra(Intent.EXTRA_STREAM, bmpUri);
-                shareIntent.setType("image/*");
+                    File cachePath = new File(activity.getCacheDir(), "images");
+                    cachePath.mkdirs(); // don't forget to make the directory
+                    FileOutputStream stream = new FileOutputStream(cachePath + "/image.jpg"); // overwrites this image every time
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    stream.close();
 
-                context.startActivity(Intent.createChooser(shareIntent, "Share Image"));
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
+                File imagePath = new File(activity.getCacheDir(), "images");
+                File newFile = new File(imagePath, "image.jpg");
+                Uri contentUri = FileProvider.getUriForFile(activity, "com.seagate.alto.fileprovider", newFile);
+
+                if (contentUri != null) {
+
+                    Intent shareIntent = new Intent();
+                    shareIntent.setAction(Intent.ACTION_SEND);
+                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+                    shareIntent.setType("image/*");
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                    activity.startActivity(Intent.createChooser(shareIntent, "Choose an app"));
+
+                }
                 if (dataSource != null) {
                     dataSource.close();
                 }
