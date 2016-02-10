@@ -2,30 +2,32 @@
  * Copyright (c) 2015. Seagate Technology PLC. All rights reserved.
  */
 
-package com.seagate.alto.provider;
+package com.seagate.alto.utils.provider;
 
 import android.os.AsyncTask;
+
+import com.seagate.alto.provider.Provider;
 
 /**
  * Async task to list items in a folder
  */
-public class SearchImagesTask extends AsyncTask<String, Void, Provider.SearchResult> {
+public class ListFolderTask extends AsyncTask<String, Void, Provider.ListFolderResult> {
     private final Provider mProvider;
     private Exception mException;
     private Callback mCallback;
 
     public interface Callback {
-        void onDataLoaded(Provider.SearchResult result);
+        void onDataLoaded(Provider.ListFolderResult result);
         void onError(Exception e);
     }
 
-    public SearchImagesTask(Provider provider, Callback callback) {
+    public ListFolderTask(Provider provider, Callback callback) {
         mProvider = provider;
         mCallback = callback;
     }
 
     @Override
-    protected void onPostExecute(Provider.SearchResult result) {
+    protected void onPostExecute(Provider.ListFolderResult result) {
         super.onPostExecute(result);
         if (mException != null) {
             mCallback.onError(mException);
@@ -35,9 +37,9 @@ public class SearchImagesTask extends AsyncTask<String, Void, Provider.SearchRes
     }
 
     @Override
-    protected Provider.SearchResult doInBackground(String... params) {
+    protected Provider.ListFolderResult doInBackground(String... params) {
         try {
-            return mProvider.search("/camera uploads", ".jpg");
+            return mProvider.listFolder(params[0]);
         } catch (Provider.ProviderException e) {
             mException = e;
             e.printStackTrace();

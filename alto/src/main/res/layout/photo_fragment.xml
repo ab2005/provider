@@ -24,8 +24,6 @@
         <!--android:layout_height="match_parent"-->
         <!--/>-->
 
-    PhotoDraweeView
-
     <!--<com.seagate.alto.SeagateDraweeView-->
         <!--android:id="@+id/image"-->
         <!--xmlns:fresco="http://schemas.facebook.com/apk/res/android"-->

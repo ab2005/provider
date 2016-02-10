@@ -11,13 +11,17 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.common.util.UriUtil;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.drawee.view.DraweeView;
+import com.facebook.imagepipeline.common.ResizeOptions;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.seagate.alto.events.BusMaster;
 import com.seagate.alto.events.ItemSelectedEvent;
 import com.seagate.alto.utils.LogUtils;
@@ -64,17 +68,14 @@ public class TileContentView extends RecyclerView {
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        SimpleDraweeView drawee;
+        DraweeView drawee;
         int position;
         TextView title;
 
         public ViewHolder(LayoutInflater inflater, final ViewGroup parent, final Activity activity) {
-
             super(inflater.inflate(R.layout.item_tile, parent, false));
-
-            drawee = (SimpleDraweeView) itemView.findViewById(R.id.drawee);
+            drawee = (DraweeView) itemView.findViewById(R.id.drawee);
             title = (TextView) itemView.findViewById(R.id.tile_title);
-
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -114,10 +115,37 @@ public class TileContentView extends RecyclerView {
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
 
-            Uri uri = PlaceholderContent.getThumbnailUri(position);
-            holder.drawee.setImageURI(uri);
+            Uri uri = PlaceholderContent.getThumbnailUri(position, 640);
+//            Uri thumbUri = PlaceholderContent.getThumbnailUri(position, 32);
+//            ImageRequest imageRequest = ImageRequestBuilder.newBuilderWithSource(uri)
+//                    .setProgressiveRenderingEnabled(true)
+//                    .setLocalThumbnailPreviewsEnabled(true)
+//                    .build();
+//            DraweeController controller = Fresco.newDraweeControllerBuilder()
+//                    .setLowResImageRequest(ImageRequest.fromUri(thumbUri))
+//                    .setImageRequest(imageRequest)
+//                    .setOldController(holder.drawee.getController())
+//                    .setAutoPlayAnimations(true)
+//                    .build();
+//
+//            holder.drawee.setController(controller);
 
-            Log.d("seagate-tile", "uri=" + uri);
+            ImageRequestBuilder imageRequestBuilder =
+                    ImageRequestBuilder.newBuilderWithSource(uri);
+            if (UriUtil.isNetworkUri(uri)) {
+                imageRequestBuilder.setProgressiveRenderingEnabled(true);
+            } else {
+                imageRequestBuilder.setResizeOptions(new ResizeOptions(
+                        holder.drawee.getLayoutParams().width + 2,
+                        holder.drawee.getLayoutParams().height));
+            }
+            DraweeController draweeController = Fresco.newDraweeControllerBuilder()
+                    .setImageRequest(imageRequestBuilder.build())
+                    .setOldController(holder.drawee.getController())
+                    .setAutoPlayAnimations(true)
+                    .build();
+            holder.drawee.setController(draweeController);
+
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 holder.drawee.setTransitionName("TileThumb"+position);

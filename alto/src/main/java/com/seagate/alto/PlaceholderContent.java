@@ -7,6 +7,7 @@ package com.seagate.alto;
 import android.net.Uri;
 import android.util.SparseArray;
 
+import com.facebook.common.util.UriUtil;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.seagate.alto.provider.Provider;
 
@@ -51,6 +52,7 @@ public class PlaceholderContent {
 
     public static Uri getThumbnailUri(int position, int size) {
         if (sMetadataItems == null) return dumbUri();
+
         if (position > getCount() - 1) {
             return dumbUri();
         }
@@ -63,8 +65,10 @@ public class PlaceholderContent {
         } else if (size >= 640) {
             s = "w640h480";
         }
-
         Uri uri = ((Provider.FileMetadata)md).thumbnailUri("jpeg", s);
+        if (!UriUtil.isNetworkUri(uri)) {
+            uri = ((Provider.FileMetadata)md).imageUri();
+        }
         return uri;
     }
 
@@ -82,8 +86,14 @@ public class PlaceholderContent {
             return offset + (long)(diff * (position + 1) / 100);      // TODO: 1/14/16 getTimeStamp here
         }
 
-        Provider.FileMetadata md = (Provider.FileMetadata) sMetadataItems.get(position);
-        Date t = md.mediaInfo().metadata().timeTaken();
-        return t.getTime();
+        Provider.FileMetadata md = null;
+        try {
+            md = (Provider.FileMetadata) sMetadataItems.get(position);
+            Date t = md.mediaInfo().metadata().timeTaken();
+            return t.getTime();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }

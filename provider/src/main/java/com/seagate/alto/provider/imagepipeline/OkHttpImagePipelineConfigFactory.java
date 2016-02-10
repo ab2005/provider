@@ -18,7 +18,7 @@ import com.squareup.okhttp.OkHttpClient;
 public class OkHttpImagePipelineConfigFactory {
 //    public final static int MAX_REQUEST_PER_TIME = 164;
 
-    public static ImagePipelineConfig.Builder newBuilder(Context context, OkHttpClient okHttpClient, Provider provider) {
+    public static ImagePipelineConfig.Builder newBuilder(Context context, OkHttpClient okHttpClient) {
 //        SparseIntArray defaultBuckets = new SparseIntArray();
 //        defaultBuckets.put(16 * ByteConstants.KB, MAX_REQUEST_PER_TIME);
 //        PoolParams smallByteArrayPoolParams = new PoolParams(
@@ -33,6 +33,6 @@ public class OkHttpImagePipelineConfigFactory {
                 .newBuilder(context)
                 .setDownsampleEnabled(true)
 //                .setPoolFactory(factory)
-                .setNetworkFetcher(new OkHttpNetworkFetcher(okHttpClient, provider));
+                .setNetworkFetcher(new OkHttpNetworkFetcher(okHttpClient));
     }
 }
