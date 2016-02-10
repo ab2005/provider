@@ -19,7 +19,6 @@ import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.DraweeHolder;
 import com.facebook.drawee.view.MultiDraweeHolder;
 import com.seagate.alto.PlaceholderContent;
-import com.seagate.alto.R;
 import com.seagate.alto.digest.DigestCellView;
 import com.seagate.alto.utils.LayoutUtils;
 import com.seagate.alto.utils.LogUtils;
@@ -179,7 +178,6 @@ public class ImageSwitchView extends ImageView {
                 .setActualImageScaleType(ScalingUtils.ScaleType.CENTER_CROP)
                 .setFadeDuration(10)
                 .build();
-        hierarchy.setPlaceholderImage(getResources().getDrawable(R.drawable.photo_offline_large), ScalingUtils.ScaleType.CENTER_INSIDE);
         return hierarchy;
     }
 

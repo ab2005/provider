@@ -322,7 +322,7 @@ public class Attacher implements IAttacher, View.OnTouchListener, OnScaleDragGes
     }
 
     @Override public void onScale(float scaleFactor, float focusX, float focusY) {
-        if (getScale() < mMaxScale || scaleFactor < 1.0F) {
+        if (getScale() < mMaxScale || scaleFactor < 2.0F) {
 
             if (mScaleChangeListener != null) {
                 mScaleChangeListener.onScaleChange(scaleFactor, focusX, focusY);

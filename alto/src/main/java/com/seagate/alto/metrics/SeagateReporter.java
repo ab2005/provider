@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
@@ -29,6 +30,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -54,9 +56,16 @@ public class SeagateReporter implements IMetricsReporter{
 
         mContext = context;
 
-        String androidId = Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
+        // use the Android ID to generate a client UUID
+        // http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id
 
-        Consumer consumer = new Consumer(mQueue, androidId);
+        String androidId = Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
+        BigInteger bigId = new BigInteger(androidId, 16);
+        long top = bigId.shiftRight(64).longValue(); // should be 0
+        long bottom = bigId.longValue();
+        UUID clientUUID = new UUID(top, bottom);
+
+        Consumer consumer = new Consumer(mQueue, clientUUID.toString());
         new Thread(consumer).start();
 
         // used for testing
@@ -110,11 +119,11 @@ public class SeagateReporter implements IMetricsReporter{
         public static final String PAYLOAD = "payload";
 
         protected BlockingQueue<SeagateReport> queue = null;
-        private String mAndroidId;
+        private String mClientId;
 
-        public Consumer(BlockingQueue<SeagateReport> queue, String androidId) {
+        public Consumer(BlockingQueue<SeagateReport> queue, String clientId) {
             this.queue = queue;
-            this.mAndroidId = androidId;
+            this.mClientId = clientId;
         }
 
         @Override
@@ -146,9 +155,7 @@ public class SeagateReporter implements IMetricsReporter{
                 header.put(REQUEST_TIMESTAMP, System.currentTimeMillis());
                 header.put(ACCOUNT_ID, "94025");
 
-                // using android_id as the device id -
-                // http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id
-                header.put(CLIENT_ID, mAndroidId);
+                header.put(CLIENT_ID, mClientId);
 
                 JSONArray eventArray = new JSONArray();
 
