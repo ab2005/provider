@@ -7,11 +7,9 @@ package com.seagate.alto.metrics;
 public enum AltoMetricsEvent implements IMetricsEvent {
 
 
-    CreateAccount(0),
-    Login(1),
-    RestoreContent(2),
-    ReplaceDrive(3),
-    EmptyTrash(4),
+    ClientLaunched(0),
+    CreateAccount(1),
+    Login(2),
 
     ;  // end of constants
 

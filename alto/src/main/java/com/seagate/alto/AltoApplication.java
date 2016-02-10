@@ -1,4 +1,4 @@
-// Copyright (c) 2015. Seagate Technology PLC. All rights reserved.
+// Copyright (c) 2015-16. Seagate Technology PLC. All rights reserved.
 
 package com.seagate.alto;
 
@@ -7,17 +7,12 @@ package com.seagate.alto;
 import android.app.Application;
 import android.util.Log;
 
-import com.facebook.imagepipeline.core.ImagePipelineConfig;
-import com.facebook.imagepipeline.listener.RequestListener;
-import com.facebook.imagepipeline.listener.RequestLoggingListener;
+import com.seagate.alto.metrics.AltoMetricsEvent;
 import com.seagate.alto.metrics.Metrics;
 import com.seagate.alto.metrics.MixpanelReporter;
 import com.seagate.alto.metrics.SeagateReporter;
 import com.seagate.alto.utils.LogUtils;
 import com.seagate.alto.utils.ScreenUtils;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class AltoApplication extends Application {
 
@@ -42,7 +37,6 @@ public class AltoApplication extends Application {
 //        );
 
         ScreenUtils.init(this);
-//        startFresco();
     }
 
     public static AltoApplication getInstance() {
@@ -53,34 +47,11 @@ public class AltoApplication extends Application {
         SeagateReporter seagateReporter = new SeagateReporter(this);
         Metrics.getInstance().addReporter(seagateReporter);
 
-        MixpanelReporter mixPanelReporter = new MixpanelReporter(getApplicationContext());
+        MixpanelReporter mixPanelReporter = new MixpanelReporter(this);
         Metrics.getInstance().addReporter(mixPanelReporter);
 
-//        Metrics.getInstance().report(AltoMetricsEvent.Startup);
+        // while we're here, let everyone know we are launched
+        Metrics.getInstance().report(AltoMetricsEvent.ClientLaunched);
     }
-
-    private void startFresco() {
-        Set<RequestListener> requestListeners = new HashSet<>();
-        requestListeners.add(new RequestLoggingListener());
-
-//        DiskCacheConfig diskCacheConfig = DiskCacheConfig.newBuilder()
-//                .setBaseDirectoryName("SeagateCloud/ImageCache")
-//                .setBaseDirectoryPath(getExternalFilesDir(Environment.DIRECTORY_PICTURES))
-//                .setMaxCacheSize(50000000)
-//                .build();
-//        DiskCacheConfig smallImageDiskCacheConfig = DiskCacheConfig.newBuilder()
-//                .setBaseDirectoryName("SeagateCloud/SmallImageCache")
-//                .setBaseDirectoryPath(getExternalFilesDir(Environment.DIRECTORY_PICTURES))
-//                .setMaxCacheSize(10000000)
-//                .build();
-        ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
-                .setRequestListeners(requestListeners)
-//                .setMainDiskCacheConfig(diskCacheConfig)
-//                .setSmallImageDiskCacheConfig(smallImageDiskCacheConfig)
-                .build();
-//        Fresco.initialize(this, config);
-//        FLog.setMinimumLoggingLevel(FLog.VERBOSE);
-    }
-
 
 }
