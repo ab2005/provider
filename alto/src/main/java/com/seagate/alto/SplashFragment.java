@@ -132,7 +132,7 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
     }
 
     private void doneSplash(String token) {
-        boolean dropbox = false;
+        boolean dropbox = true;
         String path = dropbox ? "/camera uploads" :  "/d6f14c1e-ce88-4ebf-aa2f-f50fc7250dc4/Demo1/test";
         Provider provider = dropbox ? Providers.DROPBOX.provider : Providers.SEAGATE.provider;
         if (dropbox) provider.setAccessToken(token);

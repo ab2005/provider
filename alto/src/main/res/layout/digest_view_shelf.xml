@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!-- Copyright (c) 2015. Seagate Technology PLC. All rights reserved. -->
+<!-- Copyright (c) 2015-2016. Seagate Technology PLC. All rights reserved. -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/life_layout"
