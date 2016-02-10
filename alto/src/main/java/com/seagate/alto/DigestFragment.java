@@ -1,4 +1,4 @@
-// Copyright (c) 2015. Seagate Technology PLC. All rights reserved.
+// Copyright (c) 2015-2016. Seagate Technology PLC. All rights reserved.
 
 package com.seagate.alto;
 
@@ -11,7 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.seagate.alto.ui.DigestRecyclerView;
+import com.seagate.alto.digest.DigestRecyclerView;
 import com.seagate.alto.utils.LogUtils;
 import com.seagate.alto.utils.ScreenUtils;
 

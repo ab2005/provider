@@ -1,6 +1,6 @@
-// Copyright (c) 2015. Seagate Technology PLC. All rights reserved.
+// Copyright (c) 2015-2016. Seagate Technology PLC. All rights reserved.
 
-package com.seagate.alto.ui;
+package com.seagate.alto.digest;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -15,6 +15,7 @@ import android.widget.RelativeLayout;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.seagate.alto.PlaceholderContent;
+import com.seagate.alto.ui.ImageSwitchView;
 import com.seagate.alto.utils.LayoutUtils;
 import com.seagate.alto.utils.LogUtils;
 import com.seagate.alto.utils.ScreenUtils;

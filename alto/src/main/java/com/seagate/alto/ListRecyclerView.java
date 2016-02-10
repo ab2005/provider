@@ -1,4 +1,4 @@
-// Copyright (c) 2015. Seagate Technology PLC. All rights reserved.
+// Copyright (c) 2015-2016. Seagate Technology PLC. All rights reserved.
 
 package com.seagate.alto;
 
@@ -11,7 +11,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -21,6 +23,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.seagate.alto.events.BusMaster;
 import com.seagate.alto.events.ItemSelectedEvent;
 import com.seagate.alto.utils.LogUtils;
+import com.seagate.alto.utils.SharingUtils;
 
 import java.util.ArrayList;
 
@@ -54,7 +57,6 @@ public class ListRecyclerView extends RecyclerView {
         Log.d(TAG, "onFinishInflate");
 
         mAdapter = new ViewHolder.ContentAdapter();
-        mAdapter.setActivity((Activity) getContext());
         setAdapter(mAdapter);
         setHasFixedSize(true);
         setLayoutManager(new LinearLayoutManager(getContext()));
@@ -74,7 +76,7 @@ public class ListRecyclerView extends RecyclerView {
         TextView title;
         int position;
 
-        public ViewHolder(LayoutInflater inflater, final ViewGroup parent, final Activity activity) {
+        public ViewHolder(LayoutInflater inflater, final ViewGroup parent) {
             super(inflater.inflate(R.layout.item_list, parent, false));
 
             drawee = (SimpleDraweeView) itemView.findViewById(R.id.list_avatar);
@@ -85,40 +87,43 @@ public class ListRecyclerView extends RecyclerView {
             drawee.getHierarchy().setRoundingParams(roundingParams);
 
             itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                @Override
+                public void onClick(View v) {
 
-                        ArrayList<Pair<View, String>> pairs = new ArrayList<Pair<View, String>>();
-                        Pair<View, String> imagePair = Pair.create((View) drawee, "tThumbnail");
-                        pairs.add(imagePair);
-                        Pair<View, String> titlePair = Pair.create((View) title, "tTitle");
-                        pairs.add(titlePair);
+                    ArrayList<Pair<View, String>> pairs = new ArrayList<Pair<View, String>>();
+                    Pair<View, String> imagePair = Pair.create((View) drawee, "tThumbnail");
+                    pairs.add(imagePair);
+                    Pair<View, String> titlePair = Pair.create((View) title, "tTitle");
+                    pairs.add(titlePair);
 
-                        BusMaster.getBus().post(new ItemSelectedEvent(position, pairs));
+                    BusMaster.getBus().post(new ItemSelectedEvent(position, pairs));
 
-                    }
                 }
-            );
-        }
+            });
 
+            itemView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
+                @Override
+                public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+                    menu.add("share").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            SharingUtils.shareImageFromRecyclerView(position, (Activity) itemView.getContext());
+                            return true;
+                        }
+                    });
+                }
+            });
+
+        }
 
         /**
          * Adapter to display recycler view.
          */
         public static class ContentAdapter extends RecyclerView.Adapter<ViewHolder> {
 
-            public void setActivity(Activity mActivity) {
-                this.mActivity = mActivity;
-            }
-
-            private Activity mActivity;
-
-            public ContentAdapter() {
-            }
-
             @Override
             public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                return new ViewHolder(LayoutInflater.from(parent.getContext()), parent, mActivity);
+                return new ViewHolder(LayoutInflater.from(parent.getContext()), parent);
             }
 
             @Override
@@ -142,6 +147,6 @@ public class ListRecyclerView extends RecyclerView {
             }
         }
 
-
     }
+
 }

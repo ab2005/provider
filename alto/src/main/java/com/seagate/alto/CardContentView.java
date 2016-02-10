@@ -2,6 +2,7 @@
 
 package com.seagate.alto;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
@@ -11,7 +12,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -22,6 +25,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.seagate.alto.events.BusMaster;
 import com.seagate.alto.events.ItemSelectedEvent;
 import com.seagate.alto.utils.LogUtils;
+import com.seagate.alto.utils.SharingUtils;
 
 import java.util.ArrayList;
 
@@ -82,6 +86,19 @@ public class CardContentView extends RecyclerView {
 
                         BusMaster.getBus().post(new ItemSelectedEvent(position, pairs));
 
+                }
+            });
+
+            itemView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
+                @Override
+                public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+                    menu.add("share").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            SharingUtils.shareImageFromRecyclerView(position, (Activity) itemView.getContext());
+                            return true;
+                        }
+                    });
                 }
             });
 

@@ -1,3 +1,5 @@
+// Copyright (c) 2015-2016. Seagate Technology PLC. All rights reserved.
+
 package com.seagate.alto.ui;
 
 import android.content.Context;
@@ -7,7 +9,6 @@ import android.net.Uri;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -19,9 +20,7 @@ import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.DraweeHolder;
 import com.facebook.drawee.view.MultiDraweeHolder;
 import com.seagate.alto.PlaceholderContent;
-import com.seagate.alto.utils.LayoutUtils;
 import com.seagate.alto.utils.LogUtils;
-import com.seagate.alto.utils.ScreenUtils;
 
 import java.util.Random;
 
@@ -83,26 +82,8 @@ public class ImageSwitchView extends ImageView {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        // gonna be called when rotating the screen. Recalculate the layouts/bounds/sizes here.
         Log.d(TAG, "onMeasure()");
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        int size;
-        int realSize;
-
-        DigestCellView parent = (DigestCellView) getParent();
-        size = parent.getWidth();
-        int margin = LayoutUtils.getDigestMargin(size);
-        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) getLayoutParams();
-        lp.leftMargin = margin;
-        lp.topMargin = margin;
-        lp.rightMargin = ScreenUtils.isPortrait()? margin : 0;
-        lp.bottomMargin = ScreenUtils.isPortrait()? 0 : margin;
-        setLayoutParams(lp);
-
-        realSize = size - 2 * margin;
-        setMeasuredDimension(realSize, realSize);
-        Log.d(TAG, "onMeasure: realSize: " + realSize);
-        invalidate();
     }
 
     @Override
