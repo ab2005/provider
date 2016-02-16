@@ -25,6 +25,7 @@ public class AltoApplication extends Application {
         ScreenUtils.init(this);
 
         Providers.initWithDefaults(this);
+        Providers.applyStoredTokens();
     }
 
     private void startMetrics() {
