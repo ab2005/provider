@@ -5,18 +5,21 @@
 package com.seagate.alto.provider;
 
 import android.content.Context;
-import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.facebook.imagepipeline.producers.NetworkFetcher;
+
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
 
 /**
  * Local image provider.
@@ -48,24 +51,24 @@ public class MediaProvider implements Provider {
             MediaStore.Images.Media.BUCKET_DISPLAY_NAME
     };
 
-    private static ContentObserver watcher = new ContentObserver(new Handler()) {
-        @Override
-        public void onChange(boolean selfChange, Uri uri) {
-            // TODO: notify
-            Log.d(TAG, "Content changed:" + uri);
-            super.onChange(selfChange, uri);
-        }
-    };
-    ;
-
-    static public void startWatchingMediaStore() {
-        Providers.getContext().getContentResolver()
-                .registerContentObserver(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, true, watcher);
-    }
-
-    static public void stopWatchingMediaStore() {
-        Providers.getContext().getContentResolver().unregisterContentObserver(watcher);
-    }
+//    private static ContentObserver watcher = new ContentObserver(new Handler()) {
+//        @Override
+//        public void onChange(boolean selfChange, Uri uri) {
+//            // TODO: notify
+//            Log.d(TAG, "Content changed:" + uri);
+//            super.onChange(selfChange, uri);
+//        }
+//    };
+//    ;
+//
+//    static public void startWatchingMediaStore() {
+//        Providers.getContext().getContentResolver()
+//                .registerContentObserver(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, true, watcher);
+//    }
+//
+//    static public void stopWatchingMediaStore() {
+//        Providers.getContext().getContentResolver().unregisterContentObserver(watcher);
+//    }
 
     static public List<FileMetadata> getLocalMediaItems(Context ctx) {
         List<FileMetadata> items = new LinkedList<>();
@@ -158,47 +161,68 @@ public class MediaProvider implements Provider {
 
     @Override
     public ListFolderResult listFolderContinue(@NonNull String cursor) throws ProviderException {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public SearchResult search(@NonNull String path, @NonNull String query) throws ProviderException {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public SearchResult search(@NonNull String path, @NonNull String query, Long start, Long maxResults, SearchMode mode) throws ProviderException {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Metadata getMetadata(@NonNull String path, boolean includeMediaInfo) throws ProviderException {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Metadata delete(@NonNull String path) throws ProviderException {
-        return null;
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Download file at a given path.
+     *
+     * @param path
+     */
+    @Override
+    public Call<ResponseBody> download(String path) throws ProviderException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Download file at a given path. The callback will be invoked from  this provider executor thread.
+     *
+     * @param path
+     * @param cb
+     */
+    @Override
+    public void download(String path, NetworkFetcher.Callback cb) throws ProviderException {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Uri getThumbnailUri(@NonNull String path, @NonNull String size, @Nullable String format) throws ProviderException {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Uri getUri(@NonNull String path, @Nullable String rev) throws ProviderException {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public String getAccessToken() {
-        return null;
+        return "no token";
     }
 
     @Override
     public String getDomain() {
-        return null;
+        return "local";
     }
 
     private static class FileMetadataImpl implements FileMetadata {
