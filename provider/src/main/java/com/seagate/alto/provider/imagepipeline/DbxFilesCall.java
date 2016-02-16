@@ -18,12 +18,12 @@ import java.io.IOException;
 
 class DbxFilesCall implements OkHttpNetworkFetcher.Call {
     private static final String TAG = "DbxFilesCall";
-    private final OkHttpNetworkFetcher.OkHttpNetworkFetchState fetchState;
+    private final OkHttpNetworkFetcher.HttpNetworkFetchState fetchState;
     private final NetworkFetcher.Callback callback;
     private final DbxProvider provider;
     private DbxDownloader<DbxFiles.FileMetadata> downloader = null;
 
-    DbxFilesCall(final OkHttpNetworkFetcher.OkHttpNetworkFetchState fetchState, final NetworkFetcher.Callback callback, DbxProvider provider) {
+    DbxFilesCall(final OkHttpNetworkFetcher.HttpNetworkFetchState fetchState, final NetworkFetcher.Callback callback, DbxProvider provider) {
         this.fetchState = fetchState;
         this.callback = callback;
         this.provider = provider;

@@ -5,10 +5,15 @@
 package com.seagate.alto.provider;
 
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.facebook.imagepipeline.producers.NetworkFetcher;
+import com.seagate.alto.provider.imagepipeline.OkHttpNetworkFetcher;
+import com.seagate.alto.provider.imagepipeline.RetrofitCallbackHandler;
+import com.seagate.alto.provider.lyve.DownloadRequest;
 import com.seagate.alto.provider.lyve.LyveCloudClient;
 import com.seagate.alto.provider.lyve.ServiceGenerator;
 import com.seagate.alto.provider.lyve.request.Client;
@@ -24,55 +29,29 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * LyveCloud {@link Provider} API implementation.
  */
 public class LyveCloudProvider implements Provider {
-
-    public static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyyMMdd'T'HHmmss.SSS'Z'");
-
+    private static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyyMMdd'T'HHmmss.SSS'Z'");
     private static Date NO_DATE = new Date(1961, 5, 12);
     private static final String TAG = LyveCloudProvider.class.getName();
     private static final String DOMAIN = "seagate";
-    public static final String API_BASE_URL = "https://api.dogfood.blackpearlsystems.net";
-    private final OkHttpClient.Builder sHttpClient = new OkHttpClient.Builder();
-    private final Retrofit.Builder builder = new Retrofit.Builder()
-            .baseUrl(API_BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create());
 
-    private final LyveCloudClient mLyveCloudClient;
+    private LyveCloudClient mRetrofit;
     private String mAccessToken;
 
-    /*package*/ LyveCloudProvider() {
-        sHttpClient.addInterceptor(new Interceptor() {
-            @Override
-            public okhttp3.Response intercept(Interceptor.Chain chain) throws IOException {
-                Request original = chain.request();
-                Request.Builder requestBuilder = original.newBuilder();
-                String token = getAccessToken();
-                if (token != null) {
-                    requestBuilder.header("Authorization", "Bearer " + token);
-                }
-                requestBuilder.method(original.method(), original.body());
-                Request request = requestBuilder.build();
-                return chain.proceed(request);
-            }
-        });
-        OkHttpClient client = sHttpClient.build();
-        Retrofit retrofit = builder.client(client).build();
-        mLyveCloudClient = retrofit.create(LyveCloudClient.class);
+    LyveCloudProvider() {
     }
 
     @Override
     public void setAccessToken(String token) {
         mAccessToken = token;
+        mRetrofit = ServiceGenerator.createLyveCloudService(token);
     }
 
     @Override
@@ -82,7 +61,7 @@ public class LyveCloudProvider implements Provider {
 
     @Override
     public String getDomain() {
-        return DOMAIN;
+        return ServiceGenerator.API_BASE_URL;
     }
 
     @Override
@@ -101,13 +80,16 @@ public class LyveCloudProvider implements Provider {
                 .withLimit(1000);
 
         try {
-            Response<ListFolderResponse> response = mLyveCloudClient.listFolder(req).execute();
-            ListFolderResponse lfr = response.body();
-            return lfr;
+            Call<ListFolderResponse> call = mRetrofit.listFolder(req);
+            Response<ListFolderResponse> response = call.execute();
+            if (!response.isSuccess()) {
+                throw new ProviderException(response.message(), null);
+            }
+            return response.body();
+
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new ProviderException(e);
         }
-        return null;
     }
 
     @Override
@@ -122,7 +104,7 @@ public class LyveCloudProvider implements Provider {
                 .withPath(path)
                 .withQuery(query);
         try {
-            Response<SearchResponse> response = mLyveCloudClient.search(req).execute();
+            Response<SearchResponse> response = mRetrofit.search(req).execute();
             SearchResponse sr = response.body();
             return sr;
         } catch (IOException e) {
@@ -140,7 +122,7 @@ public class LyveCloudProvider implements Provider {
                 .withMaxResults(maxResults.intValue())
                 .withMode(searchMode);
         try {
-            Response<SearchResponse> response = mLyveCloudClient.search(req).execute();
+            Response<SearchResponse> response = mRetrofit.search(req).execute();
             SearchResponse sr = response.body();
             return sr;
         } catch (IOException e) {
@@ -158,6 +140,28 @@ public class LyveCloudProvider implements Provider {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Get a {@link Call} to download file at a given path.
+     *
+     * @param path
+     */
+    @Override
+    public Call<ResponseBody> download(String path) throws ProviderException {
+        return mRetrofit.download(new DownloadRequest(path));
+    }
+
+    /**
+     * Download file at a given path.
+     *
+     * @param uri
+     */
+    @Override
+    public void download(String path, final NetworkFetcher.Callback cb) throws ProviderException {
+        final Call<ResponseBody> call = download(path);
+        OkHttpNetworkFetcher.HttpNetworkFetchState fs = new OkHttpNetworkFetcher.HttpNetworkFetchState();
+        call.enqueue(new RetrofitCallbackHandler(call, AsyncTask.THREAD_POOL_EXECUTOR, fs, cb));
+    }
+
     @Override
     public Uri getThumbnailUri(String path, String size, String format) throws ProviderException {
         return getImageUri(path, format, size);
@@ -169,14 +173,15 @@ public class LyveCloudProvider implements Provider {
     }
 
     /**
-     * A convenience method to login to Lyve Cloud
+     * A helper to login to Lyve Cloud
      *
      * @param user
      * @param password
      * @return access token string or null if login failed
      * @throws IOException
      */
-    @Nullable public static String login(String user, String password) throws IOException {
+    @Nullable
+    public static String login(String user, String password) throws IOException {
         LoginRequest login = new LoginRequest()
                 .withEmail(user)
                 .withPassword(password)
@@ -188,7 +193,7 @@ public class LyveCloudProvider implements Provider {
                         .withClientVersion("0.0.1"));
 
 
-        LyveCloudClient client = ServiceGenerator.createJsonService(LyveCloudClient.class);
+        LyveCloudClient client = ServiceGenerator.createService(ServiceGenerator.API_BASE_URL, LyveCloudClient.class, null);
         Response<Token> response = client.login(login).execute();
 
         if (!response.isSuccess()) {
@@ -223,12 +228,13 @@ public class LyveCloudProvider implements Provider {
             }
             return ub.build();
         } catch (NullPointerException e) {
-            return null;
+            return Uri.EMPTY;
         }
     }
 
     /**
      * Get a date value from a string.
+     *
      * @return a valid {@link Date} or Gagarin day
      */
     public static Date dateFromString(String dateString) {
