@@ -13,10 +13,10 @@ public class Location {
 
     @SerializedName("latitude")
     @Expose
-    public Integer latitude;
+    public Double latitude;
     @SerializedName("longitude")
     @Expose
-    public Integer longitude;
+    public Double longitude;
 
     @Override
     public String toString() {

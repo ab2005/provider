@@ -12,11 +12,10 @@ import com.google.gson.annotations.SerializedName;
 public class Match {
 
     @SerializedName("match_type")
-    @Expose
-    public String matchType;
+    @Expose public MatchType matchType;
+
     @SerializedName("metadata")
-    @Expose
-    public Metadata metadata;
+    @Expose public Metadata metadata;
 
     @Override
     public String toString() {
