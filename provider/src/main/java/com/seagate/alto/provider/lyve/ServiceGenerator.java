@@ -4,70 +4,45 @@
 
 package com.seagate.alto.provider.lyve;
 
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
+import android.os.AsyncTask;
 
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.ConnectionPool;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
-import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ServiceGenerator {
     public static final String API_BASE_URL = "https://api.dogfood.blackpearlsystems.net";
-    private static OkHttpClient.Builder sHttpClient = new OkHttpClient.Builder();
+    public static final String DBX_API_BASE_URL = "https://api.dropboxapi.com";
+    private static final int NUM_CALLBACK_THREADS = 10;
+    private static final long READ_TIMEOUT_SEC = 20;
+    private final static int MAX_CONNECTIONS = 3;
 
-    final static class StreamBodyConverter<T extends ResponseBody> implements Converter<ResponseBody, T> {
-        @Override public T convert(ResponseBody value) throws IOException {
-            System.out.println("....");
-            LyveCloudClient.Stream body = new LyveCloudClient.Stream(value);
-            return (T) body.get();
-        }
+    public static LyveCloudClient createLyveCloudService (String authToken) {
+        return createService(API_BASE_URL, LyveCloudClient.class, authToken);
     }
 
-    final static class StreamConverterFactory extends Converter.Factory {
-        @Override
-        public Converter<okhttp3.ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
-            if (!(type instanceof Class<?>)) {
-                return null;
-            }
-            Class<?> c = (Class<?>) type;
-            if (!LyveCloudClient.Stream.class.isAssignableFrom(c)) {
-                return null;
-            }
-
-            return new StreamBodyConverter();
-        }
-    }
-
-    private static Retrofit.Builder jsonBuilder =
-            new Retrofit.Builder()
-                    .baseUrl(API_BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create());
-    private static Retrofit.Builder builder =
-            new Retrofit.Builder()
-                    .addConverterFactory(new StreamConverterFactory())
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .baseUrl(API_BASE_URL);
-
-    /**
-     * A factory method to create unauthorized service instance
-     */
-    public static <S> S createJsonService(Class<S> serviceClass) {
-        Retrofit retrofit = jsonBuilder.client(sHttpClient.build()).build();
-        return retrofit.create(serviceClass);
+    public static DbxCloudClient createDropboxService (String authToken) {
+        return createService(API_BASE_URL, DbxCloudClient.class, authToken);
     }
 
     /**
-     * A factory method to create a Json service instance with auto authorization
+     * A factory method to create a service instance with authorization
      */
-    public static <S> S createJsonService(Class<S> serviceClass, final String authToken) {
+    public static <S> S createService(String baseUrl, Class<S> serviceClass, final String authToken) {
+        OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder()
+                .connectionPool(new ConnectionPool(MAX_CONNECTIONS, 5, TimeUnit.MINUTES))
+                .readTimeout(READ_TIMEOUT_SEC, TimeUnit.SECONDS);
+//                .sslSocketFactory(SSLConfig.getSSLSocketFactory());
+
         if (authToken != null) {
-            sHttpClient.addInterceptor(new Interceptor() {
+            httpClientBuilder.addInterceptor(new Interceptor() {
                 @Override
                 public Response intercept(Interceptor.Chain chain) throws IOException {
                     Request original = chain.request();
@@ -80,30 +55,15 @@ public class ServiceGenerator {
                 }
             });
         }
-        OkHttpClient client = sHttpClient.build();
-        Retrofit retrofit = jsonBuilder.client(client).build();
-        return retrofit.create(serviceClass);
-    }
-
-    /**
-     * A factory method to create a Json service instance with auto authorization
-     */
-    public static <S> S createService(Class<S> serviceClass, final String authToken) {
-        if (authToken != null) {
-            sHttpClient.addInterceptor(new Interceptor() {
-                @Override
-                public Response intercept(Interceptor.Chain chain) throws IOException {
-                    Request original = chain.request();
-                    Request.Builder requestBuilder = original.newBuilder()
-                            .header("Authorization", "Bearer " + authToken)
-                            .method(original.method(), original.body());
-
-                    Request request = requestBuilder.build();
-                    return chain.proceed(request);
-                }
-            });
-        }
-        OkHttpClient client = sHttpClient.build();
+        OkHttpClient client = httpClientBuilder.build();
+        client.dispatcher().setMaxRequestsPerHost(MAX_CONNECTIONS);
+        client.dispatcher().setMaxRequests(MAX_CONNECTIONS * 2);
+        Retrofit.Builder builder =
+                new Retrofit.Builder()
+                        .baseUrl(baseUrl)
+                        .callbackExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+//                        .callbackExecutor(Executors.newCachedThreadPool())
+                        .addConverterFactory(GsonConverterFactory.create());
         Retrofit retrofit = builder.client(client).build();
         return retrofit.create(serviceClass);
     }

@@ -14,25 +14,21 @@ import com.seagate.alto.provider.lyve.response.Token;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
-import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
-import retrofit2.http.Query;
 import retrofit2.http.Streaming;
 
-public interface LyveCloudClient {
+public interface DbxCloudClient {
     @POST("v1/auth/login")
     Call<Token> login(@Body LoginRequest req);
 
-    @POST("v1/files/list_folder")
+    @POST("2/files/list_folder")
     Call<ListFolderResponse> listFolder(@Body ListFolderRequest req);
 
-    @POST("v1/files/search")
+    @POST("2/files/search")
     Call<SearchResponse> search(@Body SearchRequest req);
 
-    @POST("v1/files/download")
+    @POST("2/files/download")
     @Streaming
-    Call<ResponseBody> download(@Body DownloadRequest req);
-
-    @GET("v1/files/download")
-    Call<ResponseBody> checkout(@Query(value = "arg") String url);
-}
+    Call<ResponseBody> download(@Header("Dropbox-API-Arg") DownloadRequest req);
+ }

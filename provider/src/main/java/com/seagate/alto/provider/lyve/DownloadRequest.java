@@ -15,4 +15,9 @@ public class DownloadRequest {
     public DownloadRequest(String path) {
         this.path = path;
     }
+
+    @Override
+    public String toString() {
+        return "{\"path\":\"" + path + "\"}";
+    }
 }
