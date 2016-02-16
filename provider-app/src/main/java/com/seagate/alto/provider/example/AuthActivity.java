@@ -9,8 +9,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.dropbox.core.android.Auth;
-import com.seagate.alto.provider.DbxProvider;
 import com.seagate.alto.provider.Provider;
+import com.seagate.alto.provider.Providers;
 
 
 /**
@@ -56,10 +56,9 @@ public abstract class AuthActivity extends AppCompatActivity {
 
     private void initAndLoadData(String accessToken) {
         if (mProvider == null) {
-            DropboxClient.init(accessToken);
-            mProvider = DropboxClient.Provider();
-//            PicassoClient.init(getApplicationContext(), (DbxProvider) DropboxClient.Provider());
-            FrescoClient.init(getApplicationContext(), (DbxProvider) DropboxClient.Provider());
+            mProvider = Providers.LOCAL.provider;
+//            mProvider = Providers.DROPBOX.provider;
+            Providers.DROPBOX.provider.setAccessToken(accessToken);
             loadData();
         }
     }

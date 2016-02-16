@@ -6,6 +6,7 @@ package com.seagate.alto.provider;
 
 import android.net.Uri;
 
+import com.dropbox.core.DbxDownloader;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxHost;
 import com.dropbox.core.DbxRequestConfig;
@@ -13,10 +14,18 @@ import com.dropbox.core.http.OkHttpRequestor;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.DbxFiles;
 import com.dropbox.core.v2.DbxUsers;
+import com.facebook.imagepipeline.producers.NetworkFetcher;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+
+import okhttp3.Request;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Dropbox provider implementation.
@@ -111,6 +120,67 @@ public class DbxProvider implements Provider {
             throw new ProviderException("Failed to delete " + path, e);
         }
         return new MetadataImpl(md);
+    }
+
+    /**
+     * Download file at a given path.
+     *
+     * @param path
+     */
+    @Override
+    public Call<ResponseBody> download(String path) throws ProviderException {
+        Call<ResponseBody> call = new Call<ResponseBody>() {
+            @Override
+            public Response<ResponseBody> execute() throws IOException {
+                return null;
+            }
+            @Override
+            public void enqueue(Callback<ResponseBody> callback) {
+
+            }
+            @Override
+            public boolean isExecuted() {
+                return false;
+            }
+
+            @Override
+            public void cancel() {
+
+            }
+            @Override
+            public boolean isCanceled() {
+                return false;
+            }
+
+            @Override
+            public Call<ResponseBody> clone() {
+                return null;
+            }
+            public Request request() {
+                return null;
+            }
+        };
+        return call;
+    }
+
+    /**
+     * Download file at a given path. The callback will be invoked from  this provider executor thread.
+     *
+     * @param path
+     * @param cb
+     */
+    @Override
+    public void download(String path, NetworkFetcher.Callback cb) throws ProviderException {
+        try {
+            DbxDownloader<DbxFiles.FileMetadata> md = mDbxClient.files.downloadBuilder(path).start();
+            try {
+                cb.onResponse(md.body, -1);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (DbxException e) {
+            throw new ProviderException("Failed to delete " + path, e);
+        }
     }
 
     @Override

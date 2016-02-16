@@ -10,6 +10,7 @@ import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxUsers;
 import com.seagate.alto.provider.DbxProvider;
 import com.seagate.alto.provider.Provider;
+import com.seagate.alto.provider.Providers;
 
 /**
  * Async task for getting user account info
@@ -26,7 +27,7 @@ public class GetCurrentAccountTask extends AsyncTask<Void, Void, DbxUsers.FullAc
     }
 
     public GetCurrentAccountTask(Provider provider, Callback callback) {
-        mDbxUsersClient = ((DbxProvider)provider).getUsersClient();;
+        mDbxUsersClient = ((DbxProvider)Providers.DROPBOX.provider).getUsersClient();;
         mCallback = callback;
     }
 
@@ -43,7 +44,9 @@ public class GetCurrentAccountTask extends AsyncTask<Void, Void, DbxUsers.FullAc
     @Override
     protected DbxUsers.FullAccount doInBackground(Void... params) {
         try {
-            return mDbxUsersClient.getCurrentAccount();
+            if (mDbxUsersClient != null) {
+                return mDbxUsersClient.getCurrentAccount();
+            }
         } catch (DbxException e) {
             mException = e;
             e.printStackTrace();

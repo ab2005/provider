@@ -12,12 +12,12 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import com.seagate.alto.provider.Provider;
+import com.seagate.alto.provider.Providers;
 import com.seagate.alto.provider.example.tasks.DownloadFileTask;
 import com.seagate.alto.provider.example.tasks.ProviderListFolderTask;
 import com.seagate.alto.provider.example.tasks.UploadFileTask;
@@ -84,11 +84,12 @@ public class ProviderFilesActivity extends AuthActivity {
             }
         });
 
-        if (mPath.contains("camera uploads")) {
-            recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        } else {
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        }
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+//        if (mPath.contains("camera uploads") ) {
+//            recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+//        } else {
+//            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+//        }
 
         recyclerView.setAdapter(mFilesAdapter);
     }
@@ -114,7 +115,7 @@ public class ProviderFilesActivity extends AuthActivity {
         dialog.setMessage("Loading file list");
         dialog.show();
 
-        new ProviderListFolderTask(DropboxClient.Provider(), new ProviderListFolderTask.Callback() {
+        new ProviderListFolderTask(Providers.SEAGATE.provider, new ProviderListFolderTask.Callback() {
             @Override
             public void onDataLoaded(Provider.ListFolderResult result) {
                 dialog.dismiss();

@@ -56,9 +56,9 @@ public class ProviderFilesAdapter extends RecyclerView.Adapter<ProviderFilesAdap
         Context context = viewGroup.getContext();
         Provider.Metadata md = mFiles.get(i);
         int layoutId = R.layout.fresco_files_item;
-        if (md.pathLower().contains("camera uploads")) {
+//        if (md.pathLower().contains("camera uploads")) {
               layoutId = R.layout.fresco_item_tile;
-        }
+//        }
         View view = LayoutInflater.from(context).inflate(layoutId, viewGroup, false);
         return new MetadataViewHolder(view);
     }
