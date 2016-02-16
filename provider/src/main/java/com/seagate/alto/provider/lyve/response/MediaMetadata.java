@@ -8,6 +8,7 @@ package com.seagate.alto.provider.lyve.response;
 import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.seagate.alto.provider.LyveCloudProvider;
 import com.seagate.alto.provider.Provider;
 
 import java.util.Date;
@@ -47,7 +48,7 @@ public class MediaMetadata implements Provider.MediaMetadata {
 
     @Override
     public Date timeTaken() {
-        return new Date(timeTaken);
+        return LyveCloudProvider.dateFromString(timeTaken);
     }
 
     @Override
