@@ -8,7 +8,12 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.facebook.imagepipeline.producers.NetworkFetcher;
+
 import java.util.Date;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
 
 /**
  * A cloud provider API
@@ -59,6 +64,16 @@ public interface Provider {
     public Metadata delete(@NonNull String path) throws ProviderException;
 
     /**
+     * Download file at a given path.
+     */
+    public Call<ResponseBody> download(String path) throws ProviderException;
+
+    /**
+     * Download file at a given path. The callback will be invoked from  this provider executor thread.
+     */
+    public void download(String path, NetworkFetcher.Callback cb) throws ProviderException;
+
+    /**
      * Get a Uri to download an image thumbnail.
      * <p></>This method currently supports files with 'jpeg' and png formats.
      * Supported sizes are: "w32h32", "w64h64", "w128h128", "w640h480", "w1024h768".
@@ -86,6 +101,14 @@ public interface Provider {
     public class ProviderException extends Exception {
         public ProviderException(String message, Throwable e) {
             super(message, e);
+        }
+
+        public ProviderException(Exception e) {
+            super(e);
+        }
+
+        public ProviderException() {
+
         }
     }
 
