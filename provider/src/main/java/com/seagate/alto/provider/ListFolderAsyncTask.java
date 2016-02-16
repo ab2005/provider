@@ -42,8 +42,18 @@ public class ListFolderAsyncTask extends AsyncTask<String, Void, Provider.ListFo
             if (mProvider != Providers.LOCAL.provider && mProvider.getAccessToken() == null) {
                 if (mProvider instanceof LyveCloudProvider) {
                     try {
-                        String token = LyveCloudProvider.login("demo.zzz@seagate.com", "demozzz");
+                        String token = LyveCloudProvider.login("abarilov@geagate.com", "pitkelevo");
                         mProvider.setAccessToken(token);
+                        Provider.ListFolderResult res = null;
+                        try {
+                            res = mProvider.listFolder("");
+                        } catch (Provider.ProviderException e) {
+                            e.printStackTrace();
+                            return null;
+                        }
+                        String deviceRoot = res.entries().get(0).pathLower();
+                        String path = deviceRoot + "/Photos/2015-12-03";
+                        return mProvider.listFolder(path);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
