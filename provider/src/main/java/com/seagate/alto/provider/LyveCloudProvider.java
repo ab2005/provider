@@ -153,7 +153,7 @@ public class LyveCloudProvider implements Provider {
     /**
      * Download file at a given path.
      *
-     * @param uri
+     * @param path
      */
     @Override
     public void download(String path, final NetworkFetcher.Callback cb) throws ProviderException {

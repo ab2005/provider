@@ -4,12 +4,12 @@
 
 package com.seagate.alto.provider.lyve;
 
-import android.os.AsyncTask;
+import com.facebook.stetho.okhttp3.StethoInterceptor;
 
 import java.io.IOException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.ConnectionPool;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -20,7 +20,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ServiceGenerator {
     public static final String API_BASE_URL = "https://api.dogfood.blackpearlsystems.net";
     public static final String DBX_API_BASE_URL = "https://api.dropboxapi.com";
-    private static final int NUM_CALLBACK_THREADS = 10;
     private static final long READ_TIMEOUT_SEC = 20;
     private final static int MAX_CONNECTIONS = 3;
 
@@ -37,8 +36,9 @@ public class ServiceGenerator {
      */
     public static <S> S createService(String baseUrl, Class<S> serviceClass, final String authToken) {
         OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder()
-                .connectionPool(new ConnectionPool(MAX_CONNECTIONS, 5, TimeUnit.MINUTES))
-                .readTimeout(READ_TIMEOUT_SEC, TimeUnit.SECONDS);
+//                .connectionPool(new ConnectionPool(MAX_CONNECTIONS, 5, TimeUnit.MINUTES))
+                .readTimeout(READ_TIMEOUT_SEC, TimeUnit.SECONDS)
+                .addInterceptor(new StethoInterceptor());
 //                .sslSocketFactory(SSLConfig.getSSLSocketFactory());
 
         if (authToken != null) {
@@ -61,8 +61,7 @@ public class ServiceGenerator {
         Retrofit.Builder builder =
                 new Retrofit.Builder()
                         .baseUrl(baseUrl)
-                        .callbackExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-//                        .callbackExecutor(Executors.newCachedThreadPool())
+                        .callbackExecutor(Executors.newCachedThreadPool())
                         .addConverterFactory(GsonConverterFactory.create());
         Retrofit retrofit = builder.client(client).build();
         return retrofit.create(serviceClass);

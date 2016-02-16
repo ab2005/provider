@@ -4,6 +4,8 @@
 
 package com.seagate.alto.provider;
 
+import com.facebook.stetho.okhttp3.StethoInterceptor;
+
 import java.io.IOException;
 import java.util.concurrent.Executors;
 
@@ -29,7 +31,9 @@ public enum RetrofitServices {
      * A factory method to create a service instance with authorization
      */
     public <S> S createService(String baseUrl, Class<S> serviceClass, final String authToken) {
-        OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder();
+        OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder()
+                .addInterceptor(new StethoInterceptor());
+
         if (authToken != null) {
             httpClientBuilder.addInterceptor(new Interceptor() {
                 @Override
