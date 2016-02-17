@@ -13,7 +13,7 @@ import android.util.Log;
 
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxFiles;
-import com.seagate.alto.provider.DbxProvider;
+import com.seagate.alto.provider.dropbox.DbxProvider;
 import com.seagate.alto.provider.Provider;
 
 import java.io.File;

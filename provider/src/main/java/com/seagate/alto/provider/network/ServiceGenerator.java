@@ -2,9 +2,11 @@
  * Copyright (c) 2015. Seagate Technology PLC. All rights reserved.
  */
 
-package com.seagate.alto.provider.lyve;
+package com.seagate.alto.provider.network;
 
 import com.facebook.stetho.okhttp3.StethoInterceptor;
+import com.seagate.alto.provider.dropbox.DbxCloudClient;
+import com.seagate.alto.provider.lyve.LyveCloudClient;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
@@ -55,6 +57,7 @@ public class ServiceGenerator {
                 }
             });
         }
+
         OkHttpClient client = httpClientBuilder.build();
         client.dispatcher().setMaxRequestsPerHost(MAX_CONNECTIONS);
         client.dispatcher().setMaxRequests(MAX_CONNECTIONS * 2);

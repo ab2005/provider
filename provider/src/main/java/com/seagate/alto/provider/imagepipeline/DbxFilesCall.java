@@ -12,7 +12,7 @@ import com.dropbox.core.DbxDownloader;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxFiles;
 import com.facebook.imagepipeline.producers.NetworkFetcher;
-import com.seagate.alto.provider.DbxProvider;
+import com.seagate.alto.provider.dropbox.DbxProvider;
 
 import java.io.IOException;
 

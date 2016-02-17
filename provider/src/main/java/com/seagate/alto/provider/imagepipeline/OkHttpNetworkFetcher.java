@@ -16,7 +16,7 @@ import com.facebook.imagepipeline.producers.BaseProducerContextCallbacks;
 import com.facebook.imagepipeline.producers.Consumer;
 import com.facebook.imagepipeline.producers.FetchState;
 import com.facebook.imagepipeline.producers.ProducerContext;
-import com.seagate.alto.provider.DbxProvider;
+import com.seagate.alto.provider.dropbox.DbxProvider;
 import com.seagate.alto.provider.Provider;
 import com.seagate.alto.provider.Providers;
 
@@ -29,7 +29,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
 /**
- * Network fetcher that uses OkHttp and Provider callbacks as a backend for image request calls.
+ * Network fetcher that uses OkHttp and Provider's service as a backend for image request calls.
  */
 public class OkHttpNetworkFetcher extends BaseNetworkFetcher<OkHttpNetworkFetcher.HttpNetworkFetchState> {
 
@@ -90,13 +90,12 @@ public class OkHttpNetworkFetcher extends BaseNetworkFetcher<OkHttpNetworkFetche
         final String domain = fetchState.getUri().getAuthority();
         switch (domain) {
             case "seagate":
-                fetchLyveCloudProvider(fetchState, callback);
-//                executeCall(fetchState, new LyveCloudFilesCall(
-//                        fetchState, callback, Providers.SEAGATE.provider, mOkHttpClient));
+//                fetchLyveCloudProvider(fetchState, callback);
+                executeCall(fetchState, new LyveCloudFilesCall(fetchState, callback, Providers.SEAGATE.provider, mOkHttpClient));
                 break;
             case "dropbox":
-                executeCall(fetchState, new DbxFilesCall(
-                                fetchState, callback, (DbxProvider) Providers.DROPBOX.provider));
+//                executeCall(fetchState, new LyveCloudFilesCall(fetchState, callback, Providers.DROPBOX.provider, mOkHttpClient));
+                executeCall(fetchState, new DbxFilesCall(fetchState, callback, (DbxProvider) Providers.DROPBOX.provider));
                 break;
             default:
                 final Request request = new Request.Builder()
@@ -157,6 +156,7 @@ public class OkHttpNetworkFetcher extends BaseNetworkFetcher<OkHttpNetworkFetche
             }
         });
 
+        Log.d(TAG, fetchState.getUri() + ": executor execute ");
         mExecutor.execute(call);
     }
 }

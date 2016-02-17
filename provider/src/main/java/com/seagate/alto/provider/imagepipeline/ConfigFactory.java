@@ -17,7 +17,6 @@ import com.facebook.imagepipeline.memory.PoolConfig;
 import com.facebook.imagepipeline.memory.PoolFactory;
 import com.facebook.imagepipeline.memory.PoolParams;
 import com.facebook.imagepipeline.producers.NetworkFetcher;
-import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.seagate.alto.provider.Provider;
 
 import java.util.Arrays;
@@ -48,8 +47,9 @@ public class ConfigFactory {
                 .build();
 
         OkHttpClient httpClient = new OkHttpClient.Builder()
-                .addInterceptor(new StethoInterceptor())
+             //   .addInterceptor(new StethoInterceptor())
                 .build();
+
         NetworkFetcher networkFetcher = new OkHttpNetworkFetcher(httpClient);
 
         ImagePipelineConfig config = ImagePipelineConfig.newBuilder(context)

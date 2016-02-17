@@ -6,10 +6,12 @@ package com.seagate.alto.provider;
 
 import android.os.AsyncTask;
 
+import com.seagate.alto.provider.lyve.LyveCloudProvider;
+
 import java.io.IOException;
 
 /**
- * Async task to list items in a folder
+ * Async task to list items in a folder.
  */
 public class ListFolderAsyncTask extends AsyncTask<String, Void, Provider.ListFolderResult> {
     private final Provider mProvider;
@@ -51,18 +53,21 @@ public class ListFolderAsyncTask extends AsyncTask<String, Void, Provider.ListFo
                 }
             }
 
-            Provider.ListFolderResult res = null;
-            try {
-                res = mProvider.listFolder("");
-            } catch (Provider.ProviderException e) {
-                e.printStackTrace();
-                return null;
+            if (mProvider instanceof LyveCloudProvider) {
+                Provider.ListFolderResult res = null;
+                try {
+                    res = mProvider.listFolder("");
+                } catch (Provider.ProviderException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+
+                String deviceRoot = res.entries().get(0).pathLower();
+                String path = deviceRoot + "/Photos/thumbs";
+                return mProvider.listFolder(path);
+            } else {
+                return mProvider.listFolder(params[0]);
             }
-
-            String deviceRoot = res.entries().get(0).pathLower();
-            String path = deviceRoot + "/Photos/thumbs";
-            return mProvider.listFolder(path);
-
         } catch (Provider.ProviderException e) {
             mException = e;
             e.printStackTrace();

@@ -4,6 +4,7 @@
 
 package com.seagate.alto.provider.lyve;
 
+import com.seagate.alto.provider.lyve.request.DownloadRequest;
 import com.seagate.alto.provider.lyve.request.ListFolderRequest;
 import com.seagate.alto.provider.lyve.request.LoginRequest;
 import com.seagate.alto.provider.lyve.request.SearchRequest;

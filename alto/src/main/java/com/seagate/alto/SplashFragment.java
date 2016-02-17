@@ -22,6 +22,7 @@ import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.seagate.alto.metrics.AltoMetricsEvent;
 import com.seagate.alto.metrics.Metrics;
 import com.seagate.alto.provider.ListFolderAsyncTask;
@@ -132,11 +133,15 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
     }
 
     private void doneSplash(String token) {
-        boolean dropbox = false;
+        boolean dropbox = true;
         String path = dropbox ? "/camera uploads" :  "/d6f14c1e-ce88-4ebf-aa2f-f50fc7250dc4/Demo1/test";
         Provider provider = dropbox ? Providers.DROPBOX.provider : Providers.SEAGATE.provider;
         if (dropbox) provider.setAccessToken(token);
         //provider = Providers.LOCAL.provider;
+
+        // FIXME: debug
+        Fresco.getImagePipeline().clearCaches();
+
         new ListFolderAsyncTask(provider, new ListFolderAsyncTask.Callback() {
             @Override
             public void onDataLoaded(Provider.ListFolderResult result) {

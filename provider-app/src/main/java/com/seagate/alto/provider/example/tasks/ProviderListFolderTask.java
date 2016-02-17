@@ -7,7 +7,7 @@ package com.seagate.alto.provider.example.tasks;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.seagate.alto.provider.LyveCloudProvider;
+import com.seagate.alto.provider.lyve.LyveCloudProvider;
 import com.seagate.alto.provider.Provider;
 import com.seagate.alto.provider.Providers;
 
@@ -49,13 +49,24 @@ public class ProviderListFolderTask extends AsyncTask<String, Void, Provider.Lis
                 if (mProvider.getAccessToken() == null) {
                     String token = null;
                     try {
-                        token = LyveCloudProvider.login("demo.zzz@seagate.com", "demozzz");
+                        token = LyveCloudProvider.login("abarilov@geagate.com", "pitkelevo");
                         mProvider.setAccessToken(token);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
-                return mProvider.listFolder("/d6f14c1e-ce88-4ebf-aa2f-f50fc7250dc4/Demo1/test");
+
+                Provider.ListFolderResult res = null;
+                try {
+                    res = mProvider.listFolder("");
+                } catch (Provider.ProviderException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+
+                String deviceRoot = res.entries().get(0).pathLower();
+                String path = deviceRoot + "/Photos/thumbs";
+                return mProvider.listFolder(path);
             } else {
                 return mProvider.listFolder(params[0]);
             }

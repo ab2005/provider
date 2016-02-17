@@ -2,7 +2,7 @@
  * Copyright (c) 2015. Seagate Technology PLC. All rights reserved.
  */
 
-package com.seagate.alto.provider;
+package com.seagate.alto.provider.local;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -13,6 +13,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.facebook.imagepipeline.producers.NetworkFetcher;
+import com.seagate.alto.provider.Provider;
+import com.seagate.alto.provider.Providers;
 
 import java.util.Date;
 import java.util.LinkedList;
@@ -123,7 +125,8 @@ public class MediaProvider implements Provider {
         }
     }
 
-    /*package*/MediaProvider() {
+    /*package*/
+    public MediaProvider() {
         // nothing
     }
 

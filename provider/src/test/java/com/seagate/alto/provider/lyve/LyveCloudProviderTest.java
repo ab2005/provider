@@ -4,7 +4,6 @@
 
 package com.seagate.alto.provider.lyve;
 
-import com.seagate.alto.provider.LyveCloudProvider;
 import com.seagate.alto.provider.Provider;
 import com.seagate.alto.provider.Providers;
 

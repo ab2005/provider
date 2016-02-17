@@ -12,7 +12,10 @@ import android.support.annotation.NonNull;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.stetho.Stetho;
+import com.seagate.alto.provider.dropbox.DbxProvider;
 import com.seagate.alto.provider.imagepipeline.ConfigFactory;
+import com.seagate.alto.provider.local.MediaProvider;
+import com.seagate.alto.provider.lyve.LyveCloudProvider;
 
 /**
  * The collection of available providers.

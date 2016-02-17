@@ -2,13 +2,15 @@
  * Copyright (c) 2015. Seagate Technology PLC. All rights reserved.
  */
 
-package com.seagate.alto.provider;
+package com.seagate.alto.provider.imagepipeline;
 
 import android.net.Uri;
 
 import com.dropbox.core.DbxDownloader;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxFiles;
+import com.seagate.alto.provider.Provider;
+import com.seagate.alto.provider.dropbox.DbxProvider;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Request;
 import com.squareup.picasso.RequestHandler;

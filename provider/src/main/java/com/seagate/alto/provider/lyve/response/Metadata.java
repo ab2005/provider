@@ -10,7 +10,7 @@ import android.net.Uri;
 import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.seagate.alto.provider.LyveCloudProvider;
+import com.seagate.alto.provider.lyve.LyveCloudProvider;
 import com.seagate.alto.provider.Provider;
 
 import java.util.Date;

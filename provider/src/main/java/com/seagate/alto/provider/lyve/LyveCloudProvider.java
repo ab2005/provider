@@ -2,7 +2,7 @@
  * Copyright (c) 2015. Seagate Technology PLC. All rights reserved.
  */
 
-package com.seagate.alto.provider;
+package com.seagate.alto.provider.lyve;
 
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -11,18 +11,18 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.facebook.imagepipeline.producers.NetworkFetcher;
+import com.seagate.alto.provider.Provider;
 import com.seagate.alto.provider.imagepipeline.OkHttpNetworkFetcher;
 import com.seagate.alto.provider.imagepipeline.RetrofitCallbackHandler;
-import com.seagate.alto.provider.lyve.DownloadRequest;
-import com.seagate.alto.provider.lyve.LyveCloudClient;
-import com.seagate.alto.provider.lyve.ServiceGenerator;
 import com.seagate.alto.provider.lyve.request.Client;
+import com.seagate.alto.provider.lyve.request.DownloadRequest;
 import com.seagate.alto.provider.lyve.request.ListFolderRequest;
 import com.seagate.alto.provider.lyve.request.LoginRequest;
 import com.seagate.alto.provider.lyve.request.SearchRequest;
 import com.seagate.alto.provider.lyve.response.ListFolderResponse;
 import com.seagate.alto.provider.lyve.response.SearchResponse;
 import com.seagate.alto.provider.lyve.response.Token;
+import com.seagate.alto.provider.network.ServiceGenerator;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -45,7 +45,7 @@ public class LyveCloudProvider implements Provider {
     private LyveCloudClient mRetrofit;
     private String mAccessToken;
 
-    LyveCloudProvider() {
+    public LyveCloudProvider() {
     }
 
     @Override

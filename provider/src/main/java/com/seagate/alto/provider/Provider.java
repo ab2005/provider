@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.facebook.imagepipeline.producers.NetworkFetcher;
+import com.seagate.alto.provider.imagepipeline.PicassoRequestHandler;
 
 import java.util.Date;
 

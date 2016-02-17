@@ -10,9 +10,9 @@ import android.os.AsyncTask;
 
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxFiles;
-import com.seagate.alto.provider.DbxProvider;
 import com.seagate.alto.provider.Provider;
-import com.seagate.alto.provider.UriHelpers;
+import com.seagate.alto.provider.dropbox.DbxProvider;
+import com.seagate.alto.provider.util.UriHelpers;
 
 import java.io.File;
 import java.io.FileInputStream;

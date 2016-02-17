@@ -2,12 +2,13 @@
  * Copyright (c) 2015. Seagate Technology PLC. All rights reserved.
  */
 
-package com.seagate.alto.provider;
+package com.seagate.alto.provider.util;
 
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
@@ -35,7 +36,7 @@ public final class UriHelpers {
 
         String path = null;
         // DocumentProvider
-        if (DocumentsContract.isDocumentUri(context, uri)) {
+        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) && DocumentsContract.isDocumentUri(context, uri)) {
             // ExternalStorageProvider
             if (isExternalStorageDocument(uri)) {
                 final String docId = DocumentsContract.getDocumentId(uri);
@@ -89,6 +90,10 @@ public final class UriHelpers {
     }
 
     public static String getFilePathForUri(final Context context, final Uri uri) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            return null;
+        }
+
         if (!DocumentsContract.isDocumentUri(context, uri)) {
             if ("file".equalsIgnoreCase(uri.getScheme())) return uri.getPath();
             if ("content".equalsIgnoreCase(uri.getScheme())) return getDataColumn(context, uri, null, null);
@@ -101,8 +106,7 @@ public final class UriHelpers {
 
         if (isDownloadsDocument(uri)) {
             // DownloadsProvider
-            final Uri contentUri = ContentUris.withAppendedId(
-                    Uri.parse("content://downloads/public_downloads"), Long.valueOf(docId));
+            final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(docId));
             return getDataColumn(context, contentUri, null, null);
         }
 
@@ -139,8 +143,8 @@ public final class UriHelpers {
     }
 
     /*
- * Get the extension of a file.
- */
+     * Get the extension of a file.
+     */
     public static String getExtension(File f) {
         String ext = null;
         String s = f.getName();

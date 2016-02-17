@@ -6,8 +6,8 @@ package com.seagate.alto.provider.example;
 
 import android.content.Context;
 
-import com.seagate.alto.provider.DbxProvider;
-import com.seagate.alto.provider.PicassoRequestHandler;
+import com.seagate.alto.provider.dropbox.DbxProvider;
+import com.seagate.alto.provider.imagepipeline.PicassoRequestHandler;
 import com.seagate.alto.provider.Provider;
 import com.squareup.picasso.LruCache;
 import com.squareup.picasso.OkHttpDownloader;

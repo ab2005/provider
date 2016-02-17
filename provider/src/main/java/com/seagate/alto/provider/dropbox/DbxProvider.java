@@ -2,7 +2,7 @@
  * Copyright (c) 2015. Seagate Technology PLC. All rights reserved.
  */
 
-package com.seagate.alto.provider;
+package com.seagate.alto.provider.dropbox;
 
 import android.net.Uri;
 
@@ -15,6 +15,7 @@ import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.DbxFiles;
 import com.dropbox.core.v2.DbxUsers;
 import com.facebook.imagepipeline.producers.NetworkFetcher;
+import com.seagate.alto.provider.Provider;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,7 +59,8 @@ public class DbxProvider implements Provider {
     public ListFolderResult listFolder(String path) throws ProviderException {
         final DbxFiles.ListFolderResult lfr;
         try {
-            lfr = mDbxClient.files.listFolder(path);
+            lfr = mDbxClient.files.listFolderBuilder(path).includeMediaInfo(true).start();
+            //lfr = mDbxClient.files.listFolder(path);
         } catch (DbxException e) {
             throw new ProviderException("Failed to listFolder " + path, e);
         }

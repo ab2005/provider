@@ -2,8 +2,9 @@
  * Copyright (c) 2015. Seagate Technology PLC. All rights reserved.
  */
 
-package com.seagate.alto.provider.lyve;
+package com.seagate.alto.provider.dropbox;
 
+import com.seagate.alto.provider.lyve.request.DownloadRequest;
 import com.seagate.alto.provider.lyve.request.ListFolderRequest;
 import com.seagate.alto.provider.lyve.request.LoginRequest;
 import com.seagate.alto.provider.lyve.request.SearchRequest;
