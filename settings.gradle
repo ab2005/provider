@@ -1,0 +1,5 @@
+/*
+ * Copyright (C) 2015 Seagate LLC
+ */
+include ':provider'
+include ':provider-app'
