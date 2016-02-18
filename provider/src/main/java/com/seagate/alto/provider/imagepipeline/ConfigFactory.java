@@ -47,7 +47,7 @@ public class ConfigFactory {
                 .build();
 
         OkHttpClient httpClient = new OkHttpClient.Builder()
-             //   .addInterceptor(new StethoInterceptor())
+                //.addInterceptor(new StethoInterceptor())
                 .build();
 
         NetworkFetcher networkFetcher = new OkHttpNetworkFetcher(httpClient);

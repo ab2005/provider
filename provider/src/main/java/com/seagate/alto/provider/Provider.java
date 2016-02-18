@@ -146,7 +146,7 @@ public interface Provider {
         /**
          * A list (possibly empty) of matches for the query.
          */
-        java.util.ArrayList<Metadata> matches();
+        java.util.List<Metadata> matches();
 
         /**
          * Used for paging. If true, indicates there is another page of results

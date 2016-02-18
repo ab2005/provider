@@ -4,7 +4,6 @@
 
 package com.seagate.alto.provider.network;
 
-import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.seagate.alto.provider.dropbox.DbxCloudClient;
 import com.seagate.alto.provider.lyve.LyveCloudClient;
 
@@ -39,9 +38,9 @@ public class ServiceGenerator {
     public static <S> S createService(String baseUrl, Class<S> serviceClass, final String authToken) {
         OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder()
 //                .connectionPool(new ConnectionPool(MAX_CONNECTIONS, 5, TimeUnit.MINUTES))
-                .readTimeout(READ_TIMEOUT_SEC, TimeUnit.SECONDS)
-                .addInterceptor(new StethoInterceptor());
-//                .sslSocketFactory(SSLConfig.getSSLSocketFactory());
+//                .addInterceptor(new StethoInterceptor())
+//                .sslSocketFactory(SSLConfig.getSSLSocketFactory())
+                .readTimeout(READ_TIMEOUT_SEC, TimeUnit.SECONDS);
 
         if (authToken != null) {
             httpClientBuilder.addInterceptor(new Interceptor() {

@@ -11,7 +11,6 @@ import android.support.annotation.NonNull;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
-import com.facebook.stetho.Stetho;
 import com.seagate.alto.provider.dropbox.DbxProvider;
 import com.seagate.alto.provider.imagepipeline.ConfigFactory;
 import com.seagate.alto.provider.local.MediaProvider;
@@ -47,7 +46,7 @@ public enum Providers {
         ImagePipelineConfig config = ConfigFactory.getDefaultConfig(context);
         Fresco.initialize(context, config);
         //FLog.setMinimumLoggingLevel(FLog.VERBOSE);
-        Stetho.initializeWithDefaults(context);
+//        Stetho.initializeWithDefaults(context);
         applyStoredTokens();
     }
 
