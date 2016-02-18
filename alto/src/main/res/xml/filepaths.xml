@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<!-- Copyright (c) 2015-2016. Seagate Technology PLC. All rights reserved. -->
-
-<paths>
-    <cache-path name="shared_images" path="images/"/>
-</paths>

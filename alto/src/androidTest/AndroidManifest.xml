@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (c) 2015. Seagate Technology PLC. All rights reserved.
-  -->
-<manifest
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.seagate.alto" >
-    <uses-sdk tools:overrideLibrary="android.support.test.uiautomator.v18"/>
-</manifest>
