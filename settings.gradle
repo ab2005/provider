@@ -1,7 +1,5 @@
 /*
  * Copyright (C) 2015 Seagate LLC
  */
-include ':alto'
 include ':provider'
-include ':libraries:photodraweeview:'
 include ':provider-app'
